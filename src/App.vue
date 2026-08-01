@@ -49,13 +49,18 @@ watch(selectedSymbolId, async (id) => {
 })
 
 onMounted(() => loadFont('EB Garamond'))
+
+const controlsPane = ref(null)
+function forwardScroll(e) {
+  controlsPane.value?.scrollBy({ top: e.deltaY, behavior: 'auto' })
+}
 </script>
 
 <template>
   <div class="app">
     <main class="app-body">
       <!-- Preview -->
-      <section class="preview-pane">
+      <section class="preview-pane" @wheel.prevent="forwardScroll">
         <BadgeComposer
           :config="config"
           :selected-symbol-id="selectedSymbolId"
@@ -70,7 +75,7 @@ onMounted(() => loadFont('EB Garamond'))
       </section>
 
       <!-- Controls -->
-      <aside class="controls-pane">
+      <aside class="controls-pane" ref="controlsPane">
 
         <p class="logo">⚔ Crest Forge</p>
 
