@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { shapesById, VIEWBOX_W, VIEWBOX_H } from '../data/shapes.js'
 import { iconsById } from '../data/icons.js'
+import { arcPathD } from '../utils/arcPath.js'
 
 const props = defineProps({
   config: { type: Object, required: true },
@@ -13,16 +14,6 @@ const props = defineProps({
 const emit = defineEmits(['update-text-position', 'update-symbol-position', 'select-symbol', 'select-text'])
 
 function arcPathId(textId) { return `arcpath-${props.uid}-${textId}` }
-
-function arcPathD(text) {
-  const r  = text.arcRadius ?? 78
-  const cx = text.arcX ?? 100
-  const cy = text.arcY ?? 120
-  // top arc: CW sweep (1) goes through the top of the circle
-  // bottom arc: CCW sweep (0) goes through the bottom
-  const sweep = text.arc === 'top' ? 1 : 0
-  return `M ${cx - r},${cy} A ${r},${r} 0 0 ${sweep} ${cx + r},${cy}`
-}
 
 const shape = computed(() => shapesById[props.config.shapeId])
 const clipId = computed(() => `clip-${props.uid}`)
