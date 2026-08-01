@@ -57,11 +57,16 @@ watch(selectedSymbolId, async (id) => {
 
 const bgOptions = [
   { id: 'grass',       label: 'Grass',      thumb: '/backgrounds/grass.jpg' },
+  { id: 'stadium',     label: 'Stadium',    thumb: '/backgrounds/stadium.png' },
   { id: 'fabric',      label: 'Fabric',     thumb: '/backgrounds/fabric.png' },
   { id: 'brick',       label: 'Brick',      thumb: '/backgrounds/brick.jpg' },
   { id: 'bokeh',       label: 'Bokeh' },
   { id: 'hexagons',    label: 'Hexagons' },
   { id: 'topography',  label: 'Topography' },
+]
+
+const imgBgOptions = [
+  'grass', 'fabric', 'brick', 'stadium',
 ]
 
 const appBg = ref(bgOptions[Math.floor(Math.random() * bgOptions.length)].id)
