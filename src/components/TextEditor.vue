@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch, nextTick } from 'vue'
 import { fontGroups, fontsByGroup, loadFont } from '../utils/fonts.js'
+import ColorPicker from './ColorPicker.vue'
 
 const props = defineProps({
   texts: { type: Array, required: true },
@@ -55,13 +56,10 @@ function onFontChange(textId, event) {
             {{ text.content || '…' }}
           </span>
           <div class="text-row-controls">
-            <input
-              type="color"
+            <ColorPicker
               :value="text.color"
-              class="t-color"
-              title="Text color"
               @click.stop
-              @input.stop="$emit('update-text', text.id, { color: $event.target.value })"
+              @change="$emit('update-text', text.id, { color: $event })"
             />
             <button
               class="t-remove"
@@ -230,11 +228,6 @@ function onFontChange(textId, event) {
 
 .text-row-controls { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
 
-.t-color {
-  width: 28px; height: 24px; padding: 1px;
-  border: 1px solid #3a3a48; border-radius: 3px;
-  background: #13131a; cursor: pointer;
-}
 
 .t-remove {
   background: none; border: none;

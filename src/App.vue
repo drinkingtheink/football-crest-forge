@@ -4,6 +4,7 @@ import BadgeComposer from './components/BadgeComposer.vue'
 import IconPicker from './components/IconPicker.vue'
 import TextEditor from './components/TextEditor.vue'
 import ToastContainer from './components/ToastContainer.vue'
+import ColorPicker from './components/ColorPicker.vue'
 import { useBadgeConfig } from './composables/useBadgeConfig.js'
 import { shapes, shapeGroups } from './data/shapes.js'
 import { iconsById } from './data/icons.js'
@@ -13,6 +14,7 @@ const {
   config,
   selectedSymbolId,
   selectedTextId,
+  setPaletteColor,
   setShape,
   setBackgroundType,
   setBackgroundColor,
@@ -93,6 +95,28 @@ function forwardScroll(e) {
 
         <p class="logo">⚔ Crest Forge</p>
 
+        <!-- Club Colors / Palette -->
+        <div class="control-group">
+          <h3 class="control-label">Club Colors</h3>
+          <div class="palette-editor">
+            <div
+              v-for="(color, i) in config.palette"
+              :key="i"
+              class="palette-slot"
+              :style="{ background: color }"
+              :title="color"
+            >
+              <input
+                type="color"
+                :value="color"
+                class="palette-input-overlay"
+                @input="setPaletteColor(i, $event.target.value)"
+              />
+            </div>
+          </div>
+          <p class="palette-hint">Click a swatch to change it. These appear as quick picks everywhere.</p>
+        </div>
+
         <!-- Shape -->
         <div class="control-group">
           <h3 class="control-label">Shape</h3>
@@ -159,13 +183,10 @@ function forwardScroll(e) {
                 <span class="sym-label">{{ iconsById[sym.iconId]?.label }}</span>
 
                 <div class="sym-controls">
-                  <input
-                    type="color"
+                  <ColorPicker
                     :value="sym.color"
-                    class="sym-color"
-                    title="Symbol color"
                     @click.stop
-                    @input.stop="updateSymbol(sym.instanceId, { color: $event.target.value })"
+                    @change="updateSymbol(sym.instanceId, { color: $event })"
                   />
                   <button
                     class="sym-remove"
@@ -204,29 +225,24 @@ function forwardScroll(e) {
               @click="setBackgroundType(t)"
             >{{ t }}</button>
           </div>
-          <div class="color-row">
-            <label>
-              Color 1
-              <input type="color" :value="config.background.colors[0]"
-                @input="setBackgroundColor(0, $event.target.value)" />
-            </label>
-            <label v-if="config.background.type !== 'solid'">
-              Color 2
-              <input type="color" :value="config.background.colors[1]"
-                @input="setBackgroundColor(1, $event.target.value)" />
-            </label>
+          <div class="bg-color-stack">
+            <div class="bg-color-row">
+              <span class="color-label">Color 1</span>
+              <ColorPicker :value="config.background.colors[0]" @change="setBackgroundColor(0, $event)" />
+            </div>
+            <div v-if="config.background.type !== 'solid'" class="bg-color-row">
+              <span class="color-label">Color 2</span>
+              <ColorPicker :value="config.background.colors[1]" @change="setBackgroundColor(1, $event)" />
+            </div>
           </div>
         </div>
 
         <!-- Border -->
         <div class="control-group">
           <h3 class="control-label">Border</h3>
-          <div class="color-row">
-            <label>
-              Color
-              <input type="color" :value="config.border.color"
-                @input="setBorderColor($event.target.value)" />
-            </label>
+          <div class="bg-color-row" style="margin-bottom: 10px">
+            <span class="color-label">Color</span>
+            <ColorPicker :value="config.border.color" @change="setBorderColor($event)" />
           </div>
           <div class="range-row">
             <label>
@@ -339,24 +355,58 @@ function forwardScroll(e) {
 .bg-type-btn:hover { border-color: #555; color: #ddd; }
 .bg-type-btn.active { border-color: #e8c84a; color: #e8c84a; }
 
-.color-row { display: flex; gap: 16px; margin-bottom: 10px; }
-
-.color-row label {
+/* Club Colors palette editor */
+.palette-editor {
   display: flex;
-  flex-direction: column;
-  gap: 5px;
-  font-size: 12px;
-  color: #888;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
-.color-row input[type="color"] {
-  width: 44px;
-  height: 32px;
-  padding: 2px;
-  border: 1px solid #2a2a35;
-  border-radius: 4px;
-  background: #1e1e28;
+.palette-slot {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
   cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+  flex: 1;
+}
+
+.palette-slot:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.04);
+}
+
+.palette-input-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.palette-hint {
+  font-size: 11px;
+  color: #555;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Background / border color rows */
+.bg-color-stack { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+
+.bg-color-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.color-label {
+  font-size: 11px;
+  color: #888;
+  min-width: 44px;
 }
 
 .range-row label {
@@ -403,15 +453,6 @@ function forwardScroll(e) {
 
 .sym-controls { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 
-.sym-color {
-  width: 28px;
-  height: 24px;
-  padding: 1px;
-  border: 1px solid #3a3a48;
-  border-radius: 3px;
-  background: #13131a;
-  cursor: pointer;
-}
 
 .sym-remove {
   background: none;
