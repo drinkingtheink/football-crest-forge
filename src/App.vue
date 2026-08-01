@@ -56,21 +56,17 @@ watch(selectedSymbolId, async (id) => {
 })
 
 const bgOptions = [
-  { id: 'grass',       label: 'Grass',      thumb: '/backgrounds/grass.jpg' },
-  { id: 'stadium',     label: 'Stadium',    thumb: '/backgrounds/stadium.png' },
-  { id: 'fabric',      label: 'Fabric',     thumb: '/backgrounds/fabric.png' },
-  { id: 'brick',       label: 'Brick',      thumb: '/backgrounds/brick.jpg' },
+  { id: 'grass',       label: 'Grass',      thumb: '/backgrounds/grass.jpg', isImgOption: true },
+  { id: 'stadium',     label: 'Stadium',    thumb: '/backgrounds/stadium.png', isImgOption: true },
+  { id: 'fabric',      label: 'Fabric',     thumb: '/backgrounds/fabric.png', isImgOption: true },
+  { id: 'brick',       label: 'Brick',      thumb: '/backgrounds/brick.jpg', isImgOption: true },
   { id: 'bokeh',       label: 'Bokeh' },
   { id: 'hexagons',    label: 'Hexagons' },
   { id: 'topography',  label: 'Topography' },
 ]
 
-const imgBgOptions = [
-  'grass', 'fabric', 'brick', 'stadium',
-]
-
 const appBg = ref(bgOptions[Math.floor(Math.random() * bgOptions.length)].id)
-const overlay = reactive({ color: '#000000', opacity: 0.5 })
+const overlay = reactive({ color: '#000000', opacity: 0.25 })
 
 const hexThumb = computed(() => hexagonsBg(config.palette))
 const topoThumb = computed(() => topographyBg(config.palette))
@@ -99,7 +95,7 @@ function forwardScroll(e) {
     <AppBackground :type="appBg" />
     <div
       class="app-overlay"
-      :style="{ background: overlay.color, opacity: overlay.opacity }"
+      :style="[ appBG === 'stadium' ? null : { background: overlay.color, opacity: overlay.opacity }]"
     />
     <ToastContainer />
     <main class="app-body">
