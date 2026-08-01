@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { computed, ref, reactive, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import BadgeComposer from './components/BadgeComposer.vue'
 import IconPicker from './components/IconPicker.vue'
 import TextEditor from './components/TextEditor.vue'
@@ -10,6 +10,7 @@ import { useBadgeConfig } from './composables/useBadgeConfig.js'
 import { shapes, shapeGroups } from './data/shapes.js'
 import { iconsById } from './data/icons.js'
 import { loadFont } from './utils/fonts.js'
+import { hexagonsBg, topographyBg } from './utils/patterns.js'
 
 const {
   config,
@@ -54,15 +55,21 @@ watch(selectedSymbolId, async (id) => {
   symRefs[id]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
 })
 
-const appBg = ref('dark')
+const appBg = ref('none')
+const overlay = reactive({ color: '#000000', opacity: 0.8 })
 
 const bgOptions = [
-  { id: 'dark',   label: 'Dark',   thumb: null },
-  { id: 'grass',  label: 'Grass',  thumb: '/backgrounds/grass.jpg' },
-  { id: 'fabric', label: 'Fabric', thumb: '/backgrounds/fabric.png' },
-  { id: 'brick',  label: 'Brick',  thumb: '/backgrounds/brick.jpg' },
-  { id: 'bokeh',  label: 'Bokeh',  thumb: null },
+  { id: 'none',        label: 'None' },
+  { id: 'grass',       label: 'Grass',      thumb: '/backgrounds/grass.jpg' },
+  { id: 'fabric',      label: 'Fabric',     thumb: '/backgrounds/fabric.png' },
+  { id: 'brick',       label: 'Brick',      thumb: '/backgrounds/brick.jpg' },
+  { id: 'bokeh',       label: 'Bokeh' },
+  { id: 'hexagons',    label: 'Hexagons' },
+  { id: 'topography',  label: 'Topography' },
 ]
+
+const hexThumb = computed(() => hexagonsBg(config.palette))
+const topoThumb = computed(() => topographyBg(config.palette))
 
 onMounted(() => {
   loadFont('EB Garamond')
@@ -86,6 +93,10 @@ function forwardScroll(e) {
 <template>
   <div class="app">
     <AppBackground :type="appBg" />
+    <div
+      class="app-overlay"
+      :style="{ background: overlay.color, opacity: overlay.opacity }"
+    />
     <ToastContainer />
     <main class="app-body">
       <!-- Preview -->
@@ -110,12 +121,30 @@ function forwardScroll(e) {
             class="bg-opt"
             :class="{ active: appBg === opt.id }"
             :title="opt.label"
+            :style="opt.id === 'hexagons' ? hexThumb : opt.id === 'topography' ? topoThumb : {}"
             @click="appBg = opt.id"
           >
             <img v-if="opt.thumb" :src="opt.thumb" class="bg-opt-thumb" />
-            <span v-else-if="opt.id === 'bokeh'" class="bg-opt-bokeh" />
-            <span v-else class="bg-opt-dark" />
+            <span v-else-if="opt.id === 'bokeh'"    class="bg-opt-bokeh" />
+            <span v-else-if="opt.id === 'none'"     class="bg-opt-none" />
           </button>
+        </div>
+
+        <div class="overlay-controls">
+          <input
+            type="color"
+            :value="overlay.color"
+            class="overlay-color"
+            title="Overlay color"
+            @input="overlay.color = $event.target.value"
+          />
+          <input
+            type="range" min="0" max="1" step="0.05"
+            :value="overlay.opacity"
+            class="overlay-opacity"
+            @input="overlay.opacity = Number($event.target.value)"
+          />
+          <span class="overlay-label">overlay</span>
         </div>
       </section>
 
@@ -342,6 +371,13 @@ function forwardScroll(e) {
 
 .drag-hint { font-size: 12px; color: #555; }
 
+.app-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
 .bg-picker {
   display: flex;
   gap: 8px;
@@ -370,7 +406,7 @@ function forwardScroll(e) {
   display: block;
 }
 
-.bg-opt-dark {
+.bg-opt-none {
   display: block;
   width: 100%;
   height: 100%;
@@ -385,6 +421,37 @@ function forwardScroll(e) {
               radial-gradient(circle at 70% 60%, rgba(255,100,150,0.5) 0%, transparent 55%),
               radial-gradient(circle at 50% 30%, rgba(255,200,80,0.4) 0%, transparent 50%),
               #07070e;
+}
+
+.overlay-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.overlay-color {
+  width: 24px;
+  height: 24px;
+  padding: 1px;
+  border: 1px solid #3a3a48;
+  border-radius: 4px;
+  background: #1e1e28;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.overlay-opacity {
+  flex: 1;
+  accent-color: #e8c84a;
+}
+
+.overlay-label {
+  font-size: 10px;
+  color: #444;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
 }
 
 .controls-pane {
