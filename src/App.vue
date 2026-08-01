@@ -5,6 +5,7 @@ import IconPicker from './components/IconPicker.vue'
 import TextEditor from './components/TextEditor.vue'
 import ToastContainer from './components/ToastContainer.vue'
 import ColorPicker from './components/ColorPicker.vue'
+import AppBackground from './components/AppBackground.vue'
 import { useBadgeConfig } from './composables/useBadgeConfig.js'
 import { shapes, shapeGroups } from './data/shapes.js'
 import { iconsById } from './data/icons.js'
@@ -53,6 +54,16 @@ watch(selectedSymbolId, async (id) => {
   symRefs[id]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
 })
 
+const appBg = ref('dark')
+
+const bgOptions = [
+  { id: 'dark',   label: 'Dark',   thumb: null },
+  { id: 'grass',  label: 'Grass',  thumb: '/backgrounds/grass.jpg' },
+  { id: 'fabric', label: 'Fabric', thumb: '/backgrounds/fabric.png' },
+  { id: 'brick',  label: 'Brick',  thumb: '/backgrounds/brick.jpg' },
+  { id: 'bokeh',  label: 'Bokeh',  thumb: null },
+]
+
 onMounted(() => {
   loadFont('EB Garamond')
   window.addEventListener('keydown', onKeyDown)
@@ -74,6 +85,7 @@ function forwardScroll(e) {
 
 <template>
   <div class="app">
+    <AppBackground :type="appBg" />
     <ToastContainer />
     <main class="app-body">
       <!-- Preview -->
@@ -90,6 +102,21 @@ function forwardScroll(e) {
           @select-text="selectText"
         />
         <p class="drag-hint">Drag symbols and text to reposition</p>
+
+        <div class="bg-picker">
+          <button
+            v-for="opt in bgOptions"
+            :key="opt.id"
+            class="bg-opt"
+            :class="{ active: appBg === opt.id }"
+            :title="opt.label"
+            @click="appBg = opt.id"
+          >
+            <img v-if="opt.thumb" :src="opt.thumb" class="bg-opt-thumb" />
+            <span v-else-if="opt.id === 'bokeh'" class="bg-opt-bokeh" />
+            <span v-else class="bg-opt-dark" />
+          </button>
+        </div>
       </section>
 
       <!-- Controls -->
@@ -280,7 +307,6 @@ function forwardScroll(e) {
   display: flex;
   height: 100vh;
   overflow: hidden;
-  background: #0f0f13;
   color: #e8e8ec;
   font-family: system-ui, sans-serif;
 }
@@ -289,6 +315,8 @@ function forwardScroll(e) {
   display: flex;
   flex: 1;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 .logo {
@@ -314,10 +342,57 @@ function forwardScroll(e) {
 
 .drag-hint { font-size: 12px; color: #555; }
 
+.bg-picker {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.bg-opt {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  background: #1a1a24;
+  transition: border-color 0.15s, transform 0.1s;
+  flex-shrink: 0;
+}
+.bg-opt:hover   { transform: scale(1.1); border-color: rgba(255,255,255,0.3); }
+.bg-opt.active  { border-color: #e8c84a; }
+
+.bg-opt-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.bg-opt-dark {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #07070e;
+}
+
+.bg-opt-bokeh {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 30% 40%, rgba(100,120,255,0.6) 0%, transparent 60%),
+              radial-gradient(circle at 70% 60%, rgba(255,100,150,0.5) 0%, transparent 55%),
+              radial-gradient(circle at 50% 30%, rgba(255,200,80,0.4) 0%, transparent 50%),
+              #07070e;
+}
+
 .controls-pane {
   width: 300px;
-  border-left: 1px solid #2a2a35;
-  background: #13131a;
+  border-left: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(10, 10, 18, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   overflow-y: auto;
   padding: 20px 16px;
   display: flex;
