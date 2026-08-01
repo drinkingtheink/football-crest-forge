@@ -1,8 +1,9 @@
 <script setup>
-import { computed, ref, watch, nextTick, onMounted } from 'vue'
+import { computed, ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import BadgeComposer from './components/BadgeComposer.vue'
 import IconPicker from './components/IconPicker.vue'
 import TextEditor from './components/TextEditor.vue'
+import ToastContainer from './components/ToastContainer.vue'
 import { useBadgeConfig } from './composables/useBadgeConfig.js'
 import { shapes, shapeGroups } from './data/shapes.js'
 import { iconsById } from './data/icons.js'
@@ -48,7 +49,18 @@ watch(selectedSymbolId, async (id) => {
   symRefs[id]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
 })
 
-onMounted(() => loadFont('EB Garamond'))
+onMounted(() => {
+  loadFont('EB Garamond')
+  window.addEventListener('keydown', onKeyDown)
+})
+onUnmounted(() => window.removeEventListener('keydown', onKeyDown))
+
+function onKeyDown(e) {
+  if (e.key !== 'Delete' && e.key !== 'Backspace') return
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
+  if (selectedSymbolId.value) removeSymbol(selectedSymbolId.value)
+  else if (selectedTextId.value) removeText(selectedTextId.value)
+}
 
 const controlsPane = ref(null)
 function forwardScroll(e) {
@@ -58,6 +70,7 @@ function forwardScroll(e) {
 
 <template>
   <div class="app">
+    <ToastContainer />
     <main class="app-body">
       <!-- Preview -->
       <section class="preview-pane" @wheel.prevent="forwardScroll">

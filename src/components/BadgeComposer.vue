@@ -3,6 +3,10 @@ import { ref, computed } from 'vue'
 import { shapesById, VIEWBOX_W, VIEWBOX_H } from '../data/shapes.js'
 import { iconsById } from '../data/icons.js'
 import { arcPathD } from '../utils/arcPath.js'
+import { useToast } from '../composables/useToast.js'
+
+const { addToast } = useToast()
+let resizeHintShown = false
 
 const props = defineProps({
   config: { type: Object, required: true },
@@ -64,11 +68,28 @@ function onMove(e) {
 
 function stopDrag() { drag.value = null }
 
+// ── Text hover tooltip ─────────────────────────────────────────────────────
+const textTooltip = ref(null) // { x, y } screen coords
+
+function onTextEnter(e) {
+  if (drag.value) return
+  textTooltip.value = { x: e.clientX, y: e.clientY }
+  if (!resizeHintShown) {
+    resizeHintShown = true
+    addToast('Scroll over text to resize it', { type: 'tip', duration: 4000 })
+  }
+}
+
+function onTextLeave() {
+  textTooltip.value = null
+}
+
 // ── Scroll-to-resize text ──────────────────────────────────────────────────
 const sizeHint = ref(null)
 let sizeHintTimer = null
 
 function onTextWheel(e, textId) {
+  textTooltip.value = null
   const text = props.config.texts.find(t => t.id === textId)
   if (!text) return
   const delta = e.deltaY > 0 ? -1 : 1
@@ -204,6 +225,8 @@ const bgElements = computed(() => {
       :style="{ cursor: drag?.id === text.id ? 'grabbing' : 'grab' }"
       @mousedown="startTextDrag($event, text.id)"
       @click="$emit('select-text', text.id)"
+      @mouseenter="onTextEnter"
+      @mouseleave="onTextLeave"
       @wheel.stop.prevent="onTextWheel($event, text.id)"
     >{{ text.content }}</text>
 
@@ -217,6 +240,8 @@ const bgElements = computed(() => {
       :fill="text.color"
       :letter-spacing="text.letterSpacing ?? 0"
       @click="$emit('select-text', text.id)"
+      @mouseenter="onTextEnter"
+      @mouseleave="onTextLeave"
       @wheel.stop.prevent="onTextWheel($event, text.id)"
     >
       <textPath
@@ -232,4 +257,28 @@ const bgElements = computed(() => {
       <text x="0" y="0" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-size="7" font-family="system-ui,sans-serif" font-weight="600">{{ sizeHint.size }}px</text>
     </g>
   </svg>
+
+  <Teleport to="body">
+    <div
+      v-if="textTooltip && !sizeHint"
+      class="text-resize-tooltip"
+      :style="{ left: textTooltip.x + 14 + 'px', top: textTooltip.y - 36 + 'px' }"
+    >↕ Scroll to resize</div>
+  </Teleport>
 </template>
+
+<style>
+.text-resize-tooltip {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.75);
+  color: #e8e8ec;
+  font-size: 11px;
+  font-family: system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  padding: 4px 9px;
+  border-radius: 4px;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 1000;
+}
+</style>
