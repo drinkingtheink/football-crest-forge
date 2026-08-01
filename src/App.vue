@@ -207,6 +207,30 @@ function forwardScroll(e) {
           </div>
         </div>
 
+        <!-- Background -->
+        <div class="control-group">
+          <h3 class="control-label">Background</h3>
+          <div class="bg-type-grid">
+            <button
+              v-for="t in bgTypes"
+              :key="t"
+              class="bg-type-btn"
+              :class="{ active: config.background.type === t }"
+              @click="setBackgroundType(t)"
+            >{{ t }}</button>
+          </div>
+          <div class="bg-color-stack">
+            <div class="bg-color-row">
+              <span class="color-label">Color 1</span>
+              <ColorPicker :value="config.background.colors[0]" @change="setBackgroundColor(0, $event)" />
+            </div>
+            <div v-if="config.background.type !== 'solid'" class="bg-color-row">
+              <span class="color-label">Color 2</span>
+              <ColorPicker :value="config.background.colors[1]" @change="setBackgroundColor(1, $event)" />
+            </div>
+          </div>
+        </div>
+
         <!-- Text -->
         <div class="control-group">
           <h3 class="control-label">Text</h3>
@@ -277,30 +301,6 @@ function forwardScroll(e) {
                   <span>{{ sym.size }}</span>
                 </label>
               </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Background -->
-        <div class="control-group">
-          <h3 class="control-label">Background</h3>
-          <div class="bg-type-grid">
-            <button
-              v-for="t in bgTypes"
-              :key="t"
-              class="bg-type-btn"
-              :class="{ active: config.background.type === t }"
-              @click="setBackgroundType(t)"
-            >{{ t }}</button>
-          </div>
-          <div class="bg-color-stack">
-            <div class="bg-color-row">
-              <span class="color-label">Color 1</span>
-              <ColorPicker :value="config.background.colors[0]" @change="setBackgroundColor(0, $event)" />
-            </div>
-            <div v-if="config.background.type !== 'solid'" class="bg-color-row">
-              <span class="color-label">Color 2</span>
-              <ColorPicker :value="config.background.colors[1]" @change="setBackgroundColor(1, $event)" />
             </div>
           </div>
         </div>
