@@ -16,6 +16,7 @@ const imageMap = {
   fabric: '/backgrounds/fabric.png',
   brick:  '/backgrounds/brick.jpg',
   stadium:  '/backgrounds/stadium.png',
+  pitch:  '/backgrounds/pitch.png',
 }
 
 const patternStyle = computed(() => {

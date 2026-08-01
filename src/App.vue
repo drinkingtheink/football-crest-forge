@@ -60,6 +60,7 @@ const bgOptions = [
   { id: 'stadium',     label: 'Stadium',    thumb: '/backgrounds/stadium.png', isImgOption: true },
   { id: 'fabric',      label: 'Fabric',     thumb: '/backgrounds/fabric.png', isImgOption: true },
   { id: 'brick',       label: 'Brick',      thumb: '/backgrounds/brick.jpg', isImgOption: true },
+  { id: 'pitch',       label: 'Pitch',      thumb: '/backgrounds/pitch.png', isImgOption: true },
   { id: 'bokeh',       label: 'Bokeh' },
   { id: 'hexagons',    label: 'Hexagons' },
   { id: 'topography',  label: 'Topography' },
@@ -369,7 +370,7 @@ function forwardScroll(e) {
   overflow: hidden;
 }
 
-.drag-hint { font-size: 12px; color: #555; }
+.drag-hint { font-size: 12px; color: rgb(185, 182, 182); padding: 5px 8px; background-color: rgba(0,0,0,0.5); border-radius: 6px; }
 
 .app-overlay {
   position: fixed;
