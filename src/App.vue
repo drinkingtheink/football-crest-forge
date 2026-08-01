@@ -55,11 +55,7 @@ watch(selectedSymbolId, async (id) => {
   symRefs[id]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
 })
 
-const appBg = ref('none')
-const overlay = reactive({ color: '#000000', opacity: 0.8 })
-
 const bgOptions = [
-  { id: 'none',        label: 'None' },
   { id: 'grass',       label: 'Grass',      thumb: '/backgrounds/grass.jpg' },
   { id: 'fabric',      label: 'Fabric',     thumb: '/backgrounds/fabric.png' },
   { id: 'brick',       label: 'Brick',      thumb: '/backgrounds/brick.jpg' },
@@ -67,6 +63,9 @@ const bgOptions = [
   { id: 'hexagons',    label: 'Hexagons' },
   { id: 'topography',  label: 'Topography' },
 ]
+
+const appBg = ref(bgOptions[Math.floor(Math.random() * bgOptions.length)].id)
+const overlay = reactive({ color: '#000000', opacity: 0.8 })
 
 const hexThumb = computed(() => hexagonsBg(config.palette))
 const topoThumb = computed(() => topographyBg(config.palette))

@@ -68,10 +68,15 @@ function onMove(e) {
 
 function stopDrag() { drag.value = null }
 
+// ── Hover highlight ────────────────────────────────────────────────────────
+const hoveredSymbolId = ref(null)
+const hoveredTextId   = ref(null)
+
 // ── Text hover tooltip ─────────────────────────────────────────────────────
 const textTooltip = ref(null) // { x, y } screen coords
 
-function onTextEnter(e) {
+function onTextEnter(e, textId) {
+  hoveredTextId.value = textId
   if (drag.value) return
   textTooltip.value = { x: e.clientX, y: e.clientY }
   if (!resizeHintShown) {
@@ -81,6 +86,7 @@ function onTextEnter(e) {
 }
 
 function onTextLeave() {
+  hoveredTextId.value = null
   textTooltip.value = null
 }
 
@@ -185,8 +191,14 @@ const bgElements = computed(() => {
       v-for="sym in config.symbols"
       :key="sym.instanceId"
       :clip-path="`url(#${clipId})`"
-      :style="{ cursor: drag?.instanceId === sym.instanceId ? 'grabbing' : 'grab' }"
+      :style="{
+        cursor: drag?.instanceId === sym.instanceId ? 'grabbing' : 'grab',
+        filter: hoveredSymbolId === sym.instanceId ? 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' : 'none',
+        transition: 'filter 0.15s ease',
+      }"
       @mousedown="startSymbolDrag($event, sym.instanceId)"
+      @mouseenter="hoveredSymbolId = sym.instanceId"
+      @mouseleave="hoveredSymbolId = null"
     >
       <g :transform="symbolTransform(sym)">
         <path
@@ -196,7 +208,6 @@ const bgElements = computed(() => {
           :fill="sym.color"
         />
       </g>
-      <!-- selection ring — unclipped outline shown when selected -->
     </g>
 
     <!-- Border -->
@@ -222,10 +233,14 @@ const bgElements = computed(() => {
       :letter-spacing="text.letterSpacing ?? 0"
       text-anchor="middle"
       dominant-baseline="middle"
-      :style="{ cursor: drag?.id === text.id ? 'grabbing' : 'grab' }"
+      :style="{
+        cursor: drag?.id === text.id ? 'grabbing' : 'grab',
+        filter: hoveredTextId === text.id ? 'drop-shadow(0 0 5px rgba(255,255,255,0.35))' : 'none',
+        transition: 'filter 0.15s ease',
+      }"
       @mousedown="startTextDrag($event, text.id)"
       @click="$emit('select-text', text.id)"
-      @mouseenter="onTextEnter"
+      @mouseenter="onTextEnter($event, text.id)"
       @mouseleave="onTextLeave"
       @wheel.stop.prevent="onTextWheel($event, text.id)"
     >{{ text.content }}</text>
@@ -239,8 +254,12 @@ const bgElements = computed(() => {
       :font-weight="text.fontWeight"
       :fill="text.color"
       :letter-spacing="text.letterSpacing ?? 0"
+      :style="{
+        filter: hoveredTextId === text.id ? 'drop-shadow(0 0 5px rgba(255,255,255,0.35))' : 'none',
+        transition: 'filter 0.15s ease',
+      }"
       @click="$emit('select-text', text.id)"
-      @mouseenter="onTextEnter"
+      @mouseenter="onTextEnter($event, text.id)"
       @mouseleave="onTextLeave"
       @wheel.stop.prevent="onTextWheel($event, text.id)"
     >
