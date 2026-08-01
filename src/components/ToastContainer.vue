@@ -24,10 +24,12 @@ const { toasts, dismiss } = useToast()
 <style scoped>
 .toast-stack {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
+  align-items: center;
   gap: 8px;
   z-index: 9999;
   pointer-events: none;
@@ -74,8 +76,8 @@ const { toasts, dismiss } = useToast()
 }
 .toast-close:hover { color: #aaa; }
 
-.toast-enter-active { transition: opacity 0.2s ease, transform 0.22s ease; }
-.toast-leave-active { transition: opacity 0.18s ease, transform 0.18s ease; }
-.toast-enter-from   { opacity: 0; transform: translateX(16px); }
-.toast-leave-to     { opacity: 0; transform: translateX(16px); }
+.toast-enter-active { transition: opacity 0.25s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.toast-leave-active { transition: opacity 0.2s ease, transform 0.22s ease; }
+.toast-enter-from   { opacity: 0; transform: translateY(-20px); }
+.toast-leave-to     { opacity: 0; transform: translateY(-16px); }
 </style>
