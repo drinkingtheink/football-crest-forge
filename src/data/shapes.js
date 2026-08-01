@@ -75,7 +75,7 @@ export const shapes = [
     id: 'vintage-oval',
     label: 'Vintage Oval',
     group: 'Circular / Oval',
-    path: 'M 50,15 A 50,50 0 0 0 50,215 L 150,215 A 50,50 0 0 0 150,15 Z',
+    path: 'M 60,30 L 140,30 A 90,90 0 0 1 140,210 L 60,210 A 90,90 0 0 1 60,30 Z',
   },
 
   // Modern

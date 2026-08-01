@@ -1,19 +1,38 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { shapesById, VIEWBOX_W, VIEWBOX_H } from '../data/shapes.js'
+import { iconsById } from '../data/icons.js'
 
 const props = defineProps({
   config: { type: Object, required: true },
+  selectedSymbolId: { type: String, default: null },
   size: { type: Number, default: 380 },
   uid: { type: String, default: 'b0' },
 })
 
-const emit = defineEmits(['update-text-position'])
+const emit = defineEmits(['update-text-position', 'update-symbol-position', 'select-symbol', 'select-text'])
+
+function arcPathId(textId) { return `arcpath-${props.uid}-${textId}` }
+
+function arcPathD(text) {
+  const r  = text.arcRadius ?? 78
+  const cx = text.arcX ?? 100
+  const cy = text.arcY ?? 120
+  // top arc: CW sweep (1) goes through the top of the circle
+  // bottom arc: CCW sweep (0) goes through the bottom
+  const sweep = text.arc === 'top' ? 1 : 0
+  return `M ${cx - r},${cy} A ${r},${r} 0 0 ${sweep} ${cx + r},${cy}`
+}
 
 const shape = computed(() => shapesById[props.config.shapeId])
 const clipId = computed(() => `clip-${props.uid}`)
 
-// --- Drag ---
+function symbolTransform(sym) {
+  const scale = sym.size / 100
+  return `translate(${sym.x - sym.size / 2}, ${sym.y - sym.size / 2}) scale(${scale})`
+}
+
+// ── Unified drag (text or symbol) ──────────────────────────────────────────
 const drag = ref(null)
 
 function toSVGPoint(svgEl, clientX, clientY) {
@@ -23,28 +42,38 @@ function toSVGPoint(svgEl, clientX, clientY) {
   return pt.matrixTransform(svgEl.getScreenCTM().inverse())
 }
 
-function startDrag(e, textId) {
+function startTextDrag(e, textId) {
   const svgEl = e.currentTarget.closest('svg')
   const pt = toSVGPoint(svgEl, e.clientX, e.clientY)
   const text = props.config.texts.find(t => t.id === textId)
-  drag.value = { id: textId, sx: pt.x, sy: pt.y, ox: text.x, oy: text.y }
+  drag.value = { type: 'text', id: textId, sx: pt.x, sy: pt.y, ox: text.x, oy: text.y }
+  e.preventDefault()
+}
+
+function startSymbolDrag(e, instanceId) {
+  const svgEl = e.currentTarget.closest('svg')
+  const pt = toSVGPoint(svgEl, e.clientX, e.clientY)
+  const sym = props.config.symbols.find(s => s.instanceId === instanceId)
+  drag.value = { type: 'symbol', instanceId, sx: pt.x, sy: pt.y, ox: sym.x, oy: sym.y }
+  emit('select-symbol', instanceId)
   e.preventDefault()
 }
 
 function onMove(e) {
   if (!drag.value) return
   const pt = toSVGPoint(e.currentTarget, e.clientX, e.clientY)
-  emit('update-text-position', drag.value.id,
-    drag.value.ox + (pt.x - drag.value.sx),
-    drag.value.oy + (pt.y - drag.value.sy),
-  )
+  const dx = pt.x - drag.value.sx
+  const dy = pt.y - drag.value.sy
+  if (drag.value.type === 'text') {
+    emit('update-text-position', drag.value.id, drag.value.ox + dx, drag.value.oy + dy)
+  } else {
+    emit('update-symbol-position', drag.value.instanceId, drag.value.ox + dx, drag.value.oy + dy)
+  }
 }
 
 function stopDrag() { drag.value = null }
 
-// --- Background ---
-const BG_TYPES = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'striped-v', 'striped-h']
-
+// ── Background ─────────────────────────────────────────────────────────────
 const bgElements = computed(() => {
   const { type, colors } = props.config.background
   const c0 = colors[0] || '#000000'
@@ -55,67 +84,30 @@ const bgElements = computed(() => {
   switch (type) {
     case 'solid':
       return { rects: [{ x: 0, y: 0, w: W, h: H, fill: c0 }], polys: [] }
-
     case 'halved-v':
-      return {
-        rects: [
-          { x: 0, y: 0, w: W / 2, h: H, fill: c0 },
-          { x: W / 2, y: 0, w: W / 2, h: H, fill: c1 },
-        ],
-        polys: [],
-      }
-
+      return { rects: [{ x: 0, y: 0, w: W/2, h: H, fill: c0 }, { x: W/2, y: 0, w: W/2, h: H, fill: c1 }], polys: [] }
     case 'halved-h':
-      return {
-        rects: [
-          { x: 0, y: 0, w: W, h: H / 2, fill: c0 },
-          { x: 0, y: H / 2, w: W, h: H / 2, fill: c1 },
-        ],
-        polys: [],
-      }
-
+      return { rects: [{ x: 0, y: 0, w: W, h: H/2, fill: c0 }, { x: 0, y: H/2, w: W, h: H/2, fill: c1 }], polys: [] }
     case 'quartered':
-      return {
-        rects: [
-          { x: 0,     y: 0,     w: W / 2, h: H / 2, fill: c0 },
-          { x: W / 2, y: 0,     w: W / 2, h: H / 2, fill: c1 },
-          { x: 0,     y: H / 2, w: W / 2, h: H / 2, fill: c1 },
-          { x: W / 2, y: H / 2, w: W / 2, h: H / 2, fill: c0 },
-        ],
-        polys: [],
-      }
-
+      return { rects: [
+        { x: 0,   y: 0,   w: W/2, h: H/2, fill: c0 },
+        { x: W/2, y: 0,   w: W/2, h: H/2, fill: c1 },
+        { x: 0,   y: H/2, w: W/2, h: H/2, fill: c1 },
+        { x: W/2, y: H/2, w: W/2, h: H/2, fill: c0 },
+      ], polys: [] }
     case 'diagonal':
-      return {
-        rects: [],
-        polys: [
-          { points: `0,0 ${W},0 0,${H}`, fill: c0 },
-          { points: `${W},0 ${W},${H} 0,${H}`, fill: c1 },
-        ],
-      }
-
+      return { rects: [], polys: [
+        { points: `0,0 ${W},0 0,${H}`, fill: c0 },
+        { points: `${W},0 ${W},${H} 0,${H}`, fill: c1 },
+      ]}
     case 'striped-v': {
-      const n = 4
-      const sw = W / n
-      return {
-        rects: Array.from({ length: n }, (_, i) => ({
-          x: i * sw, y: 0, w: sw, h: H, fill: i % 2 === 0 ? c0 : c1,
-        })),
-        polys: [],
-      }
+      const n = 4; const sw = W / n
+      return { rects: Array.from({ length: n }, (_, i) => ({ x: i*sw, y: 0, w: sw, h: H, fill: i%2===0?c0:c1 })), polys: [] }
     }
-
     case 'striped-h': {
-      const n = 4
-      const sh = H / n
-      return {
-        rects: Array.from({ length: n }, (_, i) => ({
-          x: 0, y: i * sh, w: W, h: sh, fill: i % 2 === 0 ? c0 : c1,
-        })),
-        polys: [],
-      }
+      const n = 4; const sh = H / n
+      return { rects: Array.from({ length: n }, (_, i) => ({ x: 0, y: i*sh, w: W, h: sh, fill: i%2===0?c0:c1 })), polys: [] }
     }
-
     default:
       return { rects: [{ x: 0, y: 0, w: W, h: H, fill: c0 }], polys: [] }
   }
@@ -136,25 +128,45 @@ const bgElements = computed(() => {
       <clipPath :id="clipId">
         <path v-if="shape" :d="shape.path" />
       </clipPath>
+      <!-- Arc paths for textPath elements -->
+      <path
+        v-for="text in config.texts.filter(t => t.arc)"
+        :key="arcPathId(text.id)"
+        :id="arcPathId(text.id)"
+        :d="arcPathD(text)"
+        fill="none"
+      />
     </defs>
 
-    <!-- Background (clipped) -->
+    <!-- Background -->
     <g :clip-path="`url(#${clipId})`">
       <rect
-        v-for="(r, i) in bgElements.rects"
-        :key="`r${i}`"
+        v-for="(r, i) in bgElements.rects" :key="`r${i}`"
         :x="r.x" :y="r.y" :width="r.w" :height="r.h" :fill="r.fill"
       />
       <polygon
-        v-for="(p, i) in bgElements.polys"
-        :key="`p${i}`"
+        v-for="(p, i) in bgElements.polys" :key="`p${i}`"
         :points="p.points" :fill="p.fill"
       />
     </g>
 
-    <!-- Symbol layer (clipped) — placeholder for Phase 1b -->
-    <g v-if="config.symbol" :clip-path="`url(#${clipId})`">
-      <!-- heraldic symbols go here -->
+    <!-- Symbols (clipped, each independently draggable) -->
+    <g
+      v-for="sym in config.symbols"
+      :key="sym.instanceId"
+      :clip-path="`url(#${clipId})`"
+      :style="{ cursor: drag?.instanceId === sym.instanceId ? 'grabbing' : 'grab' }"
+      @mousedown="startSymbolDrag($event, sym.instanceId)"
+    >
+      <g :transform="symbolTransform(sym)">
+        <path
+          v-for="(p, i) in iconsById[sym.iconId]?.paths"
+          :key="i"
+          :d="p"
+          :fill="sym.color"
+        />
+      </g>
+      <!-- selection ring — unclipped outline shown when selected -->
     </g>
 
     <!-- Border -->
@@ -167,9 +179,9 @@ const bgElements = computed(() => {
       stroke-linejoin="round"
     />
 
-    <!-- Draggable text -->
+    <!-- Straight text (draggable) -->
     <text
-      v-for="text in config.texts"
+      v-for="text in config.texts.filter(t => !t.arc)"
       :key="text.id"
       :x="text.x"
       :y="text.y"
@@ -177,10 +189,30 @@ const bgElements = computed(() => {
       :font-size="text.fontSize"
       :font-weight="text.fontWeight"
       :fill="text.color"
+      :letter-spacing="text.letterSpacing ?? 0"
       text-anchor="middle"
       dominant-baseline="middle"
       :style="{ cursor: drag?.id === text.id ? 'grabbing' : 'grab' }"
-      @mousedown="startDrag($event, text.id)"
+      @mousedown="startTextDrag($event, text.id)"
+      @click="$emit('select-text', text.id)"
     >{{ text.content }}</text>
+
+    <!-- Arc text (follows circular path, not draggable) -->
+    <text
+      v-for="text in config.texts.filter(t => t.arc)"
+      :key="text.id"
+      :font-family="text.fontFamily"
+      :font-size="text.fontSize"
+      :font-weight="text.fontWeight"
+      :fill="text.color"
+      :letter-spacing="text.letterSpacing ?? 0"
+      @click="$emit('select-text', text.id)"
+    >
+      <textPath
+        :href="`#${arcPathId(text.id)}`"
+        start-offset="50%"
+        text-anchor="middle"
+      >{{ text.content }}</textPath>
+    </text>
   </svg>
 </template>
