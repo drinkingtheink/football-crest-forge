@@ -106,7 +106,7 @@ export function useBadgeConfig() {
   }
 
   function selectText(id) {
-    selectedTextId.value = id === selectedTextId.value ? null : id
+    selectedTextId.value = id
   }
 
   return {
