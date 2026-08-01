@@ -1,17 +1,17 @@
 import { reactive, ref } from 'vue'
 
 const DEFAULT_TEXT = () => ({
-  fontFamily: 'Georgia, serif',
+  fontFamily: 'EB Garamond',
   fontWeight: 'normal',
   fontSize: 14,
   color: '#ffffff',
   letterSpacing: 0,
-  arc: null,      // null | 'top' | 'bottom'
+  arc: null,
   arcRadius: 78,
   arcX: 100,
   arcY: 120,
   x: 100,
-  y: 190,
+  y: 120,
 })
 
 export function useBadgeConfig() {
@@ -30,22 +30,8 @@ export function useBadgeConfig() {
         fontSize: 15,
         fontWeight: 'bold',
         letterSpacing: 2,
-        arc: 'top',
-        arcRadius: 78,
-        arcX: 100,
-        arcY: 125,
-      },
-      {
-        ...DEFAULT_TEXT(),
-        id: 'year',
-        content: 'EST. 1888',
-        fontSize: 10,
-        color: '#ffd700',
-        letterSpacing: 1,
-        arc: 'bottom',
-        arcRadius: 72,
-        arcX: 100,
-        arcY: 112,
+        x: 100,
+        y: 120,
       },
     ],
     border: {

@@ -1,11 +1,12 @@
 <script setup>
-import { computed, ref, watch, nextTick } from 'vue'
+import { computed, ref, watch, nextTick, onMounted } from 'vue'
 import BadgeComposer from './components/BadgeComposer.vue'
 import IconPicker from './components/IconPicker.vue'
 import TextEditor from './components/TextEditor.vue'
 import { useBadgeConfig } from './composables/useBadgeConfig.js'
 import { shapes, shapeGroups } from './data/shapes.js'
 import { iconsById } from './data/icons.js'
+import { loadFont } from './utils/fonts.js'
 
 const {
   config,
@@ -46,6 +47,8 @@ watch(selectedSymbolId, async (id) => {
   await nextTick()
   symRefs[id]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
 })
+
+onMounted(() => loadFont('EB Garamond'))
 </script>
 
 <template>

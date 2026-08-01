@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch, nextTick } from 'vue'
+import { fontGroups, fontsByGroup, loadFont } from '../utils/fonts.js'
 
 const props = defineProps({
   texts: { type: Array, required: true },
@@ -27,6 +28,12 @@ const ARC_OPTS = [
   { value: 'top',    label: 'Arc top' },
   { value: 'bottom', label: 'Arc bottom' },
 ]
+
+function onFontChange(textId, event) {
+  const family = event.target.value
+  loadFont(family)
+  emit('update-text', textId, { fontFamily: family })
+}
 </script>
 
 <template>
@@ -76,6 +83,28 @@ const ARC_OPTS = [
               @input="$emit('update-text', text.id, { content: $event.target.value })"
             />
           </label>
+
+          <div class="field">
+            <span>Font</span>
+            <select
+              :value="text.fontFamily"
+              class="t-select"
+              @change="onFontChange(text.id, $event)"
+            >
+              <optgroup v-for="group in fontGroups" :key="group" :label="group">
+                <option
+                  v-for="font in fontsByGroup[group]"
+                  :key="font.family"
+                  :value="font.family"
+                >{{ font.family }}</option>
+              </optgroup>
+            </select>
+            <span
+              v-if="text.fontFamily"
+              class="font-preview"
+              :style="{ fontFamily: text.fontFamily }"
+            >AaBbCc&nbsp;123</span>
+          </div>
 
           <div class="field-row">
             <label class="field field-half">
@@ -293,4 +322,12 @@ const ARC_OPTS = [
 .arc-btn.active { border-color: #e8c84a; color: #e8c84a; }
 
 .field-hint { color: #555; font-size: 11px; margin: 0; }
+
+.font-preview {
+  color: #ccc;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  margin-top: 2px;
+  display: block;
+}
 </style>
