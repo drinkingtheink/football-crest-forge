@@ -11,7 +11,7 @@ const props = defineProps({
   uid: { type: String, default: 'b0' },
 })
 
-const emit = defineEmits(['update-text-position', 'update-symbol-position', 'select-symbol', 'select-text'])
+const emit = defineEmits(['update-text-position', 'update-symbol-position', 'update-text', 'select-symbol', 'select-text'])
 
 function arcPathId(textId) { return `arcpath-${props.uid}-${textId}` }
 
@@ -63,6 +63,24 @@ function onMove(e) {
 }
 
 function stopDrag() { drag.value = null }
+
+// ── Scroll-to-resize text ──────────────────────────────────────────────────
+const sizeHint = ref(null)
+let sizeHintTimer = null
+
+function onTextWheel(e, textId) {
+  const text = props.config.texts.find(t => t.id === textId)
+  if (!text) return
+  const delta = e.deltaY > 0 ? -1 : 1
+  const newSize = Math.min(80, Math.max(6, text.fontSize + delta))
+  emit('update-text', textId, { fontSize: newSize })
+
+  const hx = text.arc ? (text.arcX ?? 100) : text.x
+  const hy = text.arc ? (text.arcY ?? 120) - (text.arcRadius ?? 78) - 10 : text.y - newSize / 2 - 8
+  sizeHint.value = { x: hx, y: hy, size: newSize }
+  clearTimeout(sizeHintTimer)
+  sizeHintTimer = setTimeout(() => { sizeHint.value = null }, 900)
+}
 
 // ── Background ─────────────────────────────────────────────────────────────
 const bgElements = computed(() => {
@@ -170,7 +188,7 @@ const bgElements = computed(() => {
       stroke-linejoin="round"
     />
 
-    <!-- Straight text (draggable) -->
+    <!-- Straight text (draggable, scroll to resize) -->
     <text
       v-for="text in config.texts.filter(t => !t.arc)"
       :key="text.id"
@@ -186,9 +204,10 @@ const bgElements = computed(() => {
       :style="{ cursor: drag?.id === text.id ? 'grabbing' : 'grab' }"
       @mousedown="startTextDrag($event, text.id)"
       @click="$emit('select-text', text.id)"
+      @wheel.stop.prevent="onTextWheel($event, text.id)"
     >{{ text.content }}</text>
 
-    <!-- Arc text (follows circular path, not draggable) -->
+    <!-- Arc text (follows circular path, scroll to resize) -->
     <text
       v-for="text in config.texts.filter(t => t.arc)"
       :key="text.id"
@@ -198,6 +217,7 @@ const bgElements = computed(() => {
       :fill="text.color"
       :letter-spacing="text.letterSpacing ?? 0"
       @click="$emit('select-text', text.id)"
+      @wheel.stop.prevent="onTextWheel($event, text.id)"
     >
       <textPath
         :href="`#${arcPathId(text.id)}`"
@@ -205,5 +225,11 @@ const bgElements = computed(() => {
         text-anchor="middle"
       >{{ text.content }}</textPath>
     </text>
+
+    <!-- Size hint bubble (shown while scroll-resizing) -->
+    <g v-if="sizeHint" :transform="`translate(${sizeHint.x}, ${sizeHint.y})`" style="pointer-events:none">
+      <rect x="-14" y="-9" width="28" height="13" rx="3" fill="#000000" fill-opacity="0.65" />
+      <text x="0" y="0" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-size="7" font-family="system-ui,sans-serif" font-weight="600">{{ sizeHint.size }}px</text>
+    </g>
   </svg>
 </template>

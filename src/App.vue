@@ -66,6 +66,7 @@ function forwardScroll(e) {
           :selected-symbol-id="selectedSymbolId"
           :size="380"
           uid="main"
+          @update-text="updateText"
           @update-text-position="updateTextPosition"
           @update-symbol-position="updateSymbolPosition"
           @select-symbol="selectSymbol"
