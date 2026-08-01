@@ -65,7 +65,7 @@ const bgOptions = [
 ]
 
 const appBg = ref(bgOptions[Math.floor(Math.random() * bgOptions.length)].id)
-const overlay = reactive({ color: '#000000', opacity: 0.8 })
+const overlay = reactive({ color: '#000000', opacity: 0.5 })
 
 const hexThumb = computed(() => hexagonsBg(config.palette))
 const topoThumb = computed(() => topographyBg(config.palette))
