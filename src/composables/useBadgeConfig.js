@@ -48,6 +48,8 @@ let nextId = 1
 export function useBadgeConfig() {
   // ── Palette ───────────────────────────────────────────────────────────────
   function setPaletteColor(index, color) { config.palette[index] = color }
+  function addPaletteColor() { if (config.palette.length < 6) config.palette.push('#cccccc') }
+  function removePaletteColor(index) { if (config.palette.length > 1) config.palette.splice(index, 1) }
 
   // ── Shape ─────────────────────────────────────────────────────────────────
   function setShape(shapeId) { config.shapeId = shapeId }
@@ -117,6 +119,8 @@ export function useBadgeConfig() {
     selectedSymbolId,
     selectedTextId,
     setPaletteColor,
+    addPaletteColor,
+    removePaletteColor,
     setShape,
     setBackgroundType,
     setBackgroundColor,

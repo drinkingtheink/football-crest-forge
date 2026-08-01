@@ -15,6 +15,8 @@ const {
   selectedSymbolId,
   selectedTextId,
   setPaletteColor,
+  addPaletteColor,
+  removePaletteColor,
   setShape,
   setBackgroundType,
   setBackgroundColor,
@@ -112,9 +114,20 @@ function forwardScroll(e) {
                 class="palette-input-overlay"
                 @input="setPaletteColor(i, $event.target.value)"
               />
+              <button
+                class="palette-remove"
+                title="Remove color"
+                @click.stop="removePaletteColor(i)"
+              >×</button>
             </div>
+            <button
+              v-if="config.palette.length < 6"
+              class="palette-add"
+              title="Add color"
+              @click="addPaletteColor"
+            >+</button>
           </div>
-          <p class="palette-hint">Click a swatch to change it. These appear as quick picks everywhere.</p>
+          <p class="palette-hint">Click to change · hover to remove · up to 6 colors</p>
         </div>
 
         <!-- Shape -->
@@ -385,7 +398,45 @@ function forwardScroll(e) {
   height: 100%;
   opacity: 0;
   cursor: pointer;
+  z-index: 1;
 }
+
+.palette-remove {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #1e1e28;
+  border: 1px solid #555;
+  color: #aaa;
+  font-size: 11px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: background 0.12s, color 0.12s;
+}
+.palette-remove:hover { background: #e05555; border-color: #e05555; color: #fff; }
+.palette-slot:hover .palette-remove { display: flex; }
+
+.palette-add {
+  flex: 1;
+  min-width: 36px;
+  border-radius: 6px;
+  border: 2px dashed #3a3a4a;
+  background: transparent;
+  color: #555;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.palette-add:hover { border-color: #e8c84a; color: #e8c84a; }
 
 .palette-hint {
   font-size: 11px;
