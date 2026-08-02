@@ -4,7 +4,7 @@ import { icons } from '../data/icons.js'
 
 const _randomClub = clubs[Math.floor(Math.random() * clubs.length)]
 const _randomIcon = icons[Math.floor(Math.random() * icons.length)]
-const _addInitialSymbol = Math.random() < 1/3
+const _addInitialSymbol = Math.random() < 2/3
 function _contrastColor(fill, palette) {
   const alt = palette.find(c => c.toLowerCase() !== fill.toLowerCase())
   return alt ?? (fill.toLowerCase() === '#000000' ? '#ffffff' : '#000000')
