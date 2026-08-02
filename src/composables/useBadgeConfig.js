@@ -39,7 +39,7 @@ const config = reactive({
   background: {
     type: _randomBgType,
     stripeCount: 4,
-    sashWidth: 80,
+    sashWidth: 174,
   },
   symbols: _addInitialSymbol ? (() => {
     const fill = _randomClub.colors[0]?.hex || '#ffffff'
