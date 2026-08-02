@@ -26,6 +26,7 @@ const {
   setShape,
   setBackgroundType,
   setStripeCount,
+  setSashWidth,
   setBorderColor,
   setBorderWidth,
   addSymbol,
@@ -40,7 +41,7 @@ const {
   selectText,
 } = useBadgeConfig()
 
-const bgTypes = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'striped-v', 'striped-h', 'striped-diagonal']
+const bgTypes = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'chevron', 'sash', 'striped-v', 'striped-h', 'striped-diagonal']
 const stripeTypes = new Set(['striped-v', 'striped-h', 'striped-diagonal'])
 const imageBgTypes = new Set(['grass', 'stadium', 'fabric', 'brick', 'pitch'])
 
@@ -175,7 +176,10 @@ function randomizeAll() {
   ;[...config.symbols].forEach(s => removeSymbol(s.instanceId))
   if (Math.random() < 1/3) {
     addSymbol(icons[Math.floor(Math.random() * icons.length)].id)
-    updateSymbol(selectedSymbolId.value, { strokeWidth: 8, strokeColor: '#000000' })
+    const sym = config.symbols.find(s => s.instanceId === selectedSymbolId.value)
+    const strokeColor = config.palette.find(c => c.toLowerCase() !== sym.color.toLowerCase())
+      ?? (sym.color.toLowerCase() === '#000000' ? '#ffffff' : '#000000')
+    updateSymbol(selectedSymbolId.value, { strokeWidth: 8, strokeColor })
   }
 
   updateText('club-name', { y: 55 })
@@ -339,6 +343,17 @@ const showScene = ref(true)
               <span class="stepper-val">{{ config.background.stripeCount }}</span>
               <button class="stepper-btn" @click="setStripeCount(config.background.stripeCount + 1)">+</button>
             </div>
+          </div>
+          <div v-if="config.background.type === 'sash'" class="range-row">
+            <label>
+              Thickness
+              <input
+                type="range" min="68" max="280" step="4"
+                :value="config.background.sashWidth"
+                @input="setSashWidth(Number($event.target.value))"
+              />
+              <span>{{ config.background.sashWidth }}</span>
+            </label>
           </div>
         </div>
 

@@ -5,8 +5,12 @@ import { icons } from '../data/icons.js'
 const _randomClub = clubs[Math.floor(Math.random() * clubs.length)]
 const _randomIcon = icons[Math.floor(Math.random() * icons.length)]
 const _addInitialSymbol = Math.random() < 1/3
+function _contrastColor(fill, palette) {
+  const alt = palette.find(c => c.toLowerCase() !== fill.toLowerCase())
+  return alt ?? (fill.toLowerCase() === '#000000' ? '#ffffff' : '#000000')
+}
 
-const _BG_TYPES = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'striped-v', 'striped-h', 'striped-diagonal']
+const _BG_TYPES = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'chevron', 'sash', 'striped-v', 'striped-h', 'striped-diagonal']
 const _randomBgType = _BG_TYPES[Math.floor(Math.random() * _BG_TYPES.length)]
 
 const _thirdColor = _randomClub.colors[2]?.hex
@@ -35,17 +39,13 @@ const config = reactive({
   background: {
     type: _randomBgType,
     stripeCount: 4,
+    sashWidth: 80,
   },
-  symbols: _addInitialSymbol ? [{
-    instanceId: 'sym-init',
-    iconId: _randomIcon.id,
-    color: _randomClub.colors[0]?.hex || '#ffffff',
-    x: 100,
-    y: 120,
-    size: 72,
-    strokeColor: '#000000',
-    strokeWidth: 8,
-  }] : [],
+  symbols: _addInitialSymbol ? (() => {
+    const fill = _randomClub.colors[0]?.hex || '#ffffff'
+    const palette = _randomClub.colors.map(c => c.hex)
+    return [{ instanceId: 'sym-init', iconId: _randomIcon.id, color: fill, x: 100, y: 120, size: 72, strokeColor: _contrastColor(fill, palette), strokeWidth: 8 }]
+  })() : [],
   texts: [
     {
       ...DEFAULT_TEXT(),
@@ -114,6 +114,7 @@ export function useBadgeConfig() {
   // ── Background ────────────────────────────────────────────────────────────
   function setBackgroundType(type) { config.background.type = type }
   function setStripeCount(n) { config.background.stripeCount = Math.min(16, Math.max(2, n)) }
+  function setSashWidth(n) { config.background.sashWidth = Math.min(280, Math.max(68, n)) }
 
   // ── Border ────────────────────────────────────────────────────────────────
   function setBorderColor(color) { config.border.color = color }
@@ -181,6 +182,7 @@ export function useBadgeConfig() {
     setShape,
     setBackgroundType,
     setStripeCount,
+    setSashWidth,
     setBorderColor,
     setBorderWidth,
     addSymbol,

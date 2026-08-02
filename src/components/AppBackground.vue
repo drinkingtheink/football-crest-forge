@@ -30,11 +30,11 @@ function hexRgba(hex, alpha) {
 
 // Each entry: offset position (%), palette color index, opacity
 const AURORA_DEFS = [
-  { x: -15, y: -20, ci: 0, a: 0.60 },
-  { x:  45, y:  -5, ci: 1, a: 0.52 },
-  { x:  28, y:  35, ci: 2, a: 0.46 },
-  { x: -10, y:  55, ci: 0, a: 0.38 },
-  { x:  60, y:  22, ci: 1, a: 0.34 },
+  { x: -22, y: -28, ci: 0, a: 0.78 },
+  { x:  38, y:  -8, ci: 1, a: 0.68 },
+  { x:  20, y:  32, ci: 2, a: 0.58 },
+  { x: -12, y:  52, ci: 0, a: 0.48 },
+  { x:  58, y:  16, ci: 1, a: 0.42 },
 ]
 
 const auroraBlobs = computed(() => {
@@ -42,7 +42,7 @@ const auroraBlobs = computed(() => {
   return AURORA_DEFS.map(({ x, y, ci, a }) => {
     const color = hexRgba(config.palette[ci % config.palette.length] || '#888888', a)
     return {
-      background: `radial-gradient(ellipse 70% 55% at 50% 50%, ${color} 0%, transparent 70%)`,
+      background: `radial-gradient(ellipse 88% 72% at 50% 50%, ${color} 0%, transparent 68%)`,
       left: `${x}%`,
       top:  `${y}%`,
     }
@@ -112,8 +112,18 @@ onUnmounted(() => {
 .bokeh-canvas {
   width: 100%;
   height: 100%;
-  filter: blur(32px);
-  transform: scale(1.1);
+  filter: blur(24px);
+  transform: scale(1.08);
+}
+
+/* Vignette: dark halo around every dynamic background for depth */
+.app-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 110% 100% at 50% 50%, transparent 30%, rgba(7, 7, 14, 0.72) 100%);
+  pointer-events: none;
+  z-index: 2;
 }
 
 /* ── Aurora ──────────────────────────────────────────────────────────────── */
