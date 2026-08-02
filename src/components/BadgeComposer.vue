@@ -15,7 +15,7 @@ const props = defineProps({
   uid: { type: String, default: 'b0' },
 })
 
-const emit = defineEmits(['update-text-position', 'update-symbol-position', 'update-text', 'update-symbol', 'select-symbol', 'select-text', 'deselect'])
+const emit = defineEmits(['update-text-position', 'update-symbol-position', 'update-text', 'update-symbol', 'select-symbol', 'select-text', 'deselect', 'symbol-outside-bounds'])
 
 function arcPathId(textId) { return `arcpath-${props.uid}-${textId}` }
 
@@ -34,6 +34,8 @@ function symbolTransform(sym) {
 
 // ── Unified drag (text or symbol) ──────────────────────────────────────────
 const drag = ref(null)
+const shapePathEl = ref(null)
+const outsidePromptedId = ref(null)
 
 function toSVGPoint(svgEl, clientX, clientY) {
   const pt = svgEl.createSVGPoint()
@@ -55,6 +57,7 @@ function startSymbolDrag(e, instanceId) {
   const pt = toSVGPoint(svgEl, e.clientX, e.clientY)
   const sym = props.config.symbols.find(s => s.instanceId === instanceId)
   drag.value = { type: 'symbol', instanceId, sx: pt.x, sy: pt.y, ox: sym.x, oy: sym.y }
+  outsidePromptedId.value = null
   emit('select-symbol', instanceId)
   e.preventDefault()
 }
@@ -67,7 +70,16 @@ function onMove(e) {
   if (drag.value.type === 'text') {
     emit('update-text-position', drag.value.id, drag.value.ox + dx, drag.value.oy + dy)
   } else {
-    emit('update-symbol-position', drag.value.instanceId, drag.value.ox + dx, drag.value.oy + dy)
+    const newX = drag.value.ox + dx
+    const newY = drag.value.oy + dy
+    emit('update-symbol-position', drag.value.instanceId, newX, newY)
+    const sym = props.config.symbols.find(s => s.instanceId === drag.value.instanceId)
+    if (sym?.clipped !== false && shapePathEl.value && outsidePromptedId.value !== drag.value.instanceId) {
+      if (!shapePathEl.value.isPointInFill(new DOMPoint(newX, newY))) {
+        outsidePromptedId.value = drag.value.instanceId
+        emit('symbol-outside-bounds', drag.value.instanceId)
+      }
+    }
   }
 }
 
@@ -205,6 +217,9 @@ const bgElements = computed(() => {
     @mouseleave="stopDrag"
     @click="emit('deselect')"
   >
+    <!-- Hidden path used for isPointInFill hit-testing (must be in main SVG tree, not defs) -->
+    <path v-if="shape" ref="shapePathEl" :d="shape.path" style="visibility:hidden;pointer-events:none;" />
+
     <defs>
       <clipPath :id="clipId">
         <path v-if="shape" :d="shape.path" />
@@ -264,9 +279,9 @@ const bgElements = computed(() => {
       />
     </g>
 
-    <!-- Symbols (clipped, each independently draggable) -->
+    <!-- Symbols clipped to badge shape -->
     <g
-      v-for="sym in config.symbols"
+      v-for="sym in config.symbols.filter(s => s.clipped !== false)"
       :key="sym.instanceId"
       :clip-path="`url(#${clipId})`"
       :style="{
@@ -387,6 +402,37 @@ const bgElements = computed(() => {
         text-anchor="middle"
       >{{ text.content }}</textPath>
     </text>
+
+    <!-- Free symbols (unclipped — may extend outside badge bounds) -->
+    <g
+      v-for="sym in config.symbols.filter(s => s.clipped === false)"
+      :key="sym.instanceId"
+      :style="{
+        cursor: drag?.instanceId === sym.instanceId ? 'grabbing' : 'grab',
+        filter: hoveredSymbolId === sym.instanceId ? 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' : 'none',
+        transition: 'filter 0.15s ease',
+      }"
+      @click.stop
+      @mousedown="startSymbolDrag($event, sym.instanceId)"
+      @mouseenter="hoveredSymbolId = sym.instanceId"
+      @mouseleave="hoveredSymbolId = null"
+      @wheel.stop.prevent="onSymbolWheel($event, sym.instanceId)"
+    >
+      <g :transform="symbolTransform(sym)">
+        <path
+          v-for="(p, i) in iconsById[sym.iconId]?.paths"
+          :key="i"
+          :d="p"
+          :stroke-width="sym.strokeWidth"
+          paint-order="stroke fill"
+          :style="{
+            fill: sym.color,
+            stroke: sym.strokeWidth > 0 ? sym.strokeColor : 'none',
+            transition: 'fill 0.35s ease, stroke 0.35s ease',
+          }"
+        />
+      </g>
+    </g>
 
     <!-- Size hint bubble (shown while scroll-resizing) -->
     <g v-if="sizeHint" :transform="`translate(${sizeHint.x}, ${sizeHint.y})`" style="pointer-events:none">

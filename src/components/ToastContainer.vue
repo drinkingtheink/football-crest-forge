@@ -14,6 +14,7 @@ const { toasts, dismiss } = useToast()
           :class="`toast--${toast.type}`"
         >
           <span class="toast-msg">{{ toast.message }}</span>
+          <button v-if="toast.action" class="toast-action" @click="toast.action.fn(); dismiss(toast.id)">{{ toast.action.label }}</button>
           <button class="toast-close" @click="dismiss(toast.id)">×</button>
         </div>
       </TransitionGroup>
@@ -62,6 +63,19 @@ const { toasts, dismiss } = useToast()
   font-family: system-ui, sans-serif;
   line-height: 1.4;
 }
+
+.toast-action {
+  background: none;
+  border: 1px solid #e8c84a55;
+  border-radius: 4px;
+  color: #e8c84a;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 3px 8px;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.toast-action:hover { background: rgba(232, 200, 74, 0.1); }
 
 .toast-close {
   background: none;

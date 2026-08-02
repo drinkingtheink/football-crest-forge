@@ -16,6 +16,9 @@ import { icons, iconsById } from './data/icons.js'
 import { loadFont } from './utils/fonts.js'
 import { auroraBg, wavesBg, crisscrossBg } from './utils/patterns.js'
 import { burstParticles } from './utils/particles.js'
+import { useToast } from './composables/useToast.js'
+
+const { addToast } = useToast()
 
 const {
   config,
@@ -76,6 +79,19 @@ const bgOptions = [
 
 const appBg = ref(bgOptions[Math.floor(Math.random() * bgOptions.length)].id)
 const overlay = reactive({ color: config.palette[0] ?? '#000000', opacity: 0.7 })
+
+const activeClub = ref(null)
+const activeClubModified = computed(() => {
+  if (!activeClub.value) return false
+  const original = activeClub.value.colors.map(c => c.hex.toLowerCase())
+  if (original.length !== config.palette.length) return true
+  return original.some((c, i) => c !== config.palette[i]?.toLowerCase())
+})
+
+function applyClub(club) {
+  setPalette(club.colors.map(c => c.hex))
+  activeClub.value = club
+}
 watch(() => config.palette[0], c => { if (c) overlay.color = c })
 
 const auroraThumb    = computed(() => auroraBg(config.palette))
@@ -208,6 +224,20 @@ onUnmounted(() => {
   stopParticles?.()
 })
 
+function onSymbolOutsideBounds(instanceId) {
+  addToast('Symbol outside badge bounds', {
+    type: 'tip',
+    duration: 7000,
+    action: { label: 'Go Free', fn: () => updateSymbol(instanceId, { clipped: false }) },
+  })
+}
+
+function randomizeColors() {
+  const club = clubs[Math.floor(Math.random() * clubs.length)]
+  setPalette(club.colors.map(c => c.hex))
+  activeClub.value = club
+}
+
 function randomizeAll() {
   const club     = clubs[Math.floor(Math.random() * clubs.length)]
   const shape    = shapes[Math.floor(Math.random() * shapes.length)]
@@ -226,13 +256,19 @@ function randomizeAll() {
   if (Math.random() < 1/3) {
     addSymbol(icons[Math.floor(Math.random() * icons.length)].id)
     const sym = config.symbols.find(s => s.instanceId === selectedSymbolId.value)
-    const strokeColor = config.palette.find(c => c.toLowerCase() !== sym.color.toLowerCase())
-      ?? (sym.color.toLowerCase() === '#000000' ? '#ffffff' : '#000000')
-    updateSymbol(selectedSymbolId.value, { strokeWidth: 8, strokeColor })
+    if (third) {
+      const strokeColor = config.palette.find(c => c.toLowerCase() !== third.toLowerCase()) ?? config.palette[0]
+      updateSymbol(selectedSymbolId.value, { color: third, strokeWidth: 8, strokeColor })
+    } else {
+      const strokeColor = config.palette.find(c => c.toLowerCase() !== sym.color.toLowerCase())
+        ?? (sym.color.toLowerCase() === '#000000' ? '#ffffff' : '#000000')
+      updateSymbol(selectedSymbolId.value, { strokeWidth: 8, strokeColor })
+    }
   }
 
   updateText('club-name', { y: 55 })
   updateText('year', { y: 185 })
+  activeClub.value = club
 }
 
 const showScene = ref(true)
@@ -264,6 +300,7 @@ const showScene = ref(true)
             @select-symbol="selectSymbol"
             @select-text="selectText"
             @deselect="deselectAll"
+            @symbol-outside-bounds="onSymbolOutsideBounds"
           />
         </div>
         </div>
@@ -318,13 +355,17 @@ const showScene = ref(true)
 
         <div class="logo-row">
           <p class="logo">⚔ Crest Forge</p>
-          <button class="randomize-btn" title="Randomize everything" @click="randomizeAll">&#9861;</button>
+          <button class="randomize-btn" title="Randomize everything" @click="randomizeAll">⚡</button>
         </div>
 
         <!-- Club Colors / Palette -->
         <div class="control-group">
           <h3 class="control-label">Club Colors</h3>
-          <ClubPicker @apply="setPalette" />
+          <ClubPicker @apply="applyClub" />
+          <button class="random-colors-btn" @click="randomizeColors" title="Load a random club's colors">⚡ Random Club Colors</button>
+          <p v-if="activeClub" class="active-club-label">
+            {{ activeClub.name }}<span v-if="activeClubModified" class="modified-flag"> · modified</span>
+          </p>
           <div class="palette-editor" style="margin-top: 10px;">
             <div
               v-for="(color, i) in config.palette"
@@ -479,6 +520,15 @@ const showScene = ref(true)
                   />
                   <span>{{ sym.size }}</span>
                 </label>
+                <div class="sym-field sym-clip-row">
+                  <span>Bounds</span>
+                  <button
+                    class="sym-clip-toggle"
+                    :class="{ free: sym.clipped === false }"
+                    @click.stop="updateSymbol(sym.instanceId, { clipped: sym.clipped === false ? true : false })"
+                    :title="sym.clipped === false ? 'Click to clip to badge shape' : 'Click to allow outside badge bounds'"
+                  >{{ sym.clipped === false ? 'Free' : 'Clipped' }}</button>
+                </div>
                 <div class="sym-field sym-stroke-row">
                   <span>Border</span>
                   <ColorPicker
@@ -664,7 +714,7 @@ const showScene = ref(true)
   gap: 8px;
 }
 
-.drag-hint { font-size: 12px; color: #b9b6b6; margin: 0; }
+.drag-hint { font-size: 12px; color: #b9b6b6; margin: 0; text-align: center; }
 
 .app-overlay {
   position: fixed;
@@ -887,6 +937,31 @@ const showScene = ref(true)
 }
 .palette-add:hover { border-color: #e8c84a; color: #e8c84a; }
 
+.random-colors-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 7px 10px;
+  background: #1e1e28;
+  border: 1px solid #2a2a35;
+  border-radius: 6px;
+  color: #aaa;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.random-colors-btn:hover { border-color: #e8c84a; color: #e8c84a; }
+
+.active-club-label {
+  font-size: 11px;
+  color: #666;
+  margin: 6px 0 0;
+  line-height: 1.4;
+}
+.modified-flag { color: #555; }
+
 .palette-hint {
   font-size: 11px;
   color: #888;
@@ -1026,6 +1101,20 @@ const showScene = ref(true)
 
 .sym-stroke-row { gap: 6px; }
 .sym-stroke-range { flex: 1; accent-color: #e8c84a; }
+
+.sym-clip-row { gap: 8px; }
+.sym-clip-toggle {
+  padding: 3px 10px;
+  border-radius: 4px;
+  border: 1px solid #2a2a35;
+  background: #1e1e28;
+  color: #888;
+  font-size: 11px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.sym-clip-toggle:hover { border-color: #555; color: #ccc; }
+.sym-clip-toggle.free { border-color: #e8c84a55; color: #e8c84a; }
 
 /* ── Transitions ─────────────────────────────────────────────────────────── */
 .scene-fade-enter-active,

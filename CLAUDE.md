@@ -10,6 +10,24 @@ Football badge creator app for football enthusiasts. Users design club crests by
 - **`opentype.js`** — planned for SVG export (text → path outlines)
 - No backend yet (Phase 2: Supabase for save/share/gallery)
 
+## Phase 2 — Export pipeline (not yet built)
+
+### Text → path outlining (opentype.js)
+- Load `.ttf`/`.otf` font files (must be bundled — Google Fonts CSS doesn't expose raw files at stable URLs)
+- `font.getPath(text, x, y, fontSize)` returns bezier outlines identical to Illustrator's "Create Outlines"
+- Straight text: straightforward, call once per text element
+- Arc text: glyph positions must be computed along the curve manually; opentype.js supports this but it's more involved than straight text
+- Font strategy TBD: curated set of ~5–6 bundled fonts, or fetch `.ttf` on demand at export time
+- Load opentype.js **lazily** (only on export trigger, not on page load)
+
+### Text stroke (deferred — build after export pipeline)
+- SVG `<text>` supports `stroke`/`stroke-width` natively; use `paint-order="stroke fill"` so stroke renders behind fill (same pattern already used on symbols)
+- Config shape addition: `strokeColor` and `strokeWidth` on each text object (mirrors symbol stroke fields)
+- Browser rendering: works automatically
+- PNG export: works automatically via canvas rasterisation
+- SVG export with outlining: once text is converted to `<path>` elements by opentype.js, apply `stroke`/`stroke-width` to the output paths — carries through with no extra work
+- **Do not implement text stroke until the export pipeline is in place**, so stroke behaviour is consistent between canvas display and exported files
+
 ## Architecture
 
 ### File layout

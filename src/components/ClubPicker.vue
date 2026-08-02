@@ -30,7 +30,7 @@ const results = computed(() => {
 })
 
 function select(club) {
-  emit('apply', club.colors.map(c => c.hex))
+  emit('apply', club)
   query.value = ''
   open.value  = false
 }

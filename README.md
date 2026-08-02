@@ -12,6 +12,11 @@ A browser-based football badge creator for designing custom club crests. Combine
     <td align="center"><img src="designs/fc-cf-loon2.png" width="220" alt="FC Crest Forge — Loon, diagonal stripes" /><br/><sub>Loon · diagonal stripes</sub></td>
     <td align="center"><img src="designs/fc-cf-keys1.png" width="220" alt="FC Crest Forge — Crossed keys, chevron" /><br/><sub>Crossed keys · chevron</sub></td>
   </tr>
+  <tr>
+    <td align="center"><img src="designs/fc-cf-flamingo1.png" width="220" alt="FC Crest Forge — Flamingo, diagonal stripes" /><br/><sub>Flamingo · diagonal stripes</sub></td>
+    <td align="center"><img src="designs/fc-cf-unicorn-crown1.png" width="220" alt="FC Crest Forge — Unicorn with free crown above badge" /><br/><sub>Unicorn · free crown above badge</sub></td>
+    <td></td>
+  </tr>
 </table>
 
 ---
