@@ -530,10 +530,11 @@ const bgElements = computed(() => {
 
 <style>
 .align-guide {
-  stroke: #ff2d9b;
+  stroke: #00e5ff;
   stroke-width: 0.75;
   stroke-dasharray: 4 3;
-  opacity: 0.9;
+  opacity: 0.95;
+  filter: drop-shadow(0 0 2px #00e5ff) drop-shadow(0 0 5px rgba(0, 229, 255, 0.7));
 }
 
 .text-resize-tooltip {
