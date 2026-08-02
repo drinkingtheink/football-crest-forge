@@ -63,12 +63,30 @@ const selectedSymbolId = ref(null)
 const selectedTextId = ref(null)
 let nextId = 1
 
+function colorDist(a, b) {
+  const p = hex => { const h = hex.replace('#',''); return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)] }
+  const [r1,g1,b1] = p(a), [r2,g2,b2] = p(b)
+  return (r1-r2)**2 + (g1-g2)**2 + (b1-b2)**2
+}
+
+function remapColor(color, oldPalette, newPalette) {
+  let bestIdx = 0, bestDist = Infinity
+  oldPalette.forEach((c, i) => { const d = colorDist(color, c); if (d < bestDist) { bestDist = d; bestIdx = i } })
+  return newPalette[bestIdx % newPalette.length]
+}
+
 export function useBadgeConfig() {
   // ── Palette ───────────────────────────────────────────────────────────────
   function setPaletteColor(index, color) { config.palette[index] = color }
   function addPaletteColor() { if (config.palette.length < 6) config.palette.push('#cccccc') }
   function removePaletteColor(index) { if (config.palette.length > 1) config.palette.splice(index, 1) }
-  function setPalette(hexArray) { config.palette.splice(0, config.palette.length, ...hexArray.slice(0, 6)) }
+  function setPalette(hexArray) {
+    const oldPalette = [...config.palette]
+    const newPalette = hexArray.slice(0, 6)
+    for (const text of config.texts)    text.color = remapColor(text.color, oldPalette, newPalette)
+    for (const sym  of config.symbols)  sym.color  = remapColor(sym.color,  oldPalette, newPalette)
+    config.palette.splice(0, config.palette.length, ...newPalette)
+  }
 
   // ── Shape ─────────────────────────────────────────────────────────────────
   function setShape(shapeId) { config.shapeId = shapeId }
