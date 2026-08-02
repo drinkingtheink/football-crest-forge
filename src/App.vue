@@ -396,6 +396,17 @@ function stepBg(dir) {
                 title="Overlay color"
                 @input="overlay.color = $event.target.value"
               />
+              <div class="overlay-swatches">
+                <button
+                  v-for="(color, i) in config.palette"
+                  :key="i"
+                  class="overlay-swatch"
+                  :class="{ active: overlay.color.toLowerCase() === color.toLowerCase() }"
+                  :style="{ background: color }"
+                  :title="`Set overlay to club color ${color}`"
+                  @click="overlay.color = color"
+                />
+              </div>
               <input
                 type="range" min="0" max="1" step="0.05"
                 :value="overlay.opacity"
@@ -614,7 +625,7 @@ function stepBg(dir) {
                     @change="updateSymbol(sym.instanceId, { strokeColor: $event })"
                   />
                   <input
-                    type="range" min="0" max="10" step="0.5"
+                    type="range" min="0" max="20" step="0.5"
                     :value="sym.strokeWidth || 0"
                     class="sym-stroke-range"
                     @input="updateSymbol(sym.instanceId, { strokeWidth: Number($event.target.value) })"
@@ -888,6 +899,29 @@ function stepBg(dir) {
   background: #1e1e28;
   cursor: pointer;
   flex-shrink: 0;
+}
+
+.overlay-swatches {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.overlay-swatch {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 1px solid #3a3a48;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.overlay-swatch:hover { transform: scale(1.15); }
+
+.overlay-swatch.active {
+  border-color: #e8c84a;
+  box-shadow: 0 0 0 1px #e8c84a;
 }
 
 .overlay-opacity {
