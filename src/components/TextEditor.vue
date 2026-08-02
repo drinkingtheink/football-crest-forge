@@ -163,7 +163,7 @@ async function onFontChange(textId, event) {
             <label v-if="text.arc === 'arch'" class="field">
               <span>Arch height <em>{{ text.archHeight ?? 40 }}</em></span>
               <input
-                type="range" min="-80" max="80"
+                type="range" min="-160" max="160"
                 :value="text.archHeight ?? 40"
                 @input="$emit('update-text', text.id, { archHeight: Number($event.target.value) })"
               />
