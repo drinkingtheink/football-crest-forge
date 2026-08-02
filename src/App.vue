@@ -8,6 +8,7 @@ import ColorPicker from './components/ColorPicker.vue'
 import ClubPicker from './components/ClubPicker.vue'
 import AppBackground from './components/AppBackground.vue'
 import { useBadgeConfig } from './composables/useBadgeConfig.js'
+import { clubs } from './data/clubs.js'
 import { shapes, shapeGroups } from './data/shapes.js'
 import { iconsById } from './data/icons.js'
 import { loadFont } from './utils/fonts.js'
@@ -157,6 +158,21 @@ onUnmounted(() => {
   stopParticles?.()
 })
 
+function randomizeAll() {
+  const club     = clubs[Math.floor(Math.random() * clubs.length)]
+  const shape    = shapes[Math.floor(Math.random() * shapes.length)]
+  const bgType   = bgTypes[Math.floor(Math.random() * bgTypes.length)]
+  const third    = club.colors[2]?.hex
+
+  setPalette(club.colors.map(c => c.hex))
+  setShape(shape.id)
+  setBackgroundType(bgType)
+  setStripeCount(Math.floor(Math.random() * 11) + 2)
+  setBorderColor(third || '#ffffff')
+  setBorderWidth(third ? Math.floor(Math.random() * 5) + 2 : 0)
+  appBg.value = bgOptions[Math.floor(Math.random() * bgOptions.length)].id
+}
+
 const showScene = ref(true)
 </script>
 
@@ -232,7 +248,10 @@ const showScene = ref(true)
       <!-- Controls -->
       <aside class="controls-pane" ref="controlsPane">
 
-        <p class="logo">⚔ Crest Forge</p>
+        <div class="logo-row">
+          <p class="logo">⚔ Crest Forge</p>
+          <button class="randomize-btn" title="Randomize everything" @click="randomizeAll">&#9861;</button>
+        </div>
 
         <!-- Club Colors / Palette -->
         <div class="control-group">
@@ -428,14 +447,37 @@ const showScene = ref(true)
   z-index: 1;
 }
 
+.logo-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 8px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #2a2a35;
+}
+
 .logo {
   font-size: 17px;
   font-weight: 700;
   letter-spacing: 0.5px;
   color: #e8c84a;
-  margin: 0 0 8px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #2a2a35;
+  margin: 0;
+}
+
+.randomize-btn {
+  background: none;
+  border: 1px solid #3a3a4a;
+  border-radius: 6px;
+  color: #888;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 3px 7px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.randomize-btn:hover {
+  border-color: #e8c84a;
+  color: #e8c84a;
 }
 
 .preview-pane {
