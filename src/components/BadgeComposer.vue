@@ -388,6 +388,7 @@ const bgElements = computed(() => {
       :letter-spacing="text.letterSpacing ?? 0"
       :style="{
         fill: text.color,
+        cursor: 'pointer',
         filter: hoveredTextId === text.id ? 'drop-shadow(0 0 5px rgba(255,255,255,0.35))' : 'none',
         transition: 'fill 0.35s ease, filter 0.15s ease',
       }"
