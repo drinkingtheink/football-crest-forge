@@ -23,8 +23,13 @@ const shape = computed(() => shapesById[props.config.shapeId])
 const clipId = computed(() => `clip-${props.uid}`)
 
 function symbolTransform(sym) {
-  const scale = sym.size / 100
-  return `translate(${sym.x - sym.size / 2}, ${sym.y - sym.size / 2}) scale(${scale})`
+  const icon = iconsById[sym.iconId]
+  const vw = icon?.viewBox?.[0] ?? 100
+  const vh = icon?.viewBox?.[1] ?? 100
+  const scale = sym.size / Math.max(vw, vh)
+  const offX = (sym.size - vw * scale) / 2
+  const offY = (sym.size - vh * scale) / 2
+  return `translate(${sym.x - sym.size / 2 + offX}, ${sym.y - sym.size / 2 + offY}) scale(${scale})`
 }
 
 // ── Unified drag (text or symbol) ──────────────────────────────────────────
@@ -149,6 +154,23 @@ const bgElements = computed(() => {
         { points: `0,0 ${W},0 0,${H}`, fill: c0 },
         { points: `${W},0 ${W},${H} 0,${H}`, fill: c1 },
       ]}
+    case 'chevron':
+      return { rects: [], polys: [
+        { points: `0,0 ${W},0 ${W},${H*0.38} ${W/2},${H*0.54} 0,${H*0.38}`, fill: c0 },
+        { points: `0,${H*0.38} ${W/2},${H*0.54} ${W},${H*0.38} ${W},${H} 0,${H}`, fill: c1 },
+      ]}
+    case 'sash': {
+      const hw = (props.config.background.sashWidth ?? 80) / 2
+      // perpendicular unit vector to the / diagonal (upper-right → lower-left)
+      const px = 0.768, py = 0.640
+      // extend band endpoints 60 units past the badge edges so the clip is always clean
+      const ex = 60
+      const x1 = 200 + ex, y1 = -ex
+      const x2 = -ex,  y2 = 240 + ex
+      return { rects: [{ x: 0, y: 0, w: W, h: H, fill: c0 }], polys: [
+        { points: `${x1+hw*px},${y1-hw*py} ${x1-hw*px},${y1+hw*py} ${x2-hw*px},${y2+hw*py} ${x2+hw*px},${y2-hw*py}`, fill: c1 },
+      ]}
+    }
     case 'striped-v': {
       const sw = W / n
       return { rects: Array.from({ length: n }, (_, i) => ({ x: i*sw, y: 0, w: sw, h: H, fill: i%2===0?c0:c1 })), polys: [] }
