@@ -79,8 +79,9 @@ const wavesThumb = computed(() => wavesBg(config.palette))
 const crisscrossThumb = computed(() => crisscrossBg(config.palette))
 
 function onKeyDown(e) {
-  if (e.key !== 'Delete' && e.key !== 'Backspace') return
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); randomizeAll(); return }
+  if (e.key !== 'Delete' && e.key !== 'Backspace') return
   if (selectedSymbolId.value) removeSymbol(selectedSymbolId.value)
   else if (selectedTextId.value) removeText(selectedTextId.value)
 }
@@ -207,7 +208,7 @@ const showScene = ref(true)
           </button>
 
           <div v-show="showScene" class="scene-controls">
-            <p class="drag-hint hud-pill">Drag symbols and text to reposition</p>
+            <p class="drag-hint hud-pill">Drag symbols and text to reposition &nbsp;·&nbsp; Space or Enter to randomize</p>
 
             <div class="bg-picker hud-pill">
               <button
