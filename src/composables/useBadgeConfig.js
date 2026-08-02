@@ -1,4 +1,7 @@
 import { reactive, ref } from 'vue'
+import { clubs } from '../data/clubs.js'
+
+const _randomClub = clubs[Math.floor(Math.random() * clubs.length)]
 
 const DEFAULT_TEXT = () => ({
   fontFamily: 'EB Garamond',
@@ -17,7 +20,7 @@ const DEFAULT_TEXT = () => ({
 // ── Singleton state (module-level so any component gets the same instance) ──
 const config = reactive({
   shapeId: 'traditional-english',
-  palette: ['#1a3a6b', '#c8102e', '#ffd700', '#ffffff'],
+  palette: _randomClub.colors.map(c => c.hex),
   background: {
     type: 'halved-v',
     stripeCount: 4,
@@ -32,12 +35,22 @@ const config = reactive({
       fontWeight: 'bold',
       letterSpacing: 2,
       x: 100,
-      y: 120,
+      y: 110,
+    },
+    {
+      ...DEFAULT_TEXT(),
+      id: 'year',
+      content: String(new Date().getFullYear()),
+      fontSize: 11,
+      fontWeight: 'normal',
+      letterSpacing: 3,
+      x: 100,
+      y: 158,
     },
   ],
   border: {
-    color: '#ffd700',
-    width: 3,
+    color: '#ffffff',
+    width: 0,
   },
 })
 
