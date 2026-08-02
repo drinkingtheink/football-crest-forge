@@ -545,6 +545,10 @@ const showScene = ref(true)
 }
 
 .scene-wrap {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
