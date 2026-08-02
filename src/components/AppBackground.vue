@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useBadgeConfig } from '../composables/useBadgeConfig.js'
-import { drawBokeh } from '../utils/bokeh.js'
+import { startBokeh } from '../utils/bokeh.js'
 import { hexagonsBg, topographyBg } from '../utils/patterns.js'
 
 const props = defineProps({
@@ -10,13 +10,14 @@ const props = defineProps({
 
 const { config } = useBadgeConfig()
 const bokehCanvas = ref(null)
+let bokehInstance = null
 
 const imageMap = {
-  grass:  '/backgrounds/grass.jpg',
-  fabric: '/backgrounds/fabric.png',
-  brick:  '/backgrounds/brick.jpg',
-  stadium:  '/backgrounds/stadium.png',
-  pitch:  '/backgrounds/pitch.png',
+  grass:   '/backgrounds/grass.jpg',
+  fabric:  '/backgrounds/fabric.png',
+  brick:   '/backgrounds/brick.jpg',
+  stadium: '/backgrounds/stadium.png',
+  pitch:   '/backgrounds/pitch.png',
 }
 
 const patternStyle = computed(() => {
@@ -26,24 +27,31 @@ const patternStyle = computed(() => {
   return {}
 })
 
-function redraw() {
-  if (props.type !== 'bokeh' || !bokehCanvas.value) return
-  const canvas = bokehCanvas.value
-  canvas.width  = window.innerWidth
-  canvas.height = window.innerHeight
-  drawBokeh(canvas, config.palette)
+function initBokeh() {
+  if (!bokehCanvas.value) return
+  bokehInstance?.stop()
+  bokehInstance = startBokeh(bokehCanvas.value, () => config.palette)
+}
+
+function stopBokeh() {
+  bokehInstance?.stop()
+  bokehInstance = null
 }
 
 watch(() => props.type, async (t) => {
-  if (t === 'bokeh') { await nextTick(); redraw() }
+  if (t === 'bokeh') { await nextTick(); initBokeh() }
+  else stopBokeh()
 })
 
-watch(() => config.palette.join(), () => {
-  if (props.type === 'bokeh') redraw()
+onMounted(() => {
+  if (props.type === 'bokeh') initBokeh()
+  window.addEventListener('resize', () => bokehInstance?.resize())
 })
 
-onMounted(() => { redraw(); window.addEventListener('resize', redraw) })
-onUnmounted(() => window.removeEventListener('resize', redraw))
+onUnmounted(() => {
+  stopBokeh()
+  window.removeEventListener('resize', () => bokehInstance?.resize())
+})
 </script>
 
 <template>
@@ -58,8 +66,8 @@ onUnmounted(() => window.removeEventListener('resize', redraw))
   inset: 0;
   z-index: 0;
   background-color: #07070e;
-  background-size: cover;
-  background-position: center;
+  background-size: auto;
+  background-repeat: repeat;
 }
 
 .bokeh-canvas {

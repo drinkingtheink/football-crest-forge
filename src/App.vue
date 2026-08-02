@@ -38,6 +38,7 @@ const {
 
 const bgTypes = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'striped-v', 'striped-h', 'striped-diagonal']
 const stripeTypes = new Set(['striped-v', 'striped-h', 'striped-diagonal'])
+const imageBgTypes = new Set(['grass', 'stadium', 'fabric', 'brick', 'pitch'])
 
 const shapesByGroup = computed(() =>
   Object.fromEntries(shapeGroups.map(g => [g, shapes.filter(s => s.group === g)]))
@@ -97,7 +98,7 @@ function forwardScroll(e) {
     <AppBackground :type="appBg" />
     <div
       class="app-overlay"
-      :style="[ appBG === 'stadium' ? null : { background: overlay.color, opacity: overlay.opacity }]"
+      :style="imageBgTypes.has(appBg) ? { background: overlay.color, opacity: overlay.opacity } : { opacity: 0 }"
     />
     <ToastContainer />
     <main class="app-body">

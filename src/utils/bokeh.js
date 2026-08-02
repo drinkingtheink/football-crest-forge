@@ -1,54 +1,92 @@
-function hexToRgba(hex, alpha) {
-  const clean = hex.replace('#', '')
-  const r = parseInt(clean.slice(0, 2), 16)
-  const g = parseInt(clean.slice(2, 4), 16)
-  const b = parseInt(clean.slice(4, 6), 16)
-  return `rgba(${r},${g},${b},${alpha})`
+function hexToRgb(hex) {
+  const h = hex.replace('#', '')
+  return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]
 }
 
-export function drawBokeh(canvas, palette) {
-  const { width, height } = canvas
-  const ctx = canvas.getContext('2d')
+function makeCircles(w, h, colors) {
+  const circles = []
 
-  ctx.clearRect(0, 0, width, height)
-  ctx.fillStyle = '#07070e'
-  ctx.fillRect(0, 0, width, height)
-
-  const colors = palette.filter(Boolean)
-  if (!colors.length) return
-
-  // Large soft background blobs
-  for (let i = 0; i < 12; i++) {
-    const color = colors[i % colors.length]
-    const x = Math.random() * width
-    const y = Math.random() * height
-    const r = height * (0.25 + Math.random() * 0.4)
-    const alpha = 0.08 + Math.random() * 0.12
-
-    const grad = ctx.createRadialGradient(x, y, 0, x, y, r)
-    grad.addColorStop(0, hexToRgba(color, alpha))
-    grad.addColorStop(1, hexToRgba(color, 0))
-    ctx.fillStyle = grad
-    ctx.beginPath()
-    ctx.arc(x, y, r, 0, Math.PI * 2)
-    ctx.fill()
+  // Large, slow background blobs — set the ambient color wash
+  for (let i = 0; i < 7; i++) {
+    circles.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: h * (0.25 + Math.random() * 0.35),
+      alpha: 0.05 + Math.random() * 0.08,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: (Math.random() - 0.5) * 0.2,
+      ci: i % colors.length,
+      blob: true,
+    })
   }
 
-  // Smaller bright circles — the actual "bokeh" spots
-  for (let i = 0; i < 40; i++) {
-    const color = colors[i % colors.length]
-    const x = Math.random() * width
-    const y = Math.random() * height
-    const r = 20 + Math.random() * 90
-    const alpha = 0.12 + Math.random() * 0.28
+  // Mid-size bokeh spots — the main visual element
+  for (let i = 0; i < 28; i++) {
+    circles.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: 25 + Math.random() * 75,
+      alpha: 0.1 + Math.random() * 0.22,
+      vx: (Math.random() - 0.5) * 0.45,
+      vy: (Math.random() - 0.5) * 0.35,
+      ci: i % colors.length,
+      blob: false,
+    })
+  }
 
-    const grad = ctx.createRadialGradient(x, y, 0, x, y, r)
-    grad.addColorStop(0, hexToRgba(color, alpha))
-    grad.addColorStop(0.4, hexToRgba(color, alpha * 0.5))
-    grad.addColorStop(1, hexToRgba(color, 0))
-    ctx.fillStyle = grad
-    ctx.beginPath()
-    ctx.arc(x, y, r, 0, Math.PI * 2)
-    ctx.fill()
+  return circles
+}
+
+// Returns a controller with stop() and resize() methods.
+export function startBokeh(canvas, getPalette) {
+  let rafId = null
+
+  canvas.width  = window.innerWidth
+  canvas.height = window.innerHeight
+
+  const colors = getPalette().filter(Boolean)
+  let circles = makeCircles(canvas.width, canvas.height, colors.length ? colors : ['#ffffff'])
+
+  function frame() {
+    const { width, height } = canvas
+    const palette = getPalette().filter(Boolean)
+    if (!palette.length) { rafId = requestAnimationFrame(frame); return }
+
+    const ctx = canvas.getContext('2d')
+    ctx.fillStyle = '#07070e'
+    ctx.fillRect(0, 0, width, height)
+
+    for (const c of circles) {
+      const [r, g, b] = hexToRgb(palette[c.ci % palette.length])
+
+      const grad = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.r)
+      grad.addColorStop(0, `rgba(${r},${g},${b},${c.alpha})`)
+      if (!c.blob) grad.addColorStop(0.45, `rgba(${r},${g},${b},${c.alpha * 0.4})`)
+      grad.addColorStop(1, `rgba(${r},${g},${b},0)`)
+
+      ctx.fillStyle = grad
+      ctx.beginPath()
+      ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2)
+      ctx.fill()
+
+      c.x += c.vx
+      c.y += c.vy
+      if (c.x < -c.r) c.x = width + c.r
+      if (c.x > width + c.r) c.x = -c.r
+      if (c.y < -c.r) c.y = height + c.r
+      if (c.y > height + c.r) c.y = -c.r
+    }
+
+    rafId = requestAnimationFrame(frame)
+  }
+
+  frame()
+
+  return {
+    stop()   { cancelAnimationFrame(rafId) },
+    resize() {
+      canvas.width  = window.innerWidth
+      canvas.height = window.innerHeight
+    },
   }
 }

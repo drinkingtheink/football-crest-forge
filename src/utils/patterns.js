@@ -10,9 +10,6 @@ function rgba(hex, alpha) {
   return `rgba(${r},${g},${b},${alpha})`
 }
 
-// ── Color selection ────────────────────────────────────────────────────────
-// Always dark base so the badge stays readable.
-// Pattern colors come from palette; fall back gracefully with 1 color.
 function pickColors(palette, primaryOpacity = 0.28, secondaryOpacity = 0.16) {
   const c0 = palette[0] || '#ffffff'
   const c1 = palette[1] || c0
@@ -23,39 +20,51 @@ function pickColors(palette, primaryOpacity = 0.28, secondaryOpacity = 0.16) {
 }
 
 // ── Hexagons ───────────────────────────────────────────────────────────────
-// Mathematically exact pointy-top hex grid.
-// Tile: 24×42 (side=14, r=12, minimal repeating unit for 2 offset columns).
-// One full hex + one downward edge — everything else is covered by adjacent tiles.
+// Pointy-top honeycomb grid. Tile is the minimal repeating unit:
+// one full hex + connecting stem to the next row.
 export function hexagonsBg(palette) {
-  const { primary } = pickColors(palette, 0.3)
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='42'>
-    <path d='M12 0 L24 7 L24 21 L12 28 L0 21 L0 7 Z' fill='none' stroke='${primary}' stroke-width='1.5'/>
-    <path d='M12 28 L12 42' fill='none' stroke='${primary}' stroke-width='1.5'/>
+  const { primary, secondary } = pickColors(palette, 0.35, 0.12)
+  // side=12 → tile 20.8×36, rounded to 21×36
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='21' height='36'>
+    <path d='M10.5 0 L21 6 L21 18 L10.5 24 L0 18 L0 6 Z'
+      fill='${secondary}' stroke='${primary}' stroke-width='1'/>
+    <path d='M10.5 24 L10.5 36' fill='none' stroke='${primary}' stroke-width='1'/>
   </svg>`
   return { backgroundImage: encode(svg), backgroundColor: '#07070e' }
 }
 
 // ── Topography ─────────────────────────────────────────────────────────────
-// Contour-line style repeating pattern.
-// Each path starts and ends at the same Y so horizontal tiling is seamless.
-// Two line weights let 2-palette-color badges feel intentional.
+// Contour-map style lines. Each path starts and ends at the same y value
+// so horizontal tiling is seamless. Two cubic bezier control points per
+// half give organic, non-mechanical curves.
 export function topographyBg(palette) {
-  const { primary, secondary } = pickColors(palette, 0.28, 0.15)
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='300' height='180'>
-    <path d='M0 20 C45 0 90 48 140 20 C190 -8 245 40 300 20'
-      fill='none' stroke='${primary}' stroke-width='1.5'/>
-    <path d='M0 60 C35 38 100 88 145 58 C190 28 255 72 300 60'
-      fill='none' stroke='${secondary}' stroke-width='1'/>
-    <path d='M0 95 C55 72 105 118 155 90 C205 62 250 105 300 95'
-      fill='none' stroke='${primary}' stroke-width='1.5'/>
-    <path d='M0 128 C50 108 115 150 160 122 C205 94 258 132 300 128'
-      fill='none' stroke='${secondary}' stroke-width='1'/>
-    <path d='M0 158 C60 140 120 172 165 152 C210 130 262 160 300 158'
-      fill='none' stroke='${primary}' stroke-width='1.5'/>
-    <path d='M0 5 C30 -6 65 14 90 5 C115 -4 140 10 160 5'
-      fill='none' stroke='${secondary}' stroke-width='1'/>
-    <path d='M195 45 C220 30 265 58 300 45'
-      fill='none' stroke='${secondary}' stroke-width='1'/>
+  const { primary, secondary } = pickColors(palette, 0.38, 0.2)
+  const W = 200, H = 140
+
+  // [baseY, [cp1dy, cp2dy, midDy, cp3dy, cp4dy], color, strokeWidth]
+  const lines = [
+    { y: 10,  cps: [ 10, -8,   6,  -10,  8],  color: primary,   w: 1.5 },
+    { y: 24,  cps: [ -8, 12,  -6,   14, -8],  color: secondary, w: 1   },
+    { y: 38,  cps: [ 12, -10,  8,   -8, 10],  color: primary,   w: 1.5 },
+    { y: 52,  cps: [-10,  8, -12,   10, -6],  color: secondary, w: 1   },
+    { y: 66,  cps: [  8, -12, 10,  -12,  8],  color: primary,   w: 1.5 },
+    { y: 80,  cps: [-12,  6,  -8,    8, -10], color: secondary, w: 1   },
+    { y: 94,  cps: [  6, -8,  12,   -8,  6],  color: primary,   w: 1.5 },
+    { y: 108, cps: [ -8, 10,  -6,   10, -8],  color: secondary, w: 1   },
+    { y: 122, cps: [ 10, -6,   8,   -6, 10],  color: primary,   w: 1.5 },
+    { y: 136, cps: [ -6,  8, -10,    8, -6],  color: secondary, w: 1   },
+  ]
+
+  const paths = lines.map(({ y, cps: [a, b, c, d, e], color, w }) => {
+    const x1 = (W * 0.15).toFixed(1), x2 = (W * 0.38).toFixed(1)
+    const xm = (W / 2).toFixed(1)
+    const x3 = (W * 0.62).toFixed(1), x4 = (W * 0.85).toFixed(1)
+    const pathD = `M0,${y} C${x1},${y+a} ${x2},${y+b} ${xm},${y+c} C${x3},${y+d} ${x4},${y+e} ${W},${y}`
+    return `<path d='${pathD}' fill='none' stroke='${color}' stroke-width='${w}'/>`
+  })
+
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${W}' height='${H}'>
+    ${paths.join('\n    ')}
   </svg>`
   return { backgroundImage: encode(svg), backgroundColor: '#07070e' }
 }
