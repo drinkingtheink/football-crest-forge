@@ -49,6 +49,19 @@ const drag = ref(null)
 const shapePathEl = ref(null)
 const outsidePromptedId = ref(null)
 
+// ── Alignment guides (show-only, badge centre) ─────────────────────────────
+const BADGE_CX = VIEWBOX_W / 2
+const BADGE_CY = VIEWBOX_H / 2
+const GUIDE_TOL = 2                 // viewBox units the centre must be within
+const guides = ref({ x: false, y: false })
+
+function updateGuides(cx, cy) {
+  guides.value = {
+    x: Math.abs(cx - BADGE_CX) <= GUIDE_TOL,
+    y: Math.abs(cy - BADGE_CY) <= GUIDE_TOL,
+  }
+}
+
 function toSVGPoint(svgEl, clientX, clientY) {
   const pt = svgEl.createSVGPoint()
   pt.x = clientX
@@ -83,6 +96,7 @@ function onMove(e) {
   const pt = toSVGPoint(e.currentTarget, e.clientX, e.clientY)
   const dx = pt.x - drag.value.sx
   const dy = pt.y - drag.value.sy
+  updateGuides(drag.value.ox + dx, drag.value.oy + dy)
   if (drag.value.type === 'text') {
     if (drag.value.isArc) {
       emit('update-text', drag.value.id, { arcX: drag.value.ox + dx, arcY: drag.value.oy + dy })
@@ -103,7 +117,7 @@ function onMove(e) {
   }
 }
 
-function stopDrag() { drag.value = null }
+function stopDrag() { drag.value = null; guides.value = { x: false, y: false } }
 
 // ── Hover highlight ────────────────────────────────────────────────────────
 const hoveredSymbolId = ref(null)
@@ -497,6 +511,12 @@ const bgElements = computed(() => {
       <rect x="-14" y="-9" width="28" height="13" rx="3" fill="#000000" fill-opacity="0.65" />
       <text x="0" y="0" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-size="7" font-family="system-ui,sans-serif" font-weight="600">{{ sizeHint.size }}px</text>
     </g>
+
+    <!-- Alignment guides (shown while dragging near badge centre) -->
+    <g style="pointer-events:none">
+      <line v-if="guides.x" :x1="BADGE_CX" y1="-8" :x2="BADGE_CX" :y2="VIEWBOX_H + 8" class="align-guide" />
+      <line v-if="guides.y" x1="-8" :y1="BADGE_CY" :x2="VIEWBOX_W + 8" :y2="BADGE_CY" class="align-guide" />
+    </g>
   </svg>
 
   <Teleport to="body">
@@ -509,6 +529,13 @@ const bgElements = computed(() => {
 </template>
 
 <style>
+.align-guide {
+  stroke: #ff2d9b;
+  stroke-width: 0.75;
+  stroke-dasharray: 4 3;
+  opacity: 0.9;
+}
+
 .text-resize-tooltip {
   position: fixed;
   background: rgba(0, 0, 0, 0.75);
