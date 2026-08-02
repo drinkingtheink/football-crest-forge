@@ -79,6 +79,14 @@ const crisscrossThumb = computed(() => crisscrossBg(config.palette))
 
 const _ARROW_DELTA = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }
 
+function onPickIcon(iconId) {
+  if (selectedSymbolId.value) {
+    updateSymbol(selectedSymbolId.value, { iconId })
+  } else {
+    addSymbol(iconId)
+  }
+}
+
 function onKeyDown(e) {
   if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return
 
@@ -396,7 +404,7 @@ const showScene = ref(true)
         <!-- Symbol Gallery -->
         <div class="control-group">
           <h3 class="control-label">Add Symbol</h3>
-          <IconPicker @add-icon="addSymbol" />
+          <IconPicker @add-icon="onPickIcon" />
         </div>
 
         <!-- Placed Symbols -->
