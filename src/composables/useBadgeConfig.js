@@ -20,7 +20,6 @@ const config = reactive({
   palette: ['#1a3a6b', '#c8102e', '#ffd700', '#ffffff'],
   background: {
     type: 'halved-v',
-    colors: ['#1a3a6b', '#c8102e'],
   },
   symbols: [],
   texts: [
@@ -56,7 +55,6 @@ export function useBadgeConfig() {
 
   // ── Background ────────────────────────────────────────────────────────────
   function setBackgroundType(type) { config.background.type = type }
-  function setBackgroundColor(index, color) { config.background.colors[index] = color }
 
   // ── Border ────────────────────────────────────────────────────────────────
   function setBorderColor(color) { config.border.color = color }
@@ -123,7 +121,6 @@ export function useBadgeConfig() {
     removePaletteColor,
     setShape,
     setBackgroundType,
-    setBackgroundColor,
     setBorderColor,
     setBorderWidth,
     addSymbol,

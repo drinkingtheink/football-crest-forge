@@ -111,9 +111,10 @@ function onTextWheel(e, textId) {
 
 // ── Background ─────────────────────────────────────────────────────────────
 const bgElements = computed(() => {
-  const { type, colors } = props.config.background
-  const c0 = colors[0] || '#000000'
-  const c1 = colors[1] || '#ffffff'
+  const { type } = props.config.background
+  const palette = props.config.palette
+  const c0 = palette[0] || '#000000'
+  const c1 = palette[1] || c0
   const W = VIEWBOX_W
   const H = VIEWBOX_H
 

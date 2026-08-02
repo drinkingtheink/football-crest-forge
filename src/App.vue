@@ -21,7 +21,6 @@ const {
   removePaletteColor,
   setShape,
   setBackgroundType,
-  setBackgroundColor,
   setBorderColor,
   setBorderWidth,
   addSymbol,
@@ -220,16 +219,6 @@ function forwardScroll(e) {
               :class="{ active: config.background.type === t }"
               @click="setBackgroundType(t)"
             >{{ t }}</button>
-          </div>
-          <div class="bg-color-stack">
-            <div class="bg-color-row">
-              <span class="color-label">Color 1</span>
-              <ColorPicker :value="config.background.colors[0]" @change="setBackgroundColor(0, $event)" />
-            </div>
-            <div v-if="config.background.type !== 'solid'" class="bg-color-row">
-              <span class="color-label">Color 2</span>
-              <ColorPicker :value="config.background.colors[1]" @change="setBackgroundColor(1, $event)" />
-            </div>
           </div>
         </div>
 
