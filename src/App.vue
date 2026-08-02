@@ -310,6 +310,11 @@ function randomizeAll() {
 }
 
 const showScene = ref(true)
+
+function stepBg(dir) {
+  const idx = bgOptions.findIndex(o => o.id === appBg.value)
+  appBg.value = bgOptions[(idx + dir + bgOptions.length) % bgOptions.length].id
+}
 </script>
 
 <template>
@@ -324,6 +329,18 @@ const showScene = ref(true)
       <!-- Preview -->
       <section class="preview-pane" @wheel.prevent="forwardScroll" @mouseenter="isBadgeActive = true" @mouseleave="isBadgeActive = false">
         <canvas ref="particleCanvas" class="particle-canvas" />
+
+        <button
+          class="bg-arrow bg-arrow-left"
+          :title="`← ${bgOptions[(bgOptions.findIndex(o => o.id === appBg) - 1 + bgOptions.length) % bgOptions.length].label}`"
+          @click="stepBg(-1)"
+        >‹</button>
+        <button
+          class="bg-arrow bg-arrow-right"
+          :title="`${bgOptions[(bgOptions.findIndex(o => o.id === appBg) + 1) % bgOptions.length].label} →`"
+          @click="stepBg(1)"
+        >›</button>
+
         <div class="badge-float-wrap" :class="{ active: isBadgeActive }">
         <div ref="badgeWrap" :class="['badge-wrap', { pulsing: isPulsing }]">
           <BadgeComposer
@@ -703,6 +720,31 @@ const showScene = ref(true)
   width: 100%;
   height: 100%;
 }
+
+.bg-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  font-size: 28px;
+  line-height: 1;
+  padding: 10px 14px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  user-select: none;
+  z-index: 6;
+}
+.bg-arrow:hover {
+  background: rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+.bg-arrow-left  { left: 14px; }
+.bg-arrow-right { right: 14px; }
 
 @keyframes badge-float {
   from { transform: translateY(0); }
