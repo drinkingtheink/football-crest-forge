@@ -260,51 +260,26 @@ function onFontChange(textId, event) {
 .field-row { display: flex; gap: 8px; }
 .field-half { flex: 1; }
 
-.t-input {
-  background: #252530;
-  border: 1px solid #3a3a4a;
+.t-input,
+.t-number,
+.t-select {
+  background: rgba(232, 200, 74, 0.04);
+  border: 1px solid rgba(232, 200, 74, 0.28);
   border-radius: 4px;
   color: #e8e8ec;
-  font-size: 13px;
+  font-size: 12px;
   padding: 5px 8px;
   outline: none;
   width: 100%;
   box-sizing: border-box;
+  box-shadow: 0 0 6px rgba(232, 200, 74, 0.07);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-.t-input:focus {
-  border-color: #e8c84a;
-  box-shadow: 0 0 0 2px rgba(232, 200, 74, 0.12), 0 0 8px rgba(232, 200, 74, 0.08);
-}
-
-.t-number {
-  background: #252530;
-  border: 1px solid #3a3a4a;
-  border-radius: 4px;
-  color: #e8e8ec;
-  font-size: 13px;
-  padding: 5px 6px;
-  outline: none;
-  width: 100%;
-  box-sizing: border-box;
-}
-.t-number:focus {
-  border-color: #e8c84a;
-  box-shadow: 0 0 0 2px rgba(232, 200, 74, 0.12), 0 0 8px rgba(232, 200, 74, 0.08);
-}
-
-.t-select {
-  background: #252530;
-  border: 1px solid #3a3a4a;
-  border-radius: 4px;
-  color: #e8e8ec;
-  font-size: 12px;
-  padding: 5px 6px;
-  outline: none;
-  width: 100%;
-}
+.t-input:focus,
+.t-number:focus,
 .t-select:focus {
-  border-color: #e8c84a;
-  box-shadow: 0 0 0 2px rgba(232, 200, 74, 0.12), 0 0 8px rgba(232, 200, 74, 0.08);
+  border-color: rgba(232, 200, 74, 0.85);
+  box-shadow: 0 0 0 2px rgba(232, 200, 74, 0.15), 0 0 14px rgba(232, 200, 74, 0.4), 0 0 28px rgba(232, 200, 74, 0.12);
 }
 
 .field input[type="range"] { accent-color: #e8c84a; width: 100%; }

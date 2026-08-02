@@ -83,21 +83,22 @@ function select(club) {
 
 .cp-input {
   width: 100%;
-  background: #1e1e28;
-  border: 1px solid #2a2a35;
+  background: rgba(232, 200, 74, 0.04);
+  border: 1px solid rgba(232, 200, 74, 0.3);
   border-radius: 6px;
   color: #e8e8ec;
   font-size: 12px;
   padding: 7px 28px 7px 10px;
   outline: none;
-  transition: border-color 0.15s;
+  box-shadow: 0 0 8px rgba(232, 200, 74, 0.08);
+  transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
 }
 .cp-input:focus {
-  border-color: #e8c84a;
-  box-shadow: 0 0 0 2px rgba(232, 200, 74, 0.12), 0 0 8px rgba(232, 200, 74, 0.08);
+  border-color: rgba(232, 200, 74, 0.85);
+  box-shadow: 0 0 0 2px rgba(232, 200, 74, 0.15), 0 0 14px rgba(232, 200, 74, 0.4), 0 0 28px rgba(232, 200, 74, 0.12);
 }
-.cp-input::placeholder { color: #666; }
+.cp-input::placeholder { color: #777; }
 
 .cp-icon {
   position: absolute;
