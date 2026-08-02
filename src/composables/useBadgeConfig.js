@@ -83,7 +83,7 @@ export function useBadgeConfig() {
   function setPalette(hexArray) {
     const oldPalette = [...config.palette]
     const newPalette = hexArray.slice(0, 6)
-    for (const text of config.texts)    text.color = remapColor(text.color, oldPalette, newPalette)
+    for (const text of config.texts)    text.color = '#ffffff'
     for (const sym  of config.symbols)  sym.color  = remapColor(sym.color,  oldPalette, newPalette)
     config.palette.splice(0, config.palette.length, ...newPalette)
   }
