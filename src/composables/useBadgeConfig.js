@@ -139,7 +139,8 @@ export function useBadgeConfig() {
     const color = config.palette[Math.floor(Math.random() * config.palette.length)] || '#ffffff'
     const icon = icons.find(ic => ic.id === iconId)
     const ring = icon?.supportsRing ? { ringThickness: icon.defaultRingThickness ?? 44 } : {}
-    config.symbols.push({ instanceId, iconId, color, x: 100, y: 105, size: 72, strokeColor: '#000000', strokeWidth: 0, clipped: true, ...ring })
+    const strokeColor = _contrastColor(color, config.palette)
+    config.symbols.push({ instanceId, iconId, color, x: 100, y: 105, size: 72, strokeColor, strokeWidth: 0, clipped: true, ...ring })
     selectedSymbolId.value = instanceId
   }
 
