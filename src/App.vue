@@ -209,6 +209,7 @@ const showScene = ref(true)
             {{ showScene ? '▲ scene' : '▼ scene' }}
           </button>
 
+          <Transition name="scene-fade">
           <div v-show="showScene" class="scene-controls">
             <p class="drag-hint hud-pill">Drag symbols and text to reposition &nbsp;·&nbsp; Space or Enter to randomize</p>
 
@@ -245,6 +246,7 @@ const showScene = ref(true)
               <span class="overlay-label">overlay</span>
             </div>
           </div>
+          </Transition>
         </div>
       </section>
 
@@ -395,6 +397,7 @@ const showScene = ref(true)
               </div>
 
               <!-- Expanded controls, visible when this row is selected -->
+              <Transition name="panel-fade">
               <div v-if="selectedSymbolId === sym.instanceId" class="sym-expanded" @click.stop>
                 <label class="sym-field">
                   Size
@@ -420,6 +423,7 @@ const showScene = ref(true)
                   <span>{{ sym.strokeWidth || 0 }}</span>
                 </div>
               </div>
+              </Transition>
             </div>
           </div>
         </div>
@@ -697,7 +701,8 @@ const showScene = ref(true)
   color: #556;
   transition: border-color 0.15s, color 0.15s;
 }
-.shape-btn:hover { border-color: #555; color: #aaa; }
+.shape-btn:hover  { border-color: #555; color: #aaa; }
+.shape-btn:active { transform: scale(0.93); }
 .shape-btn.active { border-color: #e8c84a; color: #e8c84a; }
 
 .bg-type-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
@@ -712,7 +717,8 @@ const showScene = ref(true)
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
 }
-.bg-type-btn:hover { border-color: #555; color: #ddd; }
+.bg-type-btn:hover  { border-color: #555; color: #ddd; }
+.bg-type-btn:active { transform: scale(0.93); }
 .bg-type-btn.active { border-color: #e8c84a; color: #e8c84a; }
 
 /* Club Colors palette editor */
@@ -729,7 +735,7 @@ const showScene = ref(true)
   border-radius: 6px;
   border: 2px solid rgba(255, 255, 255, 0.1);
   cursor: pointer;
-  transition: border-color 0.15s, transform 0.1s;
+  transition: background 0.35s ease, border-color 0.15s, transform 0.1s;
   flex: 1;
 }
 
@@ -821,7 +827,8 @@ const showScene = ref(true)
   justify-content: center;
   transition: border-color 0.12s, color 0.12s;
 }
-.stepper-btn:hover { border-color: #e8c84a; color: #e8c84a; }
+.stepper-btn:hover  { border-color: #e8c84a; color: #e8c84a; }
+.stepper-btn:active { transform: scale(0.88); }
 
 .stepper-val {
   font-size: 13px;
@@ -923,4 +930,15 @@ const showScene = ref(true)
 
 .sym-stroke-row { gap: 6px; }
 .sym-stroke-range { flex: 1; accent-color: #e8c84a; }
+
+/* ── Transitions ─────────────────────────────────────────────────────────── */
+.scene-fade-enter-active,
+.scene-fade-leave-active { transition: opacity 0.2s ease, transform 0.2s ease; }
+.scene-fade-enter-from,
+.scene-fade-leave-to { opacity: 0; transform: translateY(-6px); }
+
+.panel-fade-enter-active,
+.panel-fade-leave-active { transition: opacity 0.18s ease; }
+.panel-fade-enter-from,
+.panel-fade-leave-to { opacity: 0; }
 </style>

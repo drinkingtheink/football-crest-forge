@@ -47,6 +47,7 @@ function select(club) {
       </span>
     </div>
 
+    <Transition name="dropdown-fade">
     <ul v-if="open && results.length" class="cp-dropdown">
       <li
         v-for="club in results"
@@ -66,6 +67,7 @@ function select(club) {
         </span>
       </li>
     </ul>
+    </Transition>
   </div>
 </template>
 
@@ -158,4 +160,9 @@ function select(club) {
   border: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
 }
+
+.dropdown-fade-enter-active,
+.dropdown-fade-leave-active { transition: opacity 0.15s ease, transform 0.15s ease; }
+.dropdown-fade-enter-from,
+.dropdown-fade-leave-to { opacity: 0; transform: translateY(-5px); }
 </style>

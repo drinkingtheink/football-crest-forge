@@ -70,6 +70,7 @@ function onFontChange(textId, event) {
         </div>
 
         <!-- Expanded controls -->
+        <Transition name="panel-fade">
         <div v-if="selectedTextId === text.id" class="text-expanded" @click.stop>
 
           <label class="field">
@@ -175,6 +176,7 @@ function onFontChange(textId, event) {
           </template>
 
         </div>
+        </Transition>
       </div>
     </div>
   </div>
@@ -310,4 +312,9 @@ function onFontChange(textId, event) {
   margin-top: 2px;
   display: block;
 }
+
+.panel-fade-enter-active,
+.panel-fade-leave-active { transition: opacity 0.18s ease; }
+.panel-fade-enter-from,
+.panel-fade-leave-to { opacity: 0; }
 </style>

@@ -189,11 +189,13 @@ const bgElements = computed(() => {
     <g :clip-path="`url(#${clipId})`">
       <rect
         v-for="(r, i) in bgElements.rects" :key="`r${i}`"
-        :x="r.x" :y="r.y" :width="r.w" :height="r.h" :fill="r.fill"
+        :x="r.x" :y="r.y" :width="r.w" :height="r.h"
+        :style="{ fill: r.fill, transition: 'fill 0.4s ease' }"
       />
       <polygon
         v-for="(p, i) in bgElements.polys" :key="`p${i}`"
-        :points="p.points" :fill="p.fill"
+        :points="p.points"
+        :style="{ fill: p.fill, transition: 'fill 0.4s ease' }"
       />
     </g>
 
@@ -216,10 +218,13 @@ const bgElements = computed(() => {
           v-for="(p, i) in iconsById[sym.iconId]?.paths"
           :key="i"
           :d="p"
-          :fill="sym.color"
-          :stroke="sym.strokeWidth > 0 ? sym.strokeColor : 'none'"
           :stroke-width="sym.strokeWidth"
           paint-order="stroke fill"
+          :style="{
+            fill: sym.color,
+            stroke: sym.strokeWidth > 0 ? sym.strokeColor : 'none',
+            transition: 'fill 0.35s ease, stroke 0.35s ease',
+          }"
         />
       </g>
     </g>
@@ -229,9 +234,12 @@ const bgElements = computed(() => {
       v-if="shape"
       :d="shape.path"
       fill="none"
-      :stroke="config.border.color"
-      :stroke-width="config.border.width"
       stroke-linejoin="round"
+      :style="{
+        stroke: config.border.color,
+        strokeWidth: config.border.width,
+        transition: 'stroke 0.4s ease, stroke-width 0.3s ease',
+      }"
     />
 
     <!-- Straight text (draggable, scroll to resize) -->
@@ -243,14 +251,14 @@ const bgElements = computed(() => {
       :font-family="text.fontFamily"
       :font-size="text.fontSize"
       :font-weight="text.fontWeight"
-      :fill="text.color"
       :letter-spacing="text.letterSpacing ?? 0"
       text-anchor="middle"
       dominant-baseline="middle"
       :style="{
+        fill: text.color,
         cursor: drag?.id === text.id ? 'grabbing' : 'grab',
         filter: hoveredTextId === text.id ? 'drop-shadow(0 0 5px rgba(255,255,255,0.35))' : 'none',
-        transition: 'filter 0.15s ease',
+        transition: 'fill 0.35s ease, filter 0.15s ease',
       }"
       @mousedown="startTextDrag($event, text.id)"
       @click="$emit('select-text', text.id)"
@@ -266,11 +274,11 @@ const bgElements = computed(() => {
       :font-family="text.fontFamily"
       :font-size="text.fontSize"
       :font-weight="text.fontWeight"
-      :fill="text.color"
       :letter-spacing="text.letterSpacing ?? 0"
       :style="{
+        fill: text.color,
         filter: hoveredTextId === text.id ? 'drop-shadow(0 0 5px rgba(255,255,255,0.35))' : 'none',
-        transition: 'filter 0.15s ease',
+        transition: 'fill 0.35s ease, filter 0.15s ease',
       }"
       @click="$emit('select-text', text.id)"
       @mouseenter="onTextEnter($event, text.id)"
