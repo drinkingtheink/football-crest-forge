@@ -2,13 +2,20 @@ const PREFIX = 'crest-forge:snap:'
 
 export async function saveSnapshot(name, config, svgEl) {
   const thumbnail = svgEl ? await captureThumb(svgEl) : null
+  const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
   const entry = {
+    id,
     name,
     timestamp: Date.now(),
     config: JSON.parse(JSON.stringify(config)),
     thumbnail,
   }
-  localStorage.setItem(PREFIX + name, JSON.stringify(entry))
+  try {
+    localStorage.setItem(PREFIX + id, JSON.stringify(entry))
+  } catch (e) {
+    if (isQuotaError(e)) { const err = new Error('Storage full'); err.code = 'QUOTA'; throw err }
+    throw e
+  }
   return entry
 }
 
@@ -17,13 +24,23 @@ export function listSnapshots() {
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i)
     if (!key?.startsWith(PREFIX)) continue
-    try { results.push(JSON.parse(localStorage.getItem(key))) } catch {}
+    try {
+      const entry = JSON.parse(localStorage.getItem(key))
+      // Legacy snapshots were keyed by name and have no id — derive it from the key
+      entry.id = entry.id ?? key.slice(PREFIX.length)
+      results.push(entry)
+    } catch {}
   }
   return results.sort((a, b) => b.timestamp - a.timestamp)
 }
 
-export function deleteSnapshot(name) {
-  localStorage.removeItem(PREFIX + name)
+export function deleteSnapshot(id) {
+  localStorage.removeItem(PREFIX + id)
+}
+
+function isQuotaError(e) {
+  return e instanceof DOMException &&
+    (e.code === 22 || e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED')
 }
 
 async function captureThumb(svgEl) {

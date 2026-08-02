@@ -449,7 +449,8 @@ export const clubs = [
     "colors": [
       { "name": "Red", "hex": "#DA291C" },
       { "name": "Black", "hex": "#000000" },
-      { "name": "White", "hex": "#FFFFFF" }
+      { "name": "White", "hex": "#FFFFFF" },
+      { "name": "Yellow", "hex": "#FFE200" }
     ]
   },
   {
