@@ -15,7 +15,7 @@ const props = defineProps({
   uid: { type: String, default: 'b0' },
 })
 
-const emit = defineEmits(['update-text-position', 'update-symbol-position', 'update-text', 'update-symbol', 'select-symbol', 'select-text'])
+const emit = defineEmits(['update-text-position', 'update-symbol-position', 'update-text', 'update-symbol', 'select-symbol', 'select-text', 'deselect'])
 
 function arcPathId(textId) { return `arcpath-${props.uid}-${textId}` }
 
@@ -203,6 +203,7 @@ const bgElements = computed(() => {
     @mousemove="onMove"
     @mouseup="stopDrag"
     @mouseleave="stopDrag"
+    @click="emit('deselect')"
   >
     <defs>
       <clipPath :id="clipId">
@@ -250,6 +251,7 @@ const bgElements = computed(() => {
         filter: hoveredSymbolId === sym.instanceId ? 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' : 'none',
         transition: 'filter 0.15s ease',
       }"
+      @click.stop
       @mousedown="startSymbolDrag($event, sym.instanceId)"
       @mouseenter="hoveredSymbolId = sym.instanceId"
       @mouseleave="hoveredSymbolId = null"
@@ -303,7 +305,7 @@ const bgElements = computed(() => {
         transition: 'fill 0.35s ease, filter 0.15s ease',
       }"
       @mousedown="startTextDrag($event, text.id)"
-      @click="$emit('select-text', text.id)"
+      @click.stop="$emit('select-text', text.id)"
       @mouseenter="onTextEnter($event, text.id)"
       @mouseleave="onTextLeave"
       @wheel.stop.prevent="onTextWheel($event, text.id)"
@@ -322,7 +324,7 @@ const bgElements = computed(() => {
         filter: hoveredTextId === text.id ? 'drop-shadow(0 0 5px rgba(255,255,255,0.35))' : 'none',
         transition: 'fill 0.35s ease, filter 0.15s ease',
       }"
-      @click="$emit('select-text', text.id)"
+      @click.stop="$emit('select-text', text.id)"
       @mouseenter="onTextEnter($event, text.id)"
       @mouseleave="onTextLeave"
       @wheel.stop.prevent="onTextWheel($event, text.id)"

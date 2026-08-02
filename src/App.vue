@@ -39,6 +39,7 @@ const {
   updateText,
   updateTextPosition,
   selectText,
+  deselectAll,
 } = useBadgeConfig()
 
 const bgTypes = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'chevron', 'sash', 'striped-v', 'striped-h', 'striped-diagonal']
@@ -110,6 +111,7 @@ function onKeyDown(e) {
     return
   }
 
+  if (e.key === 'Escape') { deselectAll(); return }
   if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); randomizeAll(); return }
   if (e.key !== 'Delete' && e.key !== 'Backspace') return
   if (selectedSymbolId.value) removeSymbol(selectedSymbolId.value)
@@ -245,6 +247,7 @@ const showScene = ref(true)
             @update-symbol="updateSymbol"
             @select-symbol="selectSymbol"
             @select-text="selectText"
+            @deselect="deselectAll"
           />
         </div>
         </div>

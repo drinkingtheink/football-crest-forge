@@ -171,6 +171,8 @@ export function useBadgeConfig() {
 
   function selectText(id) { selectedTextId.value = id; selectedSymbolId.value = null }
 
+  function deselectAll() { selectedSymbolId.value = null; selectedTextId.value = null }
+
   return {
     config,
     selectedSymbolId,
@@ -195,5 +197,6 @@ export function useBadgeConfig() {
     updateText,
     updateTextPosition,
     selectText,
+    deselectAll,
   }
 }
