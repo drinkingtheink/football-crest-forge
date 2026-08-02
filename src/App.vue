@@ -459,11 +459,6 @@ const showScene = ref(true)
   height: 100%;
 }
 
-@keyframes badge-float {
-  from { transform: translateY(0); }
-  to   { transform: translateY(-4px); }
-}
-
 @keyframes badge-pulse {
   0%   { transform: scale(1); filter: drop-shadow(0 0 0px rgba(232,200,74,0)); }
   30%  { transform: scale(1.035); filter: drop-shadow(0 0 18px rgba(232,200,74,0.7)); }
@@ -472,13 +467,10 @@ const showScene = ref(true)
 
 .badge-wrap {
   display: inline-flex;
-  animation: badge-float 3.2s ease-in-out infinite alternate;
 }
 
 .badge-wrap.pulsing {
-  animation:
-    badge-float 3.2s ease-in-out infinite alternate,
-    badge-pulse 0.35s ease-out forwards;
+  animation: badge-pulse 0.35s ease-out forwards;
 }
 
 .hud-pill {
