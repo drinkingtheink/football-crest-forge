@@ -171,6 +171,25 @@ export function useBadgeConfig() {
 
   function selectText(id) { selectedTextId.value = id; selectedSymbolId.value = null }
 
+  function pasteSymbol(source) {
+    const instanceId = `sym-${nextId++}`
+    config.symbols.push({ ...source, instanceId, x: source.x + 8, y: source.y + 8 })
+    selectedSymbolId.value = instanceId
+    selectedTextId.value = null
+  }
+
+  function pasteText(source) {
+    const id = `text-${nextId++}`
+    const pasted = { ...source, id }
+    if (!source.arc) {
+      pasted.x = (source.x ?? 100) + 8
+      pasted.y = (source.y ?? 120) + 8
+    }
+    config.texts.push(pasted)
+    selectedTextId.value = id
+    selectedSymbolId.value = null
+  }
+
   function deselectAll() { selectedSymbolId.value = null; selectedTextId.value = null }
 
   function loadConfig(saved) {
@@ -214,6 +233,8 @@ export function useBadgeConfig() {
     updateText,
     updateTextPosition,
     selectText,
+    pasteSymbol,
+    pasteText,
     deselectAll,
     loadConfig,
   }

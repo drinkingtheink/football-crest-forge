@@ -43,9 +43,13 @@ const {
   updateText,
   updateTextPosition,
   selectText,
+  pasteSymbol,
+  pasteText,
   deselectAll,
   loadConfig,
 } = useBadgeConfig()
+
+const clipboard = ref(null)
 
 const bgTypes = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'chevron', 'sash', 'striped-v', 'striped-h', 'striped-diagonal']
 const stripeTypes = new Set(['striped-v', 'striped-h', 'striped-diagonal'])
@@ -113,6 +117,25 @@ function onKeyDown(e) {
   if ((e.metaKey || e.ctrlKey) && e.key === 's') {
     e.preventDefault()
     snapshotPanelRef.value?.startSave()
+    return
+  }
+
+  if ((e.metaKey || e.ctrlKey) && e.key === 'c') {
+    if (selectedSymbolId.value) {
+      const sym = config.symbols.find(s => s.instanceId === selectedSymbolId.value)
+      if (sym) clipboard.value = { type: 'symbol', data: { ...sym } }
+    } else if (selectedTextId.value) {
+      const text = config.texts.find(t => t.id === selectedTextId.value)
+      if (text) clipboard.value = { type: 'text', data: { ...text } }
+    }
+    return
+  }
+
+  if ((e.metaKey || e.ctrlKey) && e.key === 'v') {
+    if (!clipboard.value) return
+    e.preventDefault()
+    if (clipboard.value.type === 'symbol') pasteSymbol(clipboard.value.data)
+    else pasteText(clipboard.value.data)
     return
   }
 

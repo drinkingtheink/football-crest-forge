@@ -89,6 +89,8 @@ npm run dev
 | Space | Randomize badge |
 | Arrow keys | Nudge selected symbol or text (1px) |
 | Shift + Arrow | Nudge 10px |
+| Cmd/Ctrl + C | Copy selected symbol or text |
+| Cmd/Ctrl + V | Paste copied element |
 | Cmd/Ctrl + S | Save snapshot |
 | Escape | Deselect |
 | Delete / Backspace | Remove selected element |
