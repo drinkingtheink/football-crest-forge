@@ -449,7 +449,7 @@ const showScene = ref(true)
 
 @keyframes badge-float {
   from { transform: translateY(0); }
-  to   { transform: translateY(-8px); }
+  to   { transform: translateY(-4px); }
 }
 
 @keyframes badge-pulse {
