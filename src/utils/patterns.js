@@ -19,6 +19,22 @@ function pickColors(palette, primaryOpacity = 0.4, secondaryOpacity = 0.2) {
   }
 }
 
+// ── Aurora ─────────────────────────────────────────────────────────────────
+export function auroraBg(palette) {
+  const c = (i, a) => rgba(palette[i % palette.length] || '#888888', a)
+  return {
+    background: [
+      `radial-gradient(ellipse 160% 65% at 8%  20%, ${c(0, 0.58)} 0%, transparent 65%)`,
+      `radial-gradient(ellipse 130% 55% at 92% 78%, ${c(1, 0.52)} 0%, transparent 62%)`,
+      `radial-gradient(ellipse 110% 60% at 52% 5%,  ${c(2, 0.44)} 0%, transparent 58%)`,
+      `radial-gradient(ellipse 140% 50% at 18% 95%, ${c(0, 0.36)} 0%, transparent 60%)`,
+      `radial-gradient(ellipse  90% 65% at 78% 42%, ${c(1, 0.30)} 0%, transparent 55%)`,
+      `#07070e`,
+    ].join(', '),
+    backgroundColor: '#07070e',
+  }
+}
+
 // ── Waves ──────────────────────────────────────────────────────────────────
 export function wavesBg(palette) {
   const { primary } = pickColors(palette, 0.4)

@@ -12,7 +12,7 @@ import { clubs } from './data/clubs.js'
 import { shapes, shapeGroups } from './data/shapes.js'
 import { iconsById } from './data/icons.js'
 import { loadFont } from './utils/fonts.js'
-import { wavesBg, crisscrossBg } from './utils/patterns.js'
+import { auroraBg, wavesBg, crisscrossBg } from './utils/patterns.js'
 import { burstParticles } from './utils/particles.js'
 
 const {
@@ -68,6 +68,7 @@ const bgOptions = [
   { id: 'brick',       label: 'Brick',      thumb: '/backgrounds/brick.jpg', isImgOption: true },
   { id: 'pitch',       label: 'Pitch',      thumb: '/backgrounds/pitch.png', isImgOption: true },
   { id: 'bokeh',       label: 'Bokeh' },
+  { id: 'aurora',      label: 'Aurora' },
   { id: 'waves',       label: 'Waves' },
   { id: 'crisscross',  label: 'Criss-Cross' },
 ]
@@ -75,7 +76,8 @@ const bgOptions = [
 const appBg = ref(bgOptions[Math.floor(Math.random() * bgOptions.length)].id)
 const overlay = reactive({ color: '#000000', opacity: 0.25 })
 
-const wavesThumb = computed(() => wavesBg(config.palette))
+const auroraThumb    = computed(() => auroraBg(config.palette))
+const wavesThumb     = computed(() => wavesBg(config.palette))
 const crisscrossThumb = computed(() => crisscrossBg(config.palette))
 
 function onKeyDown(e) {
@@ -217,7 +219,7 @@ const showScene = ref(true)
                 class="bg-opt"
                 :class="{ active: appBg === opt.id }"
                 :title="opt.label"
-                :style="opt.id === 'waves' ? wavesThumb : opt.id === 'crisscross' ? crisscrossThumb : {}"
+                :style="opt.id === 'aurora' ? auroraThumb : opt.id === 'waves' ? wavesThumb : opt.id === 'crisscross' ? crisscrossThumb : {}"
                 @click="appBg = opt.id"
               >
                 <img v-if="opt.thumb" :src="opt.thumb" class="bg-opt-thumb" />
