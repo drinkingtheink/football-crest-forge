@@ -448,7 +448,8 @@ export const clubs = [
     "name": "Manchester United",
     "colors": [
       { "name": "Red", "hex": "#DA291C" },
-      { "name": "Yellow", "hex": "#FBE122" }
+      { "name": "Black", "hex": "#000000" },
+      { "name": "White", "hex": "#FFFFFF" }
     ]
   },
   {
