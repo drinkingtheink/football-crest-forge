@@ -96,6 +96,11 @@ export function useBadgeConfig() {
   function setPaletteColor(index, color) { config.palette[index] = color }
   function addPaletteColor() { if (config.palette.length < 6) config.palette.push('#cccccc') }
   function removePaletteColor(index) { if (config.palette.length > 1) config.palette.splice(index, 1) }
+  function movePaletteColor(from, to) {
+    if (from === to || from == null || to == null) return
+    const [moved] = config.palette.splice(from, 1)
+    config.palette.splice(to, 0, moved)
+  }
   function setPalette(hexArray) {
     const oldPalette = [...config.palette]
     const newPalette = hexArray.slice(0, 6)
@@ -233,6 +238,7 @@ export function useBadgeConfig() {
     setPaletteColor,
     addPaletteColor,
     removePaletteColor,
+    movePaletteColor,
     setPalette,
     setShape,
     setBackgroundType,

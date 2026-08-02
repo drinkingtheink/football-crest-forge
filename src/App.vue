@@ -26,6 +26,7 @@ const {
   setPaletteColor,
   addPaletteColor,
   removePaletteColor,
+  movePaletteColor,
   setPalette,
   setShape,
   setBackgroundType,
@@ -95,6 +96,29 @@ const activeClubModified = computed(() => {
 function applyClub(club) {
   setPalette(club.colors.map(c => c.hex))
   activeClub.value = club
+}
+
+// ── Palette drag-to-reorder ─────────────────────────────────────────────────
+const paletteDragIndex = ref(null)
+const paletteOverIndex = ref(null)
+function onPaletteDragStart(i, e) {
+  paletteDragIndex.value = i
+  e.dataTransfer.effectAllowed = 'move'
+}
+function onPaletteDragOver(i) {
+  if (paletteDragIndex.value !== null) paletteOverIndex.value = i
+}
+function onPaletteDrop(i) {
+  movePaletteColor(paletteDragIndex.value, i)
+  paletteDragIndex.value = null
+  paletteOverIndex.value = null
+}
+function onPaletteDragEnd() {
+  paletteDragIndex.value = null
+  paletteOverIndex.value = null
+}
+function openColorInput(e) {
+  e.currentTarget.querySelector('input.palette-input-overlay')?.click()
 }
 watch(() => config.palette[0], c => { if (c) overlay.color = c })
 
@@ -449,18 +473,27 @@ function stepBg(dir) {
               v-for="(color, i) in config.palette"
               :key="i"
               class="palette-slot"
+              :class="{ dragging: paletteDragIndex === i, 'drag-over': paletteOverIndex === i && paletteDragIndex !== i }"
               :style="{ background: color }"
-              :title="color"
+              :title="`${color} — drag to reorder`"
+              draggable="true"
+              @dragstart="onPaletteDragStart(i, $event)"
+              @dragover.prevent="onPaletteDragOver(i)"
+              @drop.prevent="onPaletteDrop(i)"
+              @dragend="onPaletteDragEnd"
+              @click="openColorInput"
             >
               <input
                 type="color"
                 :value="color"
                 class="palette-input-overlay"
                 @input="setPaletteColor(i, $event.target.value)"
+                @click.stop
               />
               <button
                 class="palette-remove"
                 title="Remove color"
+                draggable="false"
                 @click.stop="removePaletteColor(i)"
               >×</button>
             </div>
@@ -471,7 +504,7 @@ function stepBg(dir) {
               @click="addPaletteColor"
             >+</button>
           </div>
-          <p class="palette-hint">Click to change · hover to remove · up to 6 colors</p>
+          <p class="palette-hint">Click to change · drag to reorder · hover to remove · up to 6 colors</p>
         </div>
 
         <!-- Shape -->
@@ -1057,6 +1090,15 @@ function stepBg(dir) {
   opacity: 0;
   cursor: pointer;
   z-index: 1;
+  pointer-events: none;
+}
+
+.palette-slot.dragging {
+  opacity: 0.4;
+}
+.palette-slot.drag-over {
+  border-color: #e8c84a;
+  transform: translateY(-2px);
 }
 
 .palette-remove {
