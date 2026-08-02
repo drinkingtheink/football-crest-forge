@@ -174,7 +174,15 @@ const snapshotPanelRef = ref(null)
 
 async function doSaveSnapshot(name) {
   const svgEl = badgeWrap.value?.querySelector('svg')
-  return saveSnapshot(name, config, svgEl)
+  try {
+    return await saveSnapshot(name, config, svgEl)
+  } catch (e) {
+    if (e.code === 'QUOTA') {
+      addToast('Snapshot storage is full — delete a few snapshots and try again.', { type: 'tip', duration: 6000 })
+      return false
+    }
+    throw e
+  }
 }
 const isPulsing      = ref(false)
 const isBadgeActive  = ref(false)

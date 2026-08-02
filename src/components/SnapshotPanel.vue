@@ -29,7 +29,8 @@ async function confirmSave() {
   if (!name) return
   saving.value = true
   try {
-    await props.saveFn(name)
+    const saved = await props.saveFn(name)
+    if (saved === false) return   // save failed (e.g. storage full); keep the dialog open
     refresh()
     showNameInput.value = false
     nameInput.value = ''
@@ -47,7 +48,7 @@ function handleLoad(snap) { emit('load', snap.config) }
 
 function handleDelete(snap) {
   if (!window.confirm(`Delete "${snap.name}"?`)) return
-  deleteSnapshot(snap.name)
+  deleteSnapshot(snap.id)
   refresh()
 }
 
@@ -79,7 +80,7 @@ function formatDate(ts) {
     <p v-if="!snapshots.length" class="snap-empty">No snapshots saved yet.<br>Save a snapshot to revisit this design later.</p>
 
     <div v-else class="snap-grid">
-      <div v-for="snap in snapshots" :key="snap.name" class="snap-card">
+      <div v-for="snap in snapshots" :key="snap.id" class="snap-card">
         <button class="snap-thumb-btn" @click="handleLoad(snap)" :title="`Load: ${snap.name}`">
           <img v-if="snap.thumbnail" :src="snap.thumbnail" class="snap-thumb" />
           <div v-else class="snap-thumb-placeholder" />
