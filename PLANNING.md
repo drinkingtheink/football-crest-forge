@@ -77,6 +77,8 @@
 3. Remove `<defs>` entries that reference font names
 4. Serialize to string, trigger download
 
+> **Rotation note:** symbols and straight text now carry a `rotation` field applied as an SVG `rotate()` transform. Symbol and straight-text transforms carry through export automatically. The text-to-outline step above must re-apply each text element's rotation to its generated glyph `<path>` (opentype.js outputs unrotated paths).
+
 **PNG export strategy:**
 1. Serialize SVG → blob URL
 2. Draw onto `<canvas>` at target resolution (e.g., 800×960 for 4×)
@@ -138,6 +140,7 @@ Two buttons beneath the badge:
 - [ ] No undo/redo
 - [ ] No keyboard shortcut to remove selected element (Delete key)
 - [ ] Mobile layout not considered (controls pane too narrow on small screens)
+- [ ] Arc text rotation not supported (maybe later) — symbols and straight text have a rotation slider; arc text follows a curved path so rotating it is a niche/confusing case, deferred
 
 ---
 
