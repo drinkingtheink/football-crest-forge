@@ -11,12 +11,12 @@ const root  = ref(null)
 
 onClickOutside(root, () => { open.value = false })
 
+const randomSample = [...clubs].sort(() => Math.random() - 0.5).slice(0, 8).sort((a, b) => a.name.localeCompare(b.name))
+
 const results = computed(() => {
   const q = query.value.trim().toLowerCase()
-  const list = q
-    ? clubs.filter(c => c.name.toLowerCase().includes(q))
-    : clubs
-  return list.slice(0, 8)
+  if (!q) return randomSample
+  return clubs.filter(c => c.name.toLowerCase().includes(q)).slice(0, 8)
 })
 
 function select(club) {
