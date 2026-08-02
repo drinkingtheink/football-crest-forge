@@ -194,6 +194,14 @@ const bgElements = computed(() => {
         :d="arcPathD(text)"
         fill="none"
       />
+      <!-- Shimmer gradient: narrow white band, feathered edges -->
+      <linearGradient :id="`shimmer-grad-${uid}`" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%"   stop-color="white" stop-opacity="0" />
+        <stop offset="20%"  stop-color="white" stop-opacity="0.25" />
+        <stop offset="50%"  stop-color="white" stop-opacity="0.85" />
+        <stop offset="80%"  stop-color="white" stop-opacity="0.25" />
+        <stop offset="100%" stop-color="white" stop-opacity="0" />
+      </linearGradient>
     </defs>
 
     <!-- Background -->
@@ -303,6 +311,26 @@ const bgElements = computed(() => {
         text-anchor="middle"
       >{{ text.content }}</textPath>
     </text>
+
+    <!-- Shimmer (decorative sheen sweep, clipped to shield) -->
+    <g :clip-path="`url(#${clipId})`" style="pointer-events:none">
+      <g>
+        <animateTransform
+          attributeName="transform"
+          type="translate"
+          values="-100,0; 340,0; 340,0"
+          keyTimes="0; 0.16; 1"
+          dur="7s"
+          repeatCount="indefinite"
+        />
+        <rect
+          x="0" y="-10"
+          width="90" height="260"
+          :fill="`url(#shimmer-grad-${uid})`"
+          transform="skewX(-14)"
+        />
+      </g>
+    </g>
 
     <!-- Size hint bubble (shown while scroll-resizing) -->
     <g v-if="sizeHint" :transform="`translate(${sizeHint.x}, ${sizeHint.y})`" style="pointer-events:none">
