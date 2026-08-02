@@ -560,6 +560,15 @@ const showScene = ref(true)
                   />
                   <span>{{ sym.size }}</span>
                 </label>
+                <label v-if="iconsById[sym.iconId]?.supportsRing" class="sym-field">
+                  Thickness
+                  <input
+                    type="range" min="2" max="44"
+                    :value="sym.ringThickness ?? iconsById[sym.iconId]?.defaultRingThickness ?? 44"
+                    @input="updateSymbol(sym.instanceId, { ringThickness: Number($event.target.value) })"
+                  />
+                  <span>{{ sym.ringThickness ?? iconsById[sym.iconId]?.defaultRingThickness ?? 44 }}</span>
+                </label>
                 <div class="sym-field sym-clip-row">
                   <span>Bounds</span>
                   <button

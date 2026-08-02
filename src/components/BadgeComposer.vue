@@ -22,6 +22,17 @@ function arcPathId(textId) { return `arcpath-${props.uid}-${textId}` }
 const shape = computed(() => shapesById[props.config.shapeId])
 const clipId = computed(() => `clip-${props.uid}`)
 
+function symPaths(sym) {
+  const icon = iconsById[sym.iconId]
+  if (!icon?.supportsRing || sym.ringThickness == null) return icon?.paths ?? []
+  const cx = 50, cy = 50, outerR = 44
+  const outer = `M ${cx - outerR},${cy} A ${outerR},${outerR} 0 1 1 ${cx + outerR},${cy} A ${outerR},${outerR} 0 1 1 ${cx - outerR},${cy} Z`
+  const innerR = outerR - sym.ringThickness
+  if (innerR <= 0) return [outer]
+  const inner = `M ${cx - innerR},${cy} A ${innerR},${innerR} 0 1 0 ${cx + innerR},${cy} A ${innerR},${innerR} 0 1 0 ${cx - innerR},${cy} Z`
+  return [`${outer} ${inner}`]
+}
+
 function symbolTransform(sym) {
   const icon = iconsById[sym.iconId]
   const vw = icon?.viewBox?.[0] ?? 100
@@ -305,7 +316,7 @@ const bgElements = computed(() => {
     >
       <g :transform="symbolTransform(sym)">
         <path
-          v-for="(p, i) in iconsById[sym.iconId]?.paths"
+          v-for="(p, i) in symPaths(sym)"
           :key="i"
           :d="p"
           :stroke-width="sym.strokeWidth"
@@ -430,7 +441,7 @@ const bgElements = computed(() => {
     >
       <g :transform="symbolTransform(sym)">
         <path
-          v-for="(p, i) in iconsById[sym.iconId]?.paths"
+          v-for="(p, i) in symPaths(sym)"
           :key="i"
           :d="p"
           :stroke-width="sym.strokeWidth"

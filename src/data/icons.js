@@ -715,16 +715,18 @@ export const icons = [
     id: 'circle',
     label: 'Circle',
     group: 'Shapes',
-    // Two CW semicircular arcs forming a filled disk
     paths: ['M 6,50 A 44,44 0 1 1 94,50 A 44,44 0 1 1 6,50 Z'],
+    supportsRing: true,
+    defaultRingThickness: 44,
   },
   {
     id: 'hoop',
     label: 'Hoop',
     group: 'Shapes',
-    // Outer circle CW + inner circle CCW in one compound path.
-    // Nonzero winding rule (SVG default) makes the inner region a transparent hole.
+    // Static path kept for backward compat with saved designs that predate ringThickness.
     paths: ['M 6,50 A 44,44 0 1 1 94,50 A 44,44 0 1 1 6,50 Z M 22,50 A 28,28 0 1 0 78,50 A 28,28 0 1 0 22,50 Z'],
+    supportsRing: true,
+    defaultRingThickness: 16,
   },
 
   // ── Birds ──────────────────────────────────────────────────────────────────
