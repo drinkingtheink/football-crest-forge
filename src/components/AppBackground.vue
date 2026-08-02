@@ -74,7 +74,7 @@ onUnmounted(() => {
 .bokeh-canvas {
   width: 100%;
   height: 100%;
-  filter: blur(28px);
-  transform: scale(1.08);
+  filter: blur(32px);
+  transform: scale(1.1);
 }
 </style>

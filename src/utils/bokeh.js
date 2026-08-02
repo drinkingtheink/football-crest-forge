@@ -6,38 +6,51 @@ function hexToRgb(hex) {
 function makeCircles(w, h, colors) {
   const circles = []
 
-  // Large, slow background blobs — set the ambient color wash
-  for (let i = 0; i < 7; i++) {
+  // Large ambient blobs — set the color wash
+  for (let i = 0; i < 10; i++) {
     circles.push({
       x: Math.random() * w,
       y: Math.random() * h,
-      r: h * (0.25 + Math.random() * 0.35),
-      alpha: 0.05 + Math.random() * 0.08,
-      vx: (Math.random() - 0.5) * 0.25,
-      vy: (Math.random() - 0.5) * 0.2,
+      r: h * (0.3 + Math.random() * 0.45),
+      alpha: 0.12 + Math.random() * 0.18,
+      vx: (Math.random() - 0.5) * 0.2,
+      vy: (Math.random() - 0.5) * 0.15,
       ci: i % colors.length,
-      blob: true,
+      type: 'blob',
     })
   }
 
-  // Mid-size bokeh spots — the main visual element
-  for (let i = 0; i < 28; i++) {
+  // Mid-size bokeh donuts — bright ring, dim center (real lens bokeh shape)
+  for (let i = 0; i < 40; i++) {
     circles.push({
       x: Math.random() * w,
       y: Math.random() * h,
-      r: 25 + Math.random() * 75,
-      alpha: 0.1 + Math.random() * 0.22,
-      vx: (Math.random() - 0.5) * 0.45,
-      vy: (Math.random() - 0.5) * 0.35,
+      r: 30 + Math.random() * 95,
+      alpha: 0.38 + Math.random() * 0.52,
+      vx: (Math.random() - 0.5) * 0.42,
+      vy: (Math.random() - 0.5) * 0.32,
       ci: i % colors.length,
-      blob: false,
+      type: 'bokeh',
+    })
+  }
+
+  // Small bright pinpoints — light sources that blur into hot spots
+  for (let i = 0; i < 14; i++) {
+    circles.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: 4 + Math.random() * 16,
+      alpha: 0.75 + Math.random() * 0.25,
+      vx: (Math.random() - 0.5) * 0.55,
+      vy: (Math.random() - 0.5) * 0.45,
+      ci: i % colors.length,
+      type: 'point',
     })
   }
 
   return circles
 }
 
-// Returns a controller with stop() and resize() methods.
 export function startBokeh(canvas, getPalette) {
   let rafId = null
 
@@ -58,11 +71,23 @@ export function startBokeh(canvas, getPalette) {
 
     for (const c of circles) {
       const [r, g, b] = hexToRgb(palette[c.ci % palette.length])
-
       const grad = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.r)
-      grad.addColorStop(0, `rgba(${r},${g},${b},${c.alpha})`)
-      if (!c.blob) grad.addColorStop(0.45, `rgba(${r},${g},${b},${c.alpha * 0.4})`)
-      grad.addColorStop(1, `rgba(${r},${g},${b},0)`)
+
+      if (c.type === 'blob') {
+        grad.addColorStop(0, `rgba(${r},${g},${b},${c.alpha})`)
+        grad.addColorStop(1, `rgba(${r},${g},${b},0)`)
+      } else if (c.type === 'bokeh') {
+        // Donut: dim center → bright ring → fade out
+        grad.addColorStop(0,    `rgba(${r},${g},${b},${c.alpha * 0.2})`)
+        grad.addColorStop(0.52, `rgba(${r},${g},${b},${c.alpha})`)
+        grad.addColorStop(0.7,  `rgba(${r},${g},${b},${c.alpha * 0.4})`)
+        grad.addColorStop(1,    `rgba(${r},${g},${b},0)`)
+      } else {
+        // Pinpoint: hot bright core
+        grad.addColorStop(0,   `rgba(${r},${g},${b},${c.alpha})`)
+        grad.addColorStop(0.35,`rgba(${r},${g},${b},${c.alpha * 0.65})`)
+        grad.addColorStop(1,   `rgba(${r},${g},${b},0)`)
+      }
 
       ctx.fillStyle = grad
       ctx.beginPath()
