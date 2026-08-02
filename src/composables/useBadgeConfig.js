@@ -42,6 +42,7 @@ const config = reactive({
     type: _randomBgType,
     stripeCount: 4,
     sashWidth: 174,
+    sunburstRays: 12,
   },
   symbols: _addInitialSymbol ? (() => {
     const fill = _randomClub.colors[0]?.hex || '#ffffff'
@@ -126,6 +127,7 @@ export function useBadgeConfig() {
   function setBackgroundType(type) { config.background.type = type }
   function setStripeCount(n) { config.background.stripeCount = Math.min(16, Math.max(2, n)) }
   function setSashWidth(n) { config.background.sashWidth = Math.min(280, Math.max(68, n)) }
+  function setSunburstRays(n) { config.background.sunburstRays = Math.min(48, Math.max(6, Math.round(n / 2) * 2)) }
 
   // ── Border ────────────────────────────────────────────────────────────────
   function setBorderColor(color) { config.border.color = color }
@@ -234,6 +236,7 @@ export function useBadgeConfig() {
     setBackgroundType,
     setStripeCount,
     setSashWidth,
+    setSunburstRays,
     setBorderColor,
     setBorderWidth,
     addSymbol,

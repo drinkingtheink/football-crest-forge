@@ -219,6 +219,41 @@ const bgElements = computed(() => {
         return { points: `${cs},0 ${ce},0 ${ce-H},${H} ${cs-H},${H}`, fill: i%2===0?c0:c1 }
       })}
     }
+    case 'checkered': {
+      // Square cells sized to fit n columns across; rows overflow past H and clip
+      const cell = W / n
+      const rows = Math.ceil(H / cell)
+      const rects = []
+      for (let r = 0; r < rows; r++)
+        for (let col = 0; col < n; col++)
+          rects.push({ x: col*cell, y: r*cell, w: cell, h: cell, fill: (r+col)%2===0 ? c0 : c1 })
+      return { rects, polys: [] }
+    }
+    case 'saltire': {
+      // Per-saltire: two diagonals split the field into 4 triangles from the centre
+      const cx = W/2, cy = H/2
+      return { rects: [], polys: [
+        { points: `0,0 ${W},0 ${cx},${cy}`,      fill: c0 },  // top
+        { points: `${W},0 ${W},${H} ${cx},${cy}`, fill: c1 },  // right
+        { points: `0,${H} ${W},${H} ${cx},${cy}`, fill: c0 },  // bottom
+        { points: `0,0 0,${H} ${cx},${cy}`,       fill: c1 },  // left
+      ]}
+    }
+    case 'sunburst': {
+      // Alternating wedges radiating from the centre; count from sunburstRays (even)
+      const rays = props.config.background.sunburstRays ?? 12
+      const cx = W/2, cy = H/2
+      const R = Math.hypot(W, H)
+      const polys = Array.from({ length: rays }, (_, i) => {
+        const a0 = (i / rays) * Math.PI * 2 - Math.PI/2
+        const a1 = ((i+1) / rays) * Math.PI * 2 - Math.PI/2
+        return {
+          points: `${cx},${cy} ${cx + Math.cos(a0)*R},${cy + Math.sin(a0)*R} ${cx + Math.cos(a1)*R},${cy + Math.sin(a1)*R}`,
+          fill: i%2===0 ? c0 : c1,
+        }
+      })
+      return { rects: [{ x: 0, y: 0, w: W, h: H, fill: c0 }], polys }
+    }
     default:
       return { rects: [{ x: 0, y: 0, w: W, h: H, fill: c0 }], polys: [] }
   }

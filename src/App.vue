@@ -31,6 +31,7 @@ const {
   setBackgroundType,
   setStripeCount,
   setSashWidth,
+  setSunburstRays,
   setBorderColor,
   setBorderWidth,
   addSymbol,
@@ -51,8 +52,8 @@ const {
 
 const clipboard = ref(null)
 
-const bgTypes = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'chevron', 'sash', 'striped-v', 'striped-h', 'striped-diagonal']
-const stripeTypes = new Set(['striped-v', 'striped-h', 'striped-diagonal'])
+const bgTypes = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'chevron', 'sash', 'striped-v', 'striped-h', 'striped-diagonal', 'checkered', 'saltire', 'sunburst']
+const stripeTypes = new Set(['striped-v', 'striped-h', 'striped-diagonal', 'checkered'])
 const imageBgTypes = new Set(['grass', 'stadium', 'fabric', 'brick', 'pitch'])
 
 // Auto-scroll sidebar to selected symbol row
@@ -486,11 +487,19 @@ function stepBg(dir) {
             >{{ t }}</button>
           </div>
           <div v-if="stripeTypes.has(config.background.type)" class="stripe-count-row">
-            <span class="color-label">Stripes</span>
+            <span class="color-label">{{ config.background.type === 'checkered' ? 'Columns' : 'Stripes' }}</span>
             <div class="stripe-stepper">
               <button class="stepper-btn" @click="setStripeCount(config.background.stripeCount - 1)">−</button>
               <span class="stepper-val">{{ config.background.stripeCount }}</span>
               <button class="stepper-btn" @click="setStripeCount(config.background.stripeCount + 1)">+</button>
+            </div>
+          </div>
+          <div v-if="config.background.type === 'sunburst'" class="stripe-count-row">
+            <span class="color-label">Rays</span>
+            <div class="stripe-stepper">
+              <button class="stepper-btn" @click="setSunburstRays(config.background.sunburstRays - 2)">−</button>
+              <span class="stepper-val">{{ config.background.sunburstRays }}</span>
+              <button class="stepper-btn" @click="setSunburstRays(config.background.sunburstRays + 2)">+</button>
             </div>
           </div>
           <div v-if="config.background.type === 'sash'" class="range-row">
