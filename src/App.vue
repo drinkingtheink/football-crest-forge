@@ -92,6 +92,7 @@ const controlsPane  = ref(null)
 const particleCanvas = ref(null)
 const badgeWrap      = ref(null)
 const isPulsing      = ref(false)
+const isBadgeActive  = ref(false)
 let   stopParticles  = null
 let   pulseTimer     = null
 let   burstTimer     = null
@@ -189,8 +190,9 @@ const showScene = ref(true)
     <ToastContainer />
     <main class="app-body">
       <!-- Preview -->
-      <section class="preview-pane" @wheel.prevent="forwardScroll">
+      <section class="preview-pane" @wheel.prevent="forwardScroll" @mouseenter="isBadgeActive = true" @mouseleave="isBadgeActive = false">
         <canvas ref="particleCanvas" class="particle-canvas" />
+        <div class="badge-float-wrap" :class="{ active: isBadgeActive }">
         <div ref="badgeWrap" :class="['badge-wrap', { pulsing: isPulsing }]">
           <BadgeComposer
             :config="config"
@@ -203,6 +205,7 @@ const showScene = ref(true)
             @select-symbol="selectSymbol"
             @select-text="selectText"
           />
+        </div>
         </div>
         <div class="scene-wrap">
           <button class="scene-toggle hud-pill" @click="showScene = !showScene" title="Toggle scene controls">
@@ -524,16 +527,27 @@ const showScene = ref(true)
   height: 100%;
 }
 
+@keyframes badge-float {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-5px); }
+}
+
 @keyframes badge-pulse {
-  0%   { transform: scale(1); filter: drop-shadow(0 0 0px rgba(232,200,74,0)); }
+  0%   { transform: scale(1);     filter: drop-shadow(0 0 0px  rgba(232,200,74,0));   }
   30%  { transform: scale(1.035); filter: drop-shadow(0 0 18px rgba(232,200,74,0.7)); }
-  100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(232,200,74,0)); }
+  100% { transform: scale(1);     filter: drop-shadow(0 0 0px  rgba(232,200,74,0));   }
+}
+
+.badge-float-wrap {
+  animation: badge-float 3.4s ease-in-out infinite alternate;
+}
+.badge-float-wrap.active {
+  animation-play-state: paused;
 }
 
 .badge-wrap {
   display: inline-flex;
 }
-
 .badge-wrap.pulsing {
   animation: badge-pulse 0.35s ease-out forwards;
 }
