@@ -55,7 +55,7 @@ function setSymRef(el, instanceId) {
 watch(selectedSymbolId, async (id) => {
   if (!id) return
   await nextTick()
-  symRefs[id]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  setTimeout(() => symRefs[id]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120)
 })
 
 const bgOptions = [
@@ -77,8 +77,31 @@ const auroraThumb    = computed(() => auroraBg(config.palette))
 const wavesThumb     = computed(() => wavesBg(config.palette))
 const crisscrossThumb = computed(() => crisscrossBg(config.palette))
 
+const _ARROW_DELTA = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }
+
 function onKeyDown(e) {
   if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return
+
+  if (e.key in _ARROW_DELTA) {
+    e.preventDefault()
+    const step = e.shiftKey ? 10 : 1
+    const [dx, dy] = _ARROW_DELTA[e.key].map(v => v * step)
+    if (selectedSymbolId.value) {
+      const sym = config.symbols.find(s => s.instanceId === selectedSymbolId.value)
+      if (sym) updateSymbolPosition(selectedSymbolId.value, sym.x + dx, sym.y + dy)
+    } else if (selectedTextId.value) {
+      const text = config.texts.find(t => t.id === selectedTextId.value)
+      if (text) {
+        if (text.arc) {
+          updateText(selectedTextId.value, { arcX: (text.arcX ?? 100) + dx, arcY: (text.arcY ?? 120) + dy })
+        } else {
+          updateTextPosition(selectedTextId.value, (text.x ?? 100) + dx, (text.y ?? 120) + dy)
+        }
+      }
+    }
+    return
+  }
+
   if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); randomizeAll(); return }
   if (e.key !== 'Delete' && e.key !== 'Backspace') return
   if (selectedSymbolId.value) removeSymbol(selectedSymbolId.value)
@@ -224,7 +247,7 @@ const showScene = ref(true)
 
           <Transition name="scene-fade">
           <div v-show="showScene" class="scene-controls">
-            <p class="drag-hint hud-pill">Drag symbols and text to reposition &nbsp;·&nbsp; Space or Enter to randomize</p>
+            <p class="drag-hint hud-pill">Drag or arrow-key symbols &amp; text &nbsp;·&nbsp; Shift+Arrow = 10px &nbsp;·&nbsp; Space to randomize</p>
 
             <div class="bg-picker hud-pill">
               <button
