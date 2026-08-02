@@ -250,12 +250,12 @@ function onFontChange(textId, event) {
 .field { display: flex; flex-direction: column; gap: 4px; }
 
 .field > span {
-  color: #888;
+  color: #aaa;
   font-size: 11px;
   display: flex;
   justify-content: space-between;
 }
-.field > span em { color: #aaa; font-style: normal; }
+.field > span em { color: #ccc; font-style: normal; }
 
 .field-row { display: flex; gap: 8px; }
 .field-half { flex: 1; }
@@ -271,7 +271,10 @@ function onFontChange(textId, event) {
   width: 100%;
   box-sizing: border-box;
 }
-.t-input:focus { border-color: #e8c84a; }
+.t-input:focus {
+  border-color: #e8c84a;
+  box-shadow: 0 0 0 2px rgba(232, 200, 74, 0.12), 0 0 8px rgba(232, 200, 74, 0.08);
+}
 
 .t-number {
   background: #252530;
@@ -284,6 +287,10 @@ function onFontChange(textId, event) {
   width: 100%;
   box-sizing: border-box;
 }
+.t-number:focus {
+  border-color: #e8c84a;
+  box-shadow: 0 0 0 2px rgba(232, 200, 74, 0.12), 0 0 8px rgba(232, 200, 74, 0.08);
+}
 
 .t-select {
   background: #252530;
@@ -294,6 +301,10 @@ function onFontChange(textId, event) {
   padding: 5px 6px;
   outline: none;
   width: 100%;
+}
+.t-select:focus {
+  border-color: #e8c84a;
+  box-shadow: 0 0 0 2px rgba(232, 200, 74, 0.12), 0 0 8px rgba(232, 200, 74, 0.08);
 }
 
 .field input[type="range"] { accent-color: #e8c84a; width: 100%; }
@@ -314,7 +325,7 @@ function onFontChange(textId, event) {
 .arc-btn:hover { border-color: #666; color: #ccc; }
 .arc-btn.active { border-color: #e8c84a; color: #e8c84a; }
 
-.field-hint { color: #555; font-size: 11px; margin: 0; }
+.field-hint { color: #777; font-size: 11px; margin: 0; }
 
 .font-preview {
   color: #ccc;

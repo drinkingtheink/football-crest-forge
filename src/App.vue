@@ -493,7 +493,7 @@ const showScene = ref(true)
 
 .overlay-label {
   font-size: 10px;
-  color: #444;
+  color: #888;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   flex-shrink: 0;
@@ -519,12 +519,12 @@ const showScene = ref(true)
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #888;
+  color: #aaa;
   margin: 0 0 10px;
 }
 
 .shape-group { margin-bottom: 12px; }
-.shape-group-label { font-size: 11px; color: #555; margin: 0 0 6px; }
+.shape-group-label { font-size: 11px; color: #888; margin: 0 0 6px; }
 
 .shape-grid { display: flex; flex-wrap: wrap; gap: 6px; }
 
@@ -627,7 +627,7 @@ const showScene = ref(true)
 
 .palette-hint {
   font-size: 11px;
-  color: #555;
+  color: #888;
   margin: 0;
   line-height: 1.4;
 }
@@ -681,7 +681,7 @@ const showScene = ref(true)
 
 .color-label {
   font-size: 11px;
-  color: #888;
+  color: #aaa;
   min-width: 44px;
 }
 
@@ -690,10 +690,10 @@ const showScene = ref(true)
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: #888;
+  color: #aaa;
 }
 .range-row input[type="range"] { flex: 1; accent-color: #e8c84a; }
-.range-row span { font-size: 11px; color: #ccc; min-width: 24px; text-align: right; }
+.range-row span { font-size: 11px; color: #ddd; min-width: 24px; text-align: right; }
 
 /* Placed symbols list */
 .symbol-list { display: flex; flex-direction: column; gap: 6px; }
@@ -752,8 +752,8 @@ const showScene = ref(true)
   align-items: center;
   gap: 8px;
   font-size: 11px;
-  color: #888;
+  color: #aaa;
 }
 .sym-size input[type="range"] { flex: 1; accent-color: #e8c84a; }
-.sym-size span { font-size: 11px; color: #ccc; min-width: 24px; text-align: right; }
+.sym-size span { font-size: 11px; color: #ddd; min-width: 24px; text-align: right; }
 </style>

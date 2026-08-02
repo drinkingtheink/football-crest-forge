@@ -39,7 +39,12 @@ function select(club) {
         autocomplete="off"
         spellcheck="false"
       />
-      <span class="cp-icon">⚽</span>
+      <span class="cp-icon">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="5.5" cy="5.5" r="4" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="8.5" y1="8.5" x2="12" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </span>
     </div>
 
     <ul v-if="open && results.length" class="cp-dropdown">
@@ -88,8 +93,11 @@ function select(club) {
   transition: border-color 0.15s;
   box-sizing: border-box;
 }
-.cp-input:focus { border-color: #e8c84a; }
-.cp-input::placeholder { color: #555; }
+.cp-input:focus {
+  border-color: #e8c84a;
+  box-shadow: 0 0 0 2px rgba(232, 200, 74, 0.12), 0 0 8px rgba(232, 200, 74, 0.08);
+}
+.cp-input::placeholder { color: #666; }
 
 .cp-icon {
   position: absolute;
