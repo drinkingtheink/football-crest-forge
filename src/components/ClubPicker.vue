@@ -11,11 +11,21 @@ const root  = ref(null)
 
 onClickOutside(root, () => { open.value = false })
 
-const randomSample = [...clubs].sort(() => Math.random() - 0.5).slice(0, 8).sort((a, b) => a.name.localeCompare(b.name))
+function getRandomSample() {
+  return [...clubs].sort(() => Math.random() - 0.5).slice(0, 8).sort((a, b) => a.name.localeCompare(b.name))
+}
+
+const randomSample = ref(getRandomSample())
+
+function reshuffle() {
+  randomSample.value = getRandomSample()
+  query.value = ''
+  open.value = true
+}
 
 const results = computed(() => {
   const q = query.value.trim().toLowerCase()
-  if (!q) return randomSample
+  if (!q) return randomSample.value
   return clubs.filter(c => c.name.toLowerCase().includes(q)).slice(0, 8)
 })
 
@@ -39,6 +49,14 @@ function select(club) {
         autocomplete="off"
         spellcheck="false"
       />
+      <button class="cp-shuffle" title="Shuffle clubs" @mousedown.prevent="reshuffle">
+        <svg width="13" height="11" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 4 C7 4 10 12 16 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <polyline points="14,10 16,12 14,14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M1 12 C7 12 10 4 16 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <polyline points="14,2 16,4 14,6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
       <span class="cp-icon">
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="5.5" cy="5.5" r="4" stroke="currentColor" stroke-width="1.5"/>
@@ -90,7 +108,7 @@ function select(club) {
   border-radius: 6px;
   color: #e8e8ec;
   font-size: 12px;
-  padding: 7px 28px 7px 10px;
+  padding: 7px 48px 7px 10px;
   outline: none;
   box-shadow: 0 0 8px rgba(232, 200, 74, 0.08);
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -101,6 +119,20 @@ function select(club) {
   box-shadow: 0 0 0 2px rgba(232, 200, 74, 0.15), 0 0 14px rgba(232, 200, 74, 0.4), 0 0 28px rgba(232, 200, 74, 0.12);
 }
 .cp-input::placeholder { color: #777; }
+
+.cp-shuffle {
+  position: absolute;
+  right: 26px;
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  color: #666;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s, transform 0.15s;
+}
+.cp-shuffle:hover { color: #e8c84a; transform: rotate(180deg); }
 
 .cp-icon {
   position: absolute;
