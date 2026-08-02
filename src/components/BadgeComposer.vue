@@ -111,12 +111,13 @@ function onTextWheel(e, textId) {
 
 // ── Background ─────────────────────────────────────────────────────────────
 const bgElements = computed(() => {
-  const { type } = props.config.background
+  const { type, stripeCount = 4 } = props.config.background
   const palette = props.config.palette
   const c0 = palette[0] || '#000000'
   const c1 = palette[1] || c0
   const W = VIEWBOX_W
   const H = VIEWBOX_H
+  const n = stripeCount
 
   switch (type) {
     case 'solid':
@@ -138,12 +139,21 @@ const bgElements = computed(() => {
         { points: `${W},0 ${W},${H} 0,${H}`, fill: c1 },
       ]}
     case 'striped-v': {
-      const n = 4; const sw = W / n
+      const sw = W / n
       return { rects: Array.from({ length: n }, (_, i) => ({ x: i*sw, y: 0, w: sw, h: H, fill: i%2===0?c0:c1 })), polys: [] }
     }
     case 'striped-h': {
-      const n = 4; const sh = H / n
+      const sh = H / n
       return { rects: Array.from({ length: n }, (_, i) => ({ x: 0, y: i*sh, w: W, h: sh, fill: i%2===0?c0:c1 })), polys: [] }
+    }
+    case 'striped-diagonal': {
+      // Parallelogram stripes at 45°. Each stripe i: points where the diagonal offset c = x + y ranges over [i*sw, (i+1)*sw]
+      const sw = (W + H) / n
+      return { rects: [], polys: Array.from({ length: n }, (_, i) => {
+        const cs = i * sw
+        const ce = cs + sw
+        return { points: `${cs},0 ${ce},0 ${ce-H},${H} ${cs-H},${H}`, fill: i%2===0?c0:c1 }
+      })}
     }
     default:
       return { rects: [{ x: 0, y: 0, w: W, h: H, fill: c0 }], polys: [] }

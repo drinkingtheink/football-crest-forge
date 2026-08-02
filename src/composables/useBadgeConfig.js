@@ -20,6 +20,7 @@ const config = reactive({
   palette: ['#1a3a6b', '#c8102e', '#ffd700', '#ffffff'],
   background: {
     type: 'halved-v',
+    stripeCount: 4,
   },
   symbols: [],
   texts: [
@@ -55,6 +56,7 @@ export function useBadgeConfig() {
 
   // ── Background ────────────────────────────────────────────────────────────
   function setBackgroundType(type) { config.background.type = type }
+  function setStripeCount(n) { config.background.stripeCount = Math.min(12, Math.max(2, n)) }
 
   // ── Border ────────────────────────────────────────────────────────────────
   function setBorderColor(color) { config.border.color = color }
@@ -121,6 +123,7 @@ export function useBadgeConfig() {
     removePaletteColor,
     setShape,
     setBackgroundType,
+    setStripeCount,
     setBorderColor,
     setBorderWidth,
     addSymbol,

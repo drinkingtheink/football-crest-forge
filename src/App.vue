@@ -21,6 +21,7 @@ const {
   removePaletteColor,
   setShape,
   setBackgroundType,
+  setStripeCount,
   setBorderColor,
   setBorderWidth,
   addSymbol,
@@ -35,7 +36,8 @@ const {
   selectText,
 } = useBadgeConfig()
 
-const bgTypes = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'striped-v', 'striped-h']
+const bgTypes = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'striped-v', 'striped-h', 'striped-diagonal']
+const stripeTypes = new Set(['striped-v', 'striped-h', 'striped-diagonal'])
 
 const shapesByGroup = computed(() =>
   Object.fromEntries(shapeGroups.map(g => [g, shapes.filter(s => s.group === g)]))
@@ -219,6 +221,14 @@ function forwardScroll(e) {
               :class="{ active: config.background.type === t }"
               @click="setBackgroundType(t)"
             >{{ t }}</button>
+          </div>
+          <div v-if="stripeTypes.has(config.background.type)" class="stripe-count-row">
+            <span class="color-label">Stripes</span>
+            <div class="stripe-stepper">
+              <button class="stepper-btn" @click="setStripeCount(config.background.stripeCount - 1)">−</button>
+              <span class="stepper-val">{{ config.background.stripeCount }}</span>
+              <button class="stepper-btn" @click="setStripeCount(config.background.stripeCount + 1)">+</button>
+            </div>
           </div>
         </div>
 
@@ -575,6 +585,44 @@ function forwardScroll(e) {
   color: #555;
   margin: 0;
   line-height: 1.4;
+}
+
+/* Stripe count stepper */
+.stripe-count-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.stripe-stepper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stepper-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid #3a3a48;
+  background: #1e1e28;
+  color: #ccc;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.12s, color 0.12s;
+}
+.stepper-btn:hover { border-color: #e8c84a; color: #e8c84a; }
+
+.stepper-val {
+  font-size: 13px;
+  color: #e8e8ec;
+  min-width: 18px;
+  text-align: center;
 }
 
 /* Background / border color rows */
