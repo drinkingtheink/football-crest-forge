@@ -84,7 +84,13 @@ export function useBadgeConfig() {
     const oldPalette = [...config.palette]
     const newPalette = hexArray.slice(0, 6)
     for (const text of config.texts)   text.color = '#ffffff'
-    for (const sym  of config.symbols) sym.color  = remapColor(sym.color, oldPalette, newPalette)
+    for (const sym of config.symbols) {
+      sym.color = remapColor(sym.color, oldPalette, newPalette)
+      if (sym.strokeWidth > 0) {
+        const strokeInPalette = newPalette.some(c => c.toLowerCase() === sym.strokeColor.toLowerCase())
+        if (!strokeInPalette) sym.strokeColor = remapColor(sym.strokeColor, oldPalette, newPalette)
+      }
+    }
     const borderInPalette = newPalette.some(c => c.toLowerCase() === config.border.color.toLowerCase())
     if (!borderInPalette) config.border.color = remapColor(config.border.color, oldPalette, newPalette)
     config.palette.splice(0, config.palette.length, ...newPalette)
