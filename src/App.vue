@@ -465,9 +465,12 @@ function stepBg(dir) {
           <h3 class="control-label">Club Colors</h3>
           <ClubPicker @apply="applyClub" />
           <button class="random-colors-btn" @click="randomizeColors" title="Load a random club's colors">⚡ Random Club Colors</button>
-          <p v-if="activeClub" class="active-club-label">
-            {{ activeClub.name }}<span v-if="activeClubModified" class="modified-flag"> · modified</span>
-          </p>
+          <div v-if="activeClub" class="active-club">
+            <span class="active-club-dot" />
+            <span class="active-club-label">Showing</span>
+            <span class="active-club-name">{{ activeClub.name }}</span>
+            <span v-if="activeClubModified" class="modified-flag">modified</span>
+          </div>
           <div class="palette-editor" style="margin-top: 10px;">
             <div
               v-for="(color, i) in config.palette"
@@ -1155,13 +1158,47 @@ function stepBg(dir) {
 }
 .random-colors-btn:hover { border-color: #e8c84a; color: #e8c84a; }
 
-.active-club-label {
-  font-size: 11px;
-  color: #666;
-  margin: 6px 0 0;
-  line-height: 1.4;
+.active-club {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 10px 0 0;
+  padding: 7px 10px;
+  background: rgba(232, 200, 74, 0.1);
+  border: 1px solid rgba(232, 200, 74, 0.35);
+  border-radius: 6px;
 }
-.modified-flag { color: #555; }
+.active-club-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e8c84a;
+  box-shadow: 0 0 6px rgba(232, 200, 74, 0.8);
+  flex-shrink: 0;
+}
+.active-club-label {
+  font-size: 10px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  flex-shrink: 0;
+}
+.active-club-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e8c84a;
+  margin-right: auto;
+}
+.modified-flag {
+  font-size: 9px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid #3a3a45;
+  border-radius: 3px;
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
 
 .palette-hint {
   font-size: 11px;
