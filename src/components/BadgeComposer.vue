@@ -48,7 +48,11 @@ function startTextDrag(e, textId) {
   const svgEl = e.currentTarget.closest('svg')
   const pt = toSVGPoint(svgEl, e.clientX, e.clientY)
   const text = props.config.texts.find(t => t.id === textId)
-  drag.value = { type: 'text', id: textId, sx: pt.x, sy: pt.y, ox: text.x, oy: text.y }
+  if (text.arc) {
+    drag.value = { type: 'text', id: textId, sx: pt.x, sy: pt.y, ox: text.arcX ?? 100, oy: text.arcY ?? 120, isArc: true }
+  } else {
+    drag.value = { type: 'text', id: textId, sx: pt.x, sy: pt.y, ox: text.x, oy: text.y, isArc: false }
+  }
   e.preventDefault()
 }
 
@@ -68,7 +72,11 @@ function onMove(e) {
   const dx = pt.x - drag.value.sx
   const dy = pt.y - drag.value.sy
   if (drag.value.type === 'text') {
-    emit('update-text-position', drag.value.id, drag.value.ox + dx, drag.value.oy + dy)
+    if (drag.value.isArc) {
+      emit('update-text', drag.value.id, { arcX: drag.value.ox + dx, arcY: drag.value.oy + dy })
+    } else {
+      emit('update-text-position', drag.value.id, drag.value.ox + dx, drag.value.oy + dy)
+    }
   } else {
     const newX = drag.value.ox + dx
     const newY = drag.value.oy + dy
@@ -389,10 +397,11 @@ const bgElements = computed(() => {
       text-anchor="middle"
       :style="{
         fill: text.color,
-        cursor: 'pointer',
+        cursor: drag?.id === text.id ? 'grabbing' : 'grab',
         filter: hoveredTextId === text.id ? 'drop-shadow(0 0 5px rgba(255,255,255,0.35))' : 'none',
         transition: 'fill 0.35s ease, filter 0.15s ease',
       }"
+      @mousedown="startTextDrag($event, text.id)"
       @click.stop="$emit('select-text', text.id)"
       @mouseenter="onTextEnter($event, text.id)"
       @mouseleave="onTextLeave"
