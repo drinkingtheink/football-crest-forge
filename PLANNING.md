@@ -98,6 +98,25 @@ Two buttons beneath the badge:
 
 ---
 
+### 4. Multi-select & group move (deferred — revisit later)
+
+**Goal:** Select multiple elements — symbols, text, or a mix — and move them together.
+
+**Why it's a real change, not a quick add:** the app is built around single selection. `selectedSymbolId` and `selectedTextId` are single refs, and selecting one clears the other. The drag system (`drag.value` in `BadgeComposer`) holds exactly one element; `onMove` emits a position update for that one thing. Arrow-key nudge, delete, and the sidebar expanded editor all read those single refs.
+
+**Proposed approach:**
+- Replace the two single selection refs with two Sets (`selectedSymbolIds`, `selectedTextIds`) in `useBadgeConfig.js`. Mixed symbol+text selection falls out for free. Add computed single-value fallbacks so the sidebar editor and copy/paste keep working when exactly one item is selected.
+- **Group drag:** on drag start, capture the start position of every selected item, then apply the same `dx/dy` to all in `onMove`. Handles the three existing position modes transparently (symbol `x/y`, straight-text `x/y`, arc-text `arcX/arcY`).
+- Extend arrow-key nudge and delete to loop over the sets.
+- Add an on-canvas selection outline for selected elements (ties into the existing "No selection ring rendered" polish item below) — needed so the group is visible.
+- Collapse the sidebar per-item expanded editor to an "N selected" state when 2+ are selected.
+
+**Interaction model:** not yet decided (shift+click vs. marquee box). Pick before building.
+
+**Scope for first pass:** move + arrow-nudge + delete only. **Multi-item copy/paste is explicitly out of scope** for the first pass (clipboard rework); keep copy/paste single.
+
+---
+
 ## Phase 2 (future — requires Supabase)
 
 - [ ] **Save badge** — serialize `config` as JSON → Supabase row → return short ID
