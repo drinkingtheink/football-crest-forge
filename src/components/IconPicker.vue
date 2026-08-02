@@ -44,9 +44,13 @@ const filtered = computed(() => {
         :title="`Add ${ic.label}`"
         @click="$emit('add-icon', ic.id)"
       >
-        <svg viewBox="0 0 100 100" width="34" height="34">
+        <svg
+          :viewBox="ic.viewBox ? `0 0 ${ic.viewBox[0]} ${ic.viewBox[1]}` : '0 0 100 100'"
+          width="34" height="34"
+        >
           <path v-for="(p, i) in ic.paths" :key="i" :d="p" fill="currentColor" />
         </svg>
+        <span class="icon-label">{{ ic.label }}</span>
       </button>
     </div>
   </div>
@@ -106,12 +110,26 @@ const filtered = computed(() => {
   border-radius: 6px;
   color: #778;
   cursor: pointer;
-  padding: 4px;
+  padding: 5px 4px 4px;
   transition: border-color 0.15s, color 0.15s, background 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 54px;
 }
 .icon-btn:hover {
   background: #252530;
   border-color: #e8c84a;
   color: #e8c84a;
 }
+.icon-label {
+  font-size: 9px;
+  line-height: 1.1;
+  text-align: center;
+  color: #666;
+  word-break: break-word;
+  max-width: 100%;
+}
+.icon-btn:hover .icon-label { color: #b89a30; }
 </style>
