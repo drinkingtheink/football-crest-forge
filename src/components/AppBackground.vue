@@ -23,7 +23,7 @@ const imageMap = {
 const patternStyle = computed(() => {
   if (props.type === 'hexagons')   return hexagonsBg(config.palette)
   if (props.type === 'topography') return topographyBg(config.palette)
-  if (imageMap[props.type])        return { backgroundImage: `url(${imageMap[props.type]})` }
+  if (imageMap[props.type])        return { backgroundImage: `url(${imageMap[props.type]})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }
   return {}
 })
 
@@ -68,6 +68,7 @@ onUnmounted(() => {
   background-color: #07070e;
   background-size: auto;
   background-repeat: repeat;
+  background-position: top left;
 }
 
 .bokeh-canvas {
