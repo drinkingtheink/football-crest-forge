@@ -250,12 +250,13 @@ function onFontChange(textId, event) {
 .field { display: flex; flex-direction: column; gap: 4px; }
 
 .field > span {
-  color: #aaa;
+  color: #c8aa58;
   font-size: 11px;
   display: flex;
   justify-content: space-between;
+  text-shadow: 0 0 8px rgba(232, 200, 74, 0.2);
 }
-.field > span em { color: #ccc; font-style: normal; }
+.field > span em { color: #ddc870; font-style: normal; }
 
 .field-row { display: flex; gap: 8px; }
 .field-half { flex: 1; }

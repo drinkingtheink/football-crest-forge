@@ -519,12 +519,21 @@ const showScene = ref(true)
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #aaa;
+  color: #e8d06a;
+  text-shadow:
+    0 0 4px rgba(232, 208, 106, 0.95),
+    0 0 12px rgba(232, 200, 74, 0.5),
+    0 0 24px rgba(232, 200, 74, 0.2);
   margin: 0 0 10px;
 }
 
 .shape-group { margin-bottom: 12px; }
-.shape-group-label { font-size: 11px; color: #888; margin: 0 0 6px; }
+.shape-group-label {
+  font-size: 11px;
+  color: #b89e50;
+  text-shadow: 0 0 8px rgba(232, 200, 74, 0.25);
+  margin: 0 0 6px;
+}
 
 .shape-grid { display: flex; flex-wrap: wrap; gap: 6px; }
 
