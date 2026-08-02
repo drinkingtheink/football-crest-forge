@@ -46,7 +46,7 @@ src/
   utils/
     arcPath.js          # Pure fn: generates SVG arc path string for textPath
     exportBadge.js      # (planned) PNG + SVG export, opentype.js outlining
-    fonts.js            # (planned) Font registry + lazy Google Fonts loader
+    fonts.js            # Font registry + lazy Google Fonts loader (promise-based; EB Garamond pre-loaded in index.html)
   App.vue               # Layout shell + wires composable to components
   style.css             # Global reset only
 ```

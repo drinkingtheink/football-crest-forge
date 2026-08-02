@@ -14,6 +14,11 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Crest Forge — Football Badge Creator" />
     <meta name="twitter:description" content="Design custom football club badges. Combine shield shapes, heraldic symbols, background patterns, text, and borders to forge your crest." />
+    <!-- Warm CDN connections before any font request fires -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Default font loaded eagerly so the initial badge renders without a FOUT -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;700;900&display=swap" />
   </head>
   <body>
     <div id="app"></div>

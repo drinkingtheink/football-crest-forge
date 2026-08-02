@@ -13,7 +13,6 @@ import { saveSnapshot } from './utils/snapshots.js'
 import { clubs } from './data/clubs.js'
 import { shapes } from './data/shapes.js'
 import { icons, iconsById } from './data/icons.js'
-import { loadFont } from './utils/fonts.js'
 import { auroraBg, wavesBg, crisscrossBg } from './utils/patterns.js'
 import { burstParticles } from './utils/particles.js'
 import { useToast } from './composables/useToast.js'
@@ -212,7 +211,6 @@ watch(_designFingerprint, () => {
 })
 
 onMounted(() => {
-  loadFont('EB Garamond')
   window.addEventListener('keydown', onKeyDown)
   window.addEventListener('resize', sizeCanvas)
   nextTick(sizeCanvas)

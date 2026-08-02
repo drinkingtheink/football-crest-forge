@@ -3,6 +3,8 @@ import { ref, watch, nextTick } from 'vue'
 import { fontGroups, fontsByGroup, loadFont } from '../utils/fonts.js'
 import ColorPicker from './ColorPicker.vue'
 
+const loadingFont = ref(false)
+
 const props = defineProps({
   texts: { type: Array, required: true },
   selectedTextId: { type: String, default: null },
@@ -30,10 +32,12 @@ const ARC_OPTS = [
   { value: 'bottom', label: 'Arc bottom' },
 ]
 
-function onFontChange(textId, event) {
+async function onFontChange(textId, event) {
   const family = event.target.value
-  loadFont(family)
   emit('update-text', textId, { fontFamily: family })
+  loadingFont.value = true
+  await loadFont(family)
+  loadingFont.value = false
 }
 </script>
 
@@ -101,8 +105,9 @@ function onFontChange(textId, event) {
             <span
               v-if="text.fontFamily"
               class="font-preview"
+              :class="{ 'font-loading': loadingFont }"
               :style="{ fontFamily: text.fontFamily }"
-            >AaBbCc&nbsp;123</span>
+            >{{ loadingFont ? 'loading…' : 'AaBbCc 123' }}</span>
           </div>
 
           <div class="field-row">
@@ -311,6 +316,12 @@ function onFontChange(textId, event) {
   letter-spacing: 0.02em;
   margin-top: 2px;
   display: block;
+}
+.font-preview.font-loading {
+  color: #666;
+  font-family: system-ui, sans-serif !important;
+  font-size: 11px;
+  font-style: italic;
 }
 
 .panel-fade-enter-active,

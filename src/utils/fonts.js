@@ -16,6 +16,7 @@ export const fonts = [
   { family: 'Uncial Antiqua',     group: 'Blackletter' },
   { family: 'Almendra Display',   group: 'Blackletter' },
   { family: 'Grenze Gotisch',     group: 'Blackletter' },
+  { family: 'Pirata One',         group: 'Blackletter' },
   // Gothic / Bold Condensed
   { family: 'Oswald',               group: 'Gothic' },
   { family: 'Barlow Condensed',     group: 'Gothic' },
@@ -24,6 +25,8 @@ export const fonts = [
   { family: 'Squada One',           group: 'Gothic' },
   { family: 'Fjalla One',           group: 'Gothic' },
   { family: 'Pathway Gothic One',   group: 'Gothic' },
+  { family: 'Bebas Neue',           group: 'Gothic' },
+  { family: 'Teko',                 group: 'Gothic' },
   // Slab Serif
   { family: 'Arvo',         group: 'Slab Serif' },
   { family: 'Roboto Slab',  group: 'Slab Serif' },
@@ -32,14 +35,17 @@ export const fonts = [
   { family: 'Crete Round',  group: 'Slab Serif' },
   { family: 'Alfa Slab One',group: 'Slab Serif' },
   { family: 'Patua One',    group: 'Slab Serif' },
+  { family: 'Yeseva One',   group: 'Slab Serif' },
   // Classic Serif
   { family: 'EB Garamond',        group: 'Classic Serif' },
+  { family: 'Cinzel',             group: 'Classic Serif' },
   { family: 'Playfair Display',   group: 'Classic Serif' },
   { family: 'Cormorant Garamond', group: 'Classic Serif' },
   { family: 'Merriweather',       group: 'Classic Serif' },
   { family: 'Libre Baskerville',  group: 'Classic Serif' },
   { family: 'Lora',               group: 'Classic Serif' },
   { family: 'Crimson Text',       group: 'Classic Serif' },
+  { family: 'GFS Didot',          group: 'Classic Serif' },
   // Script / Retro
   { family: 'Pacifico',          group: 'Script' },
   { family: 'Lobster',           group: 'Script' },
@@ -48,13 +54,14 @@ export const fonts = [
   { family: 'Satisfy',           group: 'Script' },
   { family: 'Dancing Script',    group: 'Script' },
   { family: 'Righteous',         group: 'Script' },
+  { family: 'Rye',               group: 'Script' },
+  { family: 'Caesar Dressing',   group: 'Script' },
   // Military / Stencil
-  { family: 'Teko',              group: 'Military' },
   { family: 'Special Elite',     group: 'Military' },
-  { family: 'Bebas Neue',        group: 'Military' },
   { family: 'Russo One',         group: 'Military' },
   { family: 'Saira Stencil One', group: 'Military' },
   { family: 'Graduate',          group: 'Military' },
+  { family: 'Black Ops One',     group: 'Military' },
   // Modern Geometric
   { family: 'Rajdhani',     group: 'Modern' },
   { family: 'Exo 2',        group: 'Modern' },
@@ -63,19 +70,24 @@ export const fonts = [
   { family: 'Audiowide',    group: 'Modern' },
   { family: 'Play',         group: 'Modern' },
   { family: 'Michroma',     group: 'Modern' },
+  { family: 'Montserrat',   group: 'Modern' },
+  { family: 'Raleway',      group: 'Modern' },
 ]
 
 export const fontsByGroup = Object.fromEntries(
   fontGroups.map(g => [g, fonts.filter(f => f.group === g)])
 )
 
-const loaded = new Set()
+// EB Garamond is pre-loaded via <link> in index.html; mark it to skip the dynamic inject
+const loaded = new Set(['EB Garamond'])
 
 export function loadFont(family) {
-  if (loaded.has(family)) return
+  if (loaded.has(family)) return Promise.resolve()
   loaded.add(family)
   const link = document.createElement('link')
   link.rel = 'stylesheet'
-  link.href = `https://fonts.googleapis.com/css2?family=${family.replace(/ /g, '+')}:wght@400;700;900&display=swap`
+  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family).replace(/%20/g, '+')}:wght@400;700;900&display=swap`
   document.head.appendChild(link)
+  // Resolves once the browser has the face ready — callers can await this to show a loading state
+  return document.fonts.load(`700 16px "${family}"`).catch(() => {})
 }
