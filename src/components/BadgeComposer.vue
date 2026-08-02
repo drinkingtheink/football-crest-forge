@@ -199,7 +199,7 @@ const bgElements = computed(() => {
     :width="size"
     :viewBox="`0 0 ${VIEWBOX_W} ${VIEWBOX_H}`"
     xmlns="http://www.w3.org/2000/svg"
-    style="user-select: none; display: block; overflow: visible; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.55)) drop-shadow(0 10px 28px rgba(0,0,0,0.6)) drop-shadow(0 22px 48px rgba(0,0,0,0.35));"
+    style="user-select: none; display: block; overflow: visible; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.38)) drop-shadow(0 10px 28px rgba(0,0,0,0.42)) drop-shadow(0 22px 48px rgba(0,0,0,0.22));"
     @mousemove="onMove"
     @mouseup="stopDrag"
     @mouseleave="stopDrag"
@@ -309,56 +309,6 @@ const bgElements = computed(() => {
       }"
     />
 
-    <!-- Straight text (draggable, scroll to resize) -->
-    <text
-      v-for="text in config.texts.filter(t => !t.arc)"
-      :key="text.id"
-      :x="text.x"
-      :y="text.y"
-      :font-family="text.fontFamily"
-      :font-size="text.fontSize"
-      :font-weight="text.fontWeight"
-      :letter-spacing="text.letterSpacing ?? 0"
-      text-anchor="middle"
-      dominant-baseline="middle"
-      :style="{
-        fill: text.color,
-        cursor: drag?.id === text.id ? 'grabbing' : 'grab',
-        filter: hoveredTextId === text.id ? 'drop-shadow(0 0 5px rgba(255,255,255,0.35))' : 'none',
-        transition: 'fill 0.35s ease, filter 0.15s ease',
-      }"
-      @mousedown="startTextDrag($event, text.id)"
-      @click.stop="$emit('select-text', text.id)"
-      @mouseenter="onTextEnter($event, text.id)"
-      @mouseleave="onTextLeave"
-      @wheel.stop.prevent="onTextWheel($event, text.id)"
-    >{{ text.content }}</text>
-
-    <!-- Arc text (follows circular path, scroll to resize) -->
-    <text
-      v-for="text in config.texts.filter(t => t.arc)"
-      :key="text.id"
-      :font-family="text.fontFamily"
-      :font-size="text.fontSize"
-      :font-weight="text.fontWeight"
-      :letter-spacing="text.letterSpacing ?? 0"
-      :style="{
-        fill: text.color,
-        filter: hoveredTextId === text.id ? 'drop-shadow(0 0 5px rgba(255,255,255,0.35))' : 'none',
-        transition: 'fill 0.35s ease, filter 0.15s ease',
-      }"
-      @click.stop="$emit('select-text', text.id)"
-      @mouseenter="onTextEnter($event, text.id)"
-      @mouseleave="onTextLeave"
-      @wheel.stop.prevent="onTextWheel($event, text.id)"
-    >
-      <textPath
-        :href="`#${arcPathId(text.id)}`"
-        start-offset="50%"
-        text-anchor="middle"
-      >{{ text.content }}</textPath>
-    </text>
-
     <!-- Shimmer (decorative sheen sweep, clipped to shield) -->
     <g :clip-path="`url(#${clipId})`" style="pointer-events:none">
       <g>
@@ -387,6 +337,56 @@ const bgElements = computed(() => {
       <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-top-${uid})`"    />
       <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-bottom-${uid})`" />
     </g>
+
+    <!-- Straight text (draggable, scroll to resize) — above depth overlay -->
+    <text
+      v-for="text in config.texts.filter(t => !t.arc)"
+      :key="text.id"
+      :x="text.x"
+      :y="text.y"
+      :font-family="text.fontFamily"
+      :font-size="text.fontSize"
+      :font-weight="text.fontWeight"
+      :letter-spacing="text.letterSpacing ?? 0"
+      text-anchor="middle"
+      dominant-baseline="middle"
+      :style="{
+        fill: text.color,
+        cursor: drag?.id === text.id ? 'grabbing' : 'grab',
+        filter: hoveredTextId === text.id ? 'drop-shadow(0 0 5px rgba(255,255,255,0.35))' : 'none',
+        transition: 'fill 0.35s ease, filter 0.15s ease',
+      }"
+      @mousedown="startTextDrag($event, text.id)"
+      @click.stop="$emit('select-text', text.id)"
+      @mouseenter="onTextEnter($event, text.id)"
+      @mouseleave="onTextLeave"
+      @wheel.stop.prevent="onTextWheel($event, text.id)"
+    >{{ text.content }}</text>
+
+    <!-- Arc text (follows circular path, scroll to resize) — above depth overlay -->
+    <text
+      v-for="text in config.texts.filter(t => t.arc)"
+      :key="text.id"
+      :font-family="text.fontFamily"
+      :font-size="text.fontSize"
+      :font-weight="text.fontWeight"
+      :letter-spacing="text.letterSpacing ?? 0"
+      :style="{
+        fill: text.color,
+        filter: hoveredTextId === text.id ? 'drop-shadow(0 0 5px rgba(255,255,255,0.35))' : 'none',
+        transition: 'fill 0.35s ease, filter 0.15s ease',
+      }"
+      @click.stop="$emit('select-text', text.id)"
+      @mouseenter="onTextEnter($event, text.id)"
+      @mouseleave="onTextLeave"
+      @wheel.stop.prevent="onTextWheel($event, text.id)"
+    >
+      <textPath
+        :href="`#${arcPathId(text.id)}`"
+        start-offset="50%"
+        text-anchor="middle"
+      >{{ text.content }}</textPath>
+    </text>
 
     <!-- Size hint bubble (shown while scroll-resizing) -->
     <g v-if="sizeHint" :transform="`translate(${sizeHint.x}, ${sizeHint.y})`" style="pointer-events:none">
