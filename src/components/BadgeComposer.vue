@@ -156,7 +156,7 @@ const bgElements = computed(() => {
     :width="size"
     :viewBox="`0 0 ${VIEWBOX_W} ${VIEWBOX_H}`"
     xmlns="http://www.w3.org/2000/svg"
-    style="user-select: none; display: block; overflow: visible;"
+    style="user-select: none; display: block; overflow: visible; filter: drop-shadow(0 12px 32px rgba(0,0,0,0.65));"
     @mousemove="onMove"
     @mouseup="stopDrag"
     @mouseleave="stopDrag"
