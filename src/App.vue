@@ -81,7 +81,7 @@ const wavesThumb     = computed(() => wavesBg(config.palette))
 const crisscrossThumb = computed(() => crisscrossBg(config.palette))
 
 function onKeyDown(e) {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
+  if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return
   if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); randomizeAll(); return }
   if (e.key !== 'Delete' && e.key !== 'Backspace') return
   if (selectedSymbolId.value) removeSymbol(selectedSymbolId.value)
