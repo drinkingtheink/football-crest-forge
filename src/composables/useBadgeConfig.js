@@ -144,7 +144,7 @@ export function useBadgeConfig() {
     if (sym) { sym.x = x; sym.y = y }
   }
 
-  function selectSymbol(instanceId) { selectedSymbolId.value = instanceId }
+  function selectSymbol(instanceId) { selectedSymbolId.value = instanceId; selectedTextId.value = null }
 
   // ── Text ──────────────────────────────────────────────────────────────────
   function addText() {
@@ -169,7 +169,7 @@ export function useBadgeConfig() {
     if (text) { text.x = x; text.y = y }
   }
 
-  function selectText(id) { selectedTextId.value = id }
+  function selectText(id) { selectedTextId.value = id; selectedSymbolId.value = null }
 
   return {
     config,
