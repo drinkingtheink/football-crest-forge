@@ -97,12 +97,21 @@ export function useBadgeConfig() {
   function setPalette(hexArray) {
     const oldPalette = [...config.palette]
     const newPalette = hexArray.slice(0, 6)
+    const thirdColor = newPalette[2]
     for (const text of config.texts)   text.color = '#ffffff'
     for (const sym of config.symbols) {
-      sym.color = remapColor(sym.color, oldPalette, newPalette)
+      // With a third accent colour available, let symbols pick it up sometimes
+      // instead of always mapping to the nearest fill — keeps crests varied.
+      sym.color = (thirdColor && Math.random() < 0.4)
+        ? thirdColor
+        : remapColor(sym.color, oldPalette, newPalette)
       if (sym.strokeWidth > 0) {
         const strokeInPalette = newPalette.some(c => c.toLowerCase() === sym.strokeColor.toLowerCase())
         if (!strokeInPalette) sym.strokeColor = remapColor(sym.strokeColor, oldPalette, newPalette)
+        // Avoid fill and stroke collapsing to the same colour
+        if (sym.strokeColor.toLowerCase() === sym.color.toLowerCase()) {
+          sym.strokeColor = newPalette.find(c => c.toLowerCase() !== sym.color.toLowerCase()) ?? sym.strokeColor
+        }
       }
     }
     const borderInPalette = newPalette.some(c => c.toLowerCase() === config.border.color.toLowerCase())

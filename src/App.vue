@@ -294,10 +294,12 @@ function randomizeAll() {
   if (Math.random() < 1/3) {
     addSymbol(icons[Math.floor(Math.random() * icons.length)].id)
     const sym = config.symbols.find(s => s.instanceId === selectedSymbolId.value)
-    if (third) {
+    if (third && config.palette.length > 2 && Math.random() < 0.4) {
       const strokeColor = config.palette.find(c => c.toLowerCase() !== third.toLowerCase()) ?? config.palette[0]
       updateSymbol(selectedSymbolId.value, { color: third, strokeWidth: 8, strokeColor })
     } else {
+      // Two-colour palettes (and the non-accent case) always get a stroke in
+      // the other palette colour so it never matches the fill.
       const strokeColor = config.palette.find(c => c.toLowerCase() !== sym.color.toLowerCase())
         ?? (sym.color.toLowerCase() === '#000000' ? '#ffffff' : '#000000')
       updateSymbol(selectedSymbolId.value, { strokeWidth: 8, strokeColor })
@@ -321,8 +323,9 @@ function stepBg(dir) {
   <div class="app">
     <AppBackground :type="appBg" />
     <div
+      v-if="imageBgTypes.has(appBg)"
       class="app-overlay"
-      :style="imageBgTypes.has(appBg) ? { background: overlay.color, opacity: overlay.opacity } : { opacity: 0 }"
+      :style="{ background: overlay.color, opacity: overlay.opacity }"
     />
     <ToastContainer />
     <main class="app-body">
@@ -752,9 +755,9 @@ function stepBg(dir) {
 }
 
 @keyframes badge-pulse {
-  0%   { transform: scale(1);     filter: drop-shadow(0 0 0px  rgba(232,200,74,0));   }
-  30%  { transform: scale(1.035); filter: drop-shadow(0 0 18px rgba(232,200,74,0.7)); }
-  100% { transform: scale(1);     filter: drop-shadow(0 0 0px  rgba(232,200,74,0));   }
+  0%   { transform: scale(1);    filter: drop-shadow(0 0 0px  rgba(232,200,74,0));    }
+  30%  { transform: scale(1.015); filter: drop-shadow(0 0 9px rgba(232,200,74,0.38)); }
+  100% { transform: scale(1);    filter: drop-shadow(0 0 0px  rgba(232,200,74,0));    }
 }
 
 .badge-float-wrap {
@@ -810,7 +813,7 @@ function stepBg(dir) {
 .app-overlay {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: 1;
   pointer-events: none;
 }
 

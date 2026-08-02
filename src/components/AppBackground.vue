@@ -9,8 +9,6 @@ const props = defineProps({
 })
 
 const { config } = useBadgeConfig()
-const bokehCanvas = ref(null)
-let bokehInstance = null
 
 const imageMap = {
   grass:   '/backgrounds/grass.jpg',
@@ -28,8 +26,6 @@ function hexRgba(hex, alpha) {
   return `rgba(${r},${g},${b},${alpha})`
 }
 
-// Horizontal ribbon bands — distinct from bokeh's floating circles
-// Each ribbon is a wide oval that drifts vertically like a northern-lights curtain
 const AURORA_DEFS = [
   { ci: 0, yPct:  6, hPct: 38, a: 0.72 },
   { ci: 1, yPct: 28, hPct: 28, a: 0.62 },
@@ -38,58 +34,131 @@ const AURORA_DEFS = [
   { ci: 1, yPct: 64, hPct: 26, a: 0.52 },
 ]
 
-const auroraRibbons = computed(() => {
-  if (props.type !== 'aurora') return []
-  return AURORA_DEFS.map(({ ci, yPct, hPct, a }) => {
-    const color = hexRgba(config.palette[ci % config.palette.length] || '#888888', a)
-    return {
-      top:        `${yPct}%`,
-      height:     `${hPct}%`,
-      background: color,
-    }
-  })
-})
+function auroraRibbonsFor(palette) {
+  return AURORA_DEFS.map(({ ci, yPct, hPct, a }) => ({
+    top:        `${yPct}%`,
+    height:     `${hPct}%`,
+    background: hexRgba(palette[ci % palette.length] || '#888888', a),
+  }))
+}
 
-const patternStyle = computed(() => {
-  if (props.type === 'waves')      return wavesBg(config.palette)
-  if (props.type === 'crisscross') return crisscrossBg(config.palette)
-  if (imageMap[props.type])        return { backgroundImage: `url(${imageMap[props.type]})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }
+function styleFor(type) {
+  if (type === 'waves')      return wavesBg(config.palette)
+  if (type === 'crisscross') return crisscrossBg(config.palette)
+  if (imageMap[type])        return { backgroundImage: `url(${imageMap[type]})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }
   return {}
-})
-
-function initBokeh() {
-  if (!bokehCanvas.value) return
-  bokehInstance?.stop()
-  bokehInstance = startBokeh(bokehCanvas.value, () => config.palette)
 }
 
-function stopBokeh() {
-  bokehInstance?.stop()
-  bokehInstance = null
+// ── Two-layer cross-fade state ────────────────────────────────────────────────
+// `current` is always rendered; `outgoing` is the previous type shown underneath
+// while the current fades in.
+const FADE_MS = 560
+
+const current  = ref(props.type)
+const outgoing = ref(null)       // null = no outgoing layer
+const fading   = ref(false)      // true = current layer is fading in
+let   fadeTimer = null
+
+// ── Bokeh instances ───────────────────────────────────────────────────────────
+const bokehCanvas    = ref(null)  // current layer
+const bokehCanvasOut = ref(null)  // outgoing layer (only exists during cross-fade)
+let bokehCurrent  = null
+let bokehOutgoing = null
+
+function initBokehOn(canvas, store) {
+  if (!canvas) return null
+  const inst = startBokeh(canvas, () => config.palette)
+  return inst
 }
 
-watch(() => props.type, async (t) => {
-  if (t === 'bokeh') { await nextTick(); initBokeh() }
-  else stopBokeh()
+function startCurrentBokeh() {
+  bokehCurrent?.stop()
+  bokehCurrent = null
+  nextTick(() => {
+    if (bokehCanvas.value) bokehCurrent = startBokeh(bokehCanvas.value, () => config.palette)
+  })
+}
+
+function stopCurrentBokeh() {
+  bokehCurrent?.stop()
+  bokehCurrent = null
+}
+
+function stopOutgoingBokeh() {
+  bokehOutgoing?.stop()
+  bokehOutgoing = null
+}
+
+watch(() => props.type, async (newType) => {
+  if (newType === current.value) return
+
+  clearTimeout(fadeTimer)
+
+  // Promote current to outgoing layer (it stays visible underneath)
+  outgoing.value = current.value
+  // If the outgoing was bokeh, its canvas ref moves to bokehCanvasOut —
+  // we keep the instance running so it doesn't blank during the fade.
+  // (bokehCanvas will be reassigned to the new canvas on next tick)
+  bokehOutgoing = bokehCurrent
+  bokehCurrent  = null
+
+  // Mount the new current layer
+  current.value = newType
+  fading.value  = true
+
+  if (newType === 'bokeh') {
+    await nextTick()
+    startCurrentBokeh()
+  }
+
+  // After the cross-fade completes, remove the outgoing layer
+  fadeTimer = setTimeout(() => {
+    stopOutgoingBokeh()
+    outgoing.value = null
+    fading.value   = false
+  }, FADE_MS + 40)
 })
 
 onMounted(() => {
-  if (props.type === 'bokeh') initBokeh()
-  window.addEventListener('resize', () => bokehInstance?.resize())
+  if (props.type === 'bokeh') startCurrentBokeh()
+  window.addEventListener('resize', () => {
+    bokehCurrent?.resize()
+    bokehOutgoing?.resize()
+  })
 })
 
 onUnmounted(() => {
-  stopBokeh()
-  window.removeEventListener('resize', () => bokehInstance?.resize())
+  clearTimeout(fadeTimer)
+  stopCurrentBokeh()
+  stopOutgoingBokeh()
+  window.removeEventListener('resize', () => {
+    bokehCurrent?.resize()
+    bokehOutgoing?.resize()
+  })
 })
 </script>
 
 <template>
-  <div class="app-bg" :style="patternStyle">
-    <canvas v-if="type === 'bokeh'" ref="bokehCanvas" class="bokeh-canvas" />
-    <div v-if="type === 'aurora'" class="aurora-layer">
+  <!-- Outgoing layer: stays put underneath during the cross-fade -->
+  <div v-if="outgoing" class="app-bg app-bg-outgoing" :style="styleFor(outgoing)">
+    <canvas v-if="outgoing === 'bokeh'" ref="bokehCanvasOut" class="bokeh-canvas" />
+    <div v-if="outgoing === 'aurora'" class="aurora-layer">
       <div
-        v-for="(r, i) in auroraRibbons"
+        v-for="(r, i) in auroraRibbonsFor(config.palette)"
+        :key="i"
+        class="aurora-ribbon"
+        :class="`ribbon-${i}`"
+        :style="r"
+      />
+    </div>
+  </div>
+
+  <!-- Current layer: fades in on top, then stays -->
+  <div class="app-bg" :class="{ 'app-bg-entering': fading }" :style="styleFor(current)">
+    <canvas v-if="current === 'bokeh'" ref="bokehCanvas" class="bokeh-canvas" />
+    <div v-if="current === 'aurora'" class="aurora-layer">
+      <div
+        v-for="(r, i) in auroraRibbonsFor(config.palette)"
         :key="i"
         class="aurora-ribbon"
         :class="`ribbon-${i}`"
@@ -103,11 +172,39 @@ onUnmounted(() => {
 .app-bg {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: 1;
   background-color: #07070e;
   background-size: auto;
   background-repeat: repeat;
   background-position: top left;
+}
+
+/* Outgoing layer sits beneath the incoming one */
+.app-bg-outgoing {
+  z-index: 0;
+}
+
+/* Incoming layer fades in over the outgoing one */
+.app-bg-entering {
+  animation: bg-cross-fade v-bind('`${FADE_MS}ms`') cubic-bezier(0.33, 0, 0.2, 1) forwards;
+  transform-origin: center;
+  will-change: opacity, transform, filter;
+}
+
+@keyframes bg-cross-fade {
+  from {
+    opacity: 0;
+    transform: scale(1.03);
+    filter: blur(6px);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
 }
 
 .bokeh-canvas {
@@ -117,7 +214,6 @@ onUnmounted(() => {
   transform: scale(1.08);
 }
 
-/* Vignette: dark halo around every dynamic background for depth */
 .app-bg::after {
   content: '';
   position: absolute;
@@ -134,7 +230,6 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-/* Wide oval ribbons — border-radius creates soft oval edges, blur feathers them further */
 .aurora-ribbon {
   position: absolute;
   left: -20%;
