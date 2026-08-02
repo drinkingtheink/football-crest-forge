@@ -40,7 +40,8 @@ function symbolTransform(sym) {
   const scale = sym.size / Math.max(vw, vh)
   const offX = (sym.size - vw * scale) / 2
   const offY = (sym.size - vh * scale) / 2
-  return `translate(${sym.x - sym.size / 2 + offX}, ${sym.y - sym.size / 2 + offY}) scale(${scale})`
+  const rot = sym.rotation ? `rotate(${sym.rotation}, ${sym.x}, ${sym.y}) ` : ''
+  return `${rot}translate(${sym.x - sym.size / 2 + offX}, ${sym.y - sym.size / 2 + offY}) scale(${scale})`
 }
 
 // ── Unified drag (text or symbol) ──────────────────────────────────────────

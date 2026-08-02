@@ -608,6 +608,20 @@ function stepBg(dir) {
                   />
                   <span>{{ sym.size }}</span>
                 </label>
+                <div class="sym-field">
+                  <span>Rotation</span>
+                  <input
+                    type="range" min="-180" max="180"
+                    :value="sym.rotation ?? 0"
+                    @input="updateSymbol(sym.instanceId, { rotation: Number($event.target.value) })"
+                  />
+                  <button
+                    class="rotation-reset"
+                    title="Reset rotation to 0°"
+                    @click.stop="updateSymbol(sym.instanceId, { rotation: 0 })"
+                  >⟲</button>
+                  <span>{{ sym.rotation ?? 0 }}°</span>
+                </div>
                 <label v-if="iconsById[sym.iconId]?.supportsRing" class="sym-field">
                   Thickness
                   <input
@@ -1258,6 +1272,22 @@ function stepBg(dir) {
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
 }
+
+.rotation-reset {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 4px;
+  border: 1px solid #2a2a35;
+  background: #1e1e28;
+  color: #888;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.rotation-reset:hover { border-color: #e8c84a; color: #e8c84a; }
 .sym-clip-toggle:hover { border-color: #555; color: #ccc; }
 .sym-clip-toggle.free { border-color: #e8c84a55; color: #e8c84a; }
 
