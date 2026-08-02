@@ -7,7 +7,9 @@ import ToastContainer from './components/ToastContainer.vue'
 import ColorPicker from './components/ColorPicker.vue'
 import ClubPicker from './components/ClubPicker.vue'
 import AppBackground from './components/AppBackground.vue'
+import SnapshotPanel from './components/SnapshotPanel.vue'
 import { useBadgeConfig } from './composables/useBadgeConfig.js'
+import { saveSnapshot } from './utils/snapshots.js'
 import { clubs } from './data/clubs.js'
 import { shapes } from './data/shapes.js'
 import { icons, iconsById } from './data/icons.js'
@@ -40,6 +42,7 @@ const {
   updateTextPosition,
   selectText,
   deselectAll,
+  loadConfig,
 } = useBadgeConfig()
 
 const bgTypes = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'chevron', 'sash', 'striped-v', 'striped-h', 'striped-diagonal']
@@ -92,6 +95,12 @@ function onPickIcon(iconId) {
 function onKeyDown(e) {
   if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return
 
+  if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+    e.preventDefault()
+    snapshotPanelRef.value?.startSave()
+    return
+  }
+
   if (e.key in _ARROW_DELTA) {
     e.preventDefault()
     const step = e.shiftKey ? 10 : 1
@@ -119,9 +128,15 @@ function onKeyDown(e) {
   else if (selectedTextId.value) removeText(selectedTextId.value)
 }
 
-const controlsPane  = ref(null)
-const particleCanvas = ref(null)
-const badgeWrap      = ref(null)
+const controlsPane    = ref(null)
+const particleCanvas  = ref(null)
+const badgeWrap       = ref(null)
+const snapshotPanelRef = ref(null)
+
+async function doSaveSnapshot(name) {
+  const svgEl = badgeWrap.value?.querySelector('svg')
+  return saveSnapshot(name, config, svgEl)
+}
 const isPulsing      = ref(false)
 const isBadgeActive  = ref(false)
 let   stopParticles  = null
@@ -259,7 +274,7 @@ const showScene = ref(true)
 
           <Transition name="scene-fade">
           <div v-show="showScene" class="scene-controls">
-            <p class="drag-hint hud-pill">Drag or arrow-key symbols &amp; text &nbsp;·&nbsp; Shift+Arrow = 10px &nbsp;·&nbsp; Space to randomize</p>
+            <p class="drag-hint hud-pill">Drag or arrow-key symbols &amp; text &nbsp;·&nbsp; Shift+Arrow = 10px &nbsp;·&nbsp; Space to randomize &nbsp;·&nbsp; ⌘S to snapshot</p>
 
             <div class="bg-picker hud-pill">
               <button
@@ -502,6 +517,16 @@ const showScene = ref(true)
               <span>{{ config.border.width }}</span>
             </label>
           </div>
+        </div>
+
+        <!-- Snapshots -->
+        <div class="control-group">
+          <h3 class="control-label">Snapshots</h3>
+          <SnapshotPanel
+            ref="snapshotPanelRef"
+            :save-fn="doSaveSnapshot"
+            @load="loadConfig"
+          />
         </div>
 
       </aside>

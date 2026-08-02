@@ -173,6 +173,23 @@ export function useBadgeConfig() {
 
   function deselectAll() { selectedSymbolId.value = null; selectedTextId.value = null }
 
+  function loadConfig(saved) {
+    config.shapeId = saved.shapeId
+    config.palette.splice(0, config.palette.length, ...saved.palette)
+    Object.assign(config.background, saved.background)
+    config.symbols.splice(0, config.symbols.length, ...saved.symbols)
+    config.texts.splice(0, config.texts.length, ...saved.texts)
+    Object.assign(config.border, saved.border)
+    selectedSymbolId.value = null
+    selectedTextId.value = null
+    // Advance nextId past any numeric IDs in the loaded config to avoid collisions
+    const ids = [...saved.symbols.map(s => s.instanceId), ...saved.texts.map(t => t.id)]
+    for (const id of ids) {
+      const n = parseInt(id?.match(/\d+/)?.[0])
+      if (!isNaN(n) && n >= nextId) nextId = n + 1
+    }
+  }
+
   return {
     config,
     selectedSymbolId,
@@ -198,5 +215,6 @@ export function useBadgeConfig() {
     updateTextPosition,
     selectText,
     deselectAll,
+    loadConfig,
   }
 }
