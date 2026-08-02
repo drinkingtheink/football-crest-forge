@@ -104,7 +104,7 @@ function onSymbolWheel(e, instanceId) {
   const sym = props.config.symbols.find(s => s.instanceId === instanceId)
   if (!sym) return
   const delta = e.deltaY > 0 ? -3 : 3
-  const newSize = Math.min(180, Math.max(16, sym.size + delta))
+  const newSize = Math.min(240, Math.max(16, sym.size + delta))
   emit('update-symbol', instanceId, { size: newSize })
   sizeHint.value = { x: sym.x, y: sym.y - newSize / 2 - 8, size: newSize }
   clearTimeout(sizeHintTimer)

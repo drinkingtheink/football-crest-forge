@@ -535,7 +535,7 @@ const showScene = ref(true)
                 <label class="sym-field">
                   Size
                   <input
-                    type="range" min="20" max="160"
+                    type="range" min="20" max="240"
                     :value="sym.size"
                     @input="updateSymbol(sym.instanceId, { size: Number($event.target.value) })"
                   />
