@@ -220,9 +220,9 @@ const bgElements = computed(() => {
       <!-- Shimmer gradient: narrow white band, feathered edges -->
       <linearGradient :id="`shimmer-grad-${uid}`" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%"   stop-color="white" stop-opacity="0" />
-        <stop offset="20%"  stop-color="white" stop-opacity="0.25" />
-        <stop offset="50%"  stop-color="white" stop-opacity="0.85" />
-        <stop offset="80%"  stop-color="white" stop-opacity="0.25" />
+        <stop offset="20%"  stop-color="white" stop-opacity="0.1" />
+        <stop offset="50%"  stop-color="white" stop-opacity="0.38" />
+        <stop offset="80%"  stop-color="white" stop-opacity="0.1" />
         <stop offset="100%" stop-color="white" stop-opacity="0" />
       </linearGradient>
 
