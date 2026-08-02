@@ -141,6 +141,7 @@ Two buttons beneath the badge:
 - [ ] No keyboard shortcut to remove selected element (Delete key)
 - [ ] Mobile layout not considered (controls pane too narrow on small screens)
 - [ ] Arc text rotation not supported (maybe later) — symbols and straight text have a rotation slider; arc text follows a curved path so rotating it is a niche/confusing case, deferred
+- [ ] Alignment guides are badge-centre only + show-only (no snap). Possible extensions: snap-to-guide (with modifier to disable), item-to-item centre alignment, edge/bounding-box alignment (needs `getBBox()` for text), and equal-spacing/distribution hints. All isolated to `BadgeComposer`'s `onMove`/guide rendering.
 
 ---
 
