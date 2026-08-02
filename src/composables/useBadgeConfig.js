@@ -6,6 +6,11 @@ const _randomClub = clubs[Math.floor(Math.random() * clubs.length)]
 const _BG_TYPES = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'striped-v', 'striped-h', 'striped-diagonal']
 const _randomBgType = _BG_TYPES[Math.floor(Math.random() * _BG_TYPES.length)]
 
+const _thirdColor = _randomClub.colors[2]?.hex
+const _defaultBorder = _thirdColor
+  ? { color: _thirdColor, width: Math.floor(Math.random() * 5) + 2 }
+  : { color: '#ffffff', width: 0 }
+
 const DEFAULT_TEXT = () => ({
   fontFamily: 'EB Garamond',
   fontWeight: 'normal',
@@ -51,10 +56,7 @@ const config = reactive({
       y: 158,
     },
   ],
-  border: {
-    color: '#ffffff',
-    width: 0,
-  },
+  border: _defaultBorder,
 })
 
 const selectedSymbolId = ref(null)
