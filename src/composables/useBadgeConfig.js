@@ -103,7 +103,7 @@ export function useBadgeConfig() {
   function addSymbol(iconId) {
     const instanceId = `sym-${nextId++}`
     const color = config.palette[Math.floor(Math.random() * config.palette.length)] || '#ffffff'
-    config.symbols.push({ instanceId, iconId, color, x: 100, y: 105, size: 72 })
+    config.symbols.push({ instanceId, iconId, color, x: 100, y: 105, size: 72, strokeColor: '#000000', strokeWidth: 0 })
     selectedSymbolId.value = instanceId
   }
 

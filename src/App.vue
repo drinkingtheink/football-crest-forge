@@ -372,6 +372,9 @@ const showScene = ref(true)
                     :key="i"
                     :d="p"
                     :fill="sym.color"
+                    :stroke="sym.strokeWidth > 0 ? sym.strokeColor : 'none'"
+                    :stroke-width="sym.strokeWidth"
+                    paint-order="stroke fill"
                   />
                 </svg>
 
@@ -391,18 +394,31 @@ const showScene = ref(true)
                 </div>
               </div>
 
-              <!-- Inline size slider, visible when this row is selected -->
-              <div v-if="selectedSymbolId === sym.instanceId" class="sym-size">
-                <label>
+              <!-- Expanded controls, visible when this row is selected -->
+              <div v-if="selectedSymbolId === sym.instanceId" class="sym-expanded" @click.stop>
+                <label class="sym-field">
                   Size
                   <input
                     type="range" min="20" max="160"
                     :value="sym.size"
-                    @click.stop
-                    @input.stop="updateSymbol(sym.instanceId, { size: Number($event.target.value) })"
+                    @input="updateSymbol(sym.instanceId, { size: Number($event.target.value) })"
                   />
                   <span>{{ sym.size }}</span>
                 </label>
+                <div class="sym-field sym-stroke-row">
+                  <span>Border</span>
+                  <ColorPicker
+                    :value="sym.strokeColor || '#000000'"
+                    @change="updateSymbol(sym.instanceId, { strokeColor: $event })"
+                  />
+                  <input
+                    type="range" min="0" max="10" step="0.5"
+                    :value="sym.strokeWidth || 0"
+                    class="sym-stroke-range"
+                    @input="updateSymbol(sym.instanceId, { strokeWidth: Number($event.target.value) })"
+                  />
+                  <span>{{ sym.strokeWidth || 0 }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -886,18 +902,25 @@ const showScene = ref(true)
 }
 .sym-remove:hover { color: #e05555; }
 
-.sym-size {
+.sym-expanded {
   background: #191922;
   border-top: 1px solid #2a2a35;
-  padding: 6px 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
 }
-.sym-size label {
+
+.sym-field {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 11px;
   color: #aaa;
 }
-.sym-size input[type="range"] { flex: 1; accent-color: #e8c84a; }
-.sym-size span { font-size: 11px; color: #ddd; min-width: 24px; text-align: right; }
+.sym-field input[type="range"] { flex: 1; accent-color: #e8c84a; }
+.sym-field > span:last-child { font-size: 11px; color: #ddd; min-width: 24px; text-align: right; }
+
+.sym-stroke-row { gap: 6px; }
+.sym-stroke-range { flex: 1; accent-color: #e8c84a; }
 </style>

@@ -217,6 +217,9 @@ const bgElements = computed(() => {
           :key="i"
           :d="p"
           :fill="sym.color"
+          :stroke="sym.strokeWidth > 0 ? sym.strokeColor : 'none'"
+          :stroke-width="sym.strokeWidth"
+          paint-order="stroke fill"
         />
       </g>
     </g>
