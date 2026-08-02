@@ -199,7 +199,7 @@ const bgElements = computed(() => {
     :width="size"
     :viewBox="`0 0 ${VIEWBOX_W} ${VIEWBOX_H}`"
     xmlns="http://www.w3.org/2000/svg"
-    style="user-select: none; display: block; overflow: visible; filter: drop-shadow(0 12px 32px rgba(0,0,0,0.65));"
+    style="user-select: none; display: block; overflow: visible; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.55)) drop-shadow(0 10px 28px rgba(0,0,0,0.6)) drop-shadow(0 22px 48px rgba(0,0,0,0.35));"
     @mousemove="onMove"
     @mouseup="stopDrag"
     @mouseleave="stopDrag"
@@ -224,6 +224,29 @@ const bgElements = computed(() => {
         <stop offset="50%"  stop-color="white" stop-opacity="0.85" />
         <stop offset="80%"  stop-color="white" stop-opacity="0.25" />
         <stop offset="100%" stop-color="white" stop-opacity="0" />
+      </linearGradient>
+
+      <!-- 3D depth gradients (presentation only — not exported) -->
+      <radialGradient :id="`depth-radial-${uid}`" gradientUnits="userSpaceOnUse" cx="100" cy="90" r="135" fx="100" fy="68">
+        <stop offset="0%"   stop-color="white" stop-opacity="0.06" />
+        <stop offset="42%"  stop-color="black" stop-opacity="0"    />
+        <stop offset="100%" stop-color="black" stop-opacity="0.44" />
+      </radialGradient>
+      <linearGradient :id="`depth-left-${uid}`" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%"   stop-color="black" stop-opacity="0.36" />
+        <stop offset="30%"  stop-color="black" stop-opacity="0"    />
+      </linearGradient>
+      <linearGradient :id="`depth-right-${uid}`" x1="100%" y1="0%" x2="0%" y2="0%">
+        <stop offset="0%"   stop-color="black" stop-opacity="0.36" />
+        <stop offset="30%"  stop-color="black" stop-opacity="0"    />
+      </linearGradient>
+      <linearGradient :id="`depth-top-${uid}`" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%"   stop-color="white" stop-opacity="0.14" />
+        <stop offset="38%"  stop-color="white" stop-opacity="0"    />
+      </linearGradient>
+      <linearGradient :id="`depth-bottom-${uid}`" x1="0%" y1="100%" x2="0%" y2="0%">
+        <stop offset="0%"   stop-color="black" stop-opacity="0.28" />
+        <stop offset="30%"  stop-color="black" stop-opacity="0"    />
       </linearGradient>
     </defs>
 
@@ -354,6 +377,15 @@ const bgElements = computed(() => {
           transform="skewX(-14)"
         />
       </g>
+    </g>
+
+    <!-- 3D depth overlay (presentation only — excluded from export) -->
+    <g :clip-path="`url(#${clipId})`" style="pointer-events:none">
+      <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-radial-${uid})`" />
+      <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-left-${uid})`"   />
+      <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-right-${uid})`"  />
+      <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-top-${uid})`"    />
+      <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-bottom-${uid})`" />
     </g>
 
     <!-- Size hint bubble (shown while scroll-resizing) -->
