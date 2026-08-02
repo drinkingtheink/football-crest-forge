@@ -198,6 +198,7 @@ const showScene = ref(true)
             @update-text="updateText"
             @update-text-position="updateTextPosition"
             @update-symbol-position="updateSymbolPosition"
+            @update-symbol="updateSymbol"
             @select-symbol="selectSymbol"
             @select-text="selectText"
           />

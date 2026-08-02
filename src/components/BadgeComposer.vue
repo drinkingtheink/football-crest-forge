@@ -15,7 +15,7 @@ const props = defineProps({
   uid: { type: String, default: 'b0' },
 })
 
-const emit = defineEmits(['update-text-position', 'update-symbol-position', 'update-text', 'select-symbol', 'select-text'])
+const emit = defineEmits(['update-text-position', 'update-symbol-position', 'update-text', 'update-symbol', 'select-symbol', 'select-text'])
 
 function arcPathId(textId) { return `arcpath-${props.uid}-${textId}` }
 
@@ -75,13 +75,24 @@ const hoveredTextId   = ref(null)
 // ── Text hover tooltip ─────────────────────────────────────────────────────
 const textTooltip = ref(null) // { x, y } screen coords
 
+function onSymbolWheel(e, instanceId) {
+  const sym = props.config.symbols.find(s => s.instanceId === instanceId)
+  if (!sym) return
+  const delta = e.deltaY > 0 ? -3 : 3
+  const newSize = Math.min(180, Math.max(16, sym.size + delta))
+  emit('update-symbol', instanceId, { size: newSize })
+  sizeHint.value = { x: sym.x, y: sym.y - newSize / 2 - 8, size: newSize }
+  clearTimeout(sizeHintTimer)
+  sizeHintTimer = setTimeout(() => { sizeHint.value = null }, 900)
+}
+
 function onTextEnter(e, textId) {
   hoveredTextId.value = textId
   if (drag.value) return
   textTooltip.value = { x: e.clientX, y: e.clientY }
   if (!resizeHintShown) {
     resizeHintShown = true
-    addToast('Scroll over text to resize it', { type: 'tip', duration: 4000 })
+    addToast('Scroll over text or symbols to resize', { type: 'tip', duration: 4000 })
   }
 }
 
@@ -212,6 +223,7 @@ const bgElements = computed(() => {
       @mousedown="startSymbolDrag($event, sym.instanceId)"
       @mouseenter="hoveredSymbolId = sym.instanceId"
       @mouseleave="hoveredSymbolId = null"
+      @wheel.stop.prevent="onSymbolWheel($event, sym.instanceId)"
     >
       <g :transform="symbolTransform(sym)">
         <path
