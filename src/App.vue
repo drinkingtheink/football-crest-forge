@@ -225,7 +225,7 @@ const showScene = ref(true)
               </button>
             </div>
 
-            <div class="overlay-controls hud-pill">
+            <div v-show="imageBgTypes.has(appBg)" class="overlay-controls hud-pill">
               <input
                 type="color"
                 :value="overlay.color"
