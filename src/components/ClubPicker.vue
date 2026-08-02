@@ -83,6 +83,7 @@ function select(club) {
           <path d="M1 12 C7 12 10 4 16 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           <polyline points="14,2 16,4 14,6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
+        <small>Get Fresh Clubs</small>
       </li>
     </ul>
     </Transition>
@@ -192,6 +193,8 @@ function select(club) {
 .cp-reshuffle:hover { color: #e8c84a; }
 .cp-reshuffle:hover svg { transform: rotate(180deg); }
 .cp-reshuffle svg { transition: transform 0.3s ease; }
+
+.cp-reshuffle small { font-size: 60%; margin-left: 10px; }
 
 .dropdown-fade-enter-active,
 .dropdown-fade-leave-active { transition: opacity 0.15s ease, transform 0.15s ease; }
