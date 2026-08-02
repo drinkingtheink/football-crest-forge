@@ -14,7 +14,7 @@ export const icons = [
     id: 'star-5',
     label: '5-Point Star',
     group: 'Celestial',
-    paths: ['M 50,5 L 61,35 L 93,64 L 67,56 L 76,86 L 50,68 L 24,86 L 33,56 L 7,64 L 39,35 Z'],
+    paths: ['M 50,5 L 61,35 L 93,36 L 67,56 L 76,86 L 50,68 L 24,86 L 33,56 L 7,36 L 39,35 Z'],
   },
   {
     id: 'star-6',
@@ -49,10 +49,12 @@ export const icons = [
     label: 'Comet',
     group: 'Celestial',
     paths: [
-      'M 65,8 A 18,18 0 1 0 65,44 A 18,18 0 1 0 65,8 Z',
-      'M 52,34 L 5,52 L 8,60 L 56,42 Z',
-      'M 50,40 L 5,68 L 10,74 L 56,48 Z',
-      'M 52,28 L 8,14 L 12,22 L 56,36 Z',
+      // nucleus (upper-right)
+      'M 65,8 A 20,20 0 1 0 65,48 A 20,20 0 1 0 65,8 Z',
+      // tail bands sweeping to lower-left
+      'M 57,12 L 4,44 L 8,54 L 63,24 Z',
+      'M 52,26 L 4,62 L 8,72 L 58,40 Z',
+      'M 48,42 L 5,82 L 9,92 L 54,56 Z',
     ],
   },
 
@@ -79,7 +81,7 @@ export const icons = [
     id: 'chevron',
     label: 'Chevron',
     group: 'Heraldic',
-    paths: ['M 8,85 L 50,22 L 92,85 L 80,92 L 50,42 L 20,92 Z'],
+    paths: ['M 6,88 L 50,16 L 94,88 L 80,96 L 50,38 L 20,96 Z'],
   },
   {
     id: 'fleur-de-lis',
@@ -117,7 +119,7 @@ export const icons = [
     label: 'Crown',
     group: 'Crowns',
     paths: [
-      'M 10,80 L 10,46 L 28,60 L 38,20 L 50,52 L 62,20 L 72,60 L 90,46 L 90,80 Z',
+      'M 10,80 L 10,55 L 22,32 L 34,55 L 50,20 L 66,55 L 78,32 L 90,55 L 90,80 Z',
       'M 8,80 L 92,80 L 92,90 L 8,90 Z',
     ],
   },
@@ -126,10 +128,10 @@ export const icons = [
     label: 'Imperial Crown',
     group: 'Crowns',
     paths: [
-      'M 12,80 L 12,50 L 26,62 L 36,24 L 50,54 L 64,24 L 74,62 L 88,50 L 88,80 Z',
+      'M 12,80 L 12,56 L 24,36 L 36,56 L 50,28 L 64,56 L 76,36 L 88,56 L 88,80 Z',
       'M 8,80 L 92,80 L 92,90 L 8,90 Z',
-      // cross on top
-      'M 46,8 L 54,8 L 54,20 L 60,20 L 60,28 L 54,28 L 54,40 L 46,40 L 46,28 L 40,28 L 40,20 L 46,20 Z',
+      // cross atop center peak
+      'M 46,6 L 54,6 L 54,14 L 62,14 L 62,22 L 54,22 L 54,28 L 46,28 L 46,22 L 38,22 L 38,14 L 46,14 Z',
     ],
   },
   {
@@ -137,19 +139,12 @@ export const icons = [
     label: 'Laurel Wreath',
     group: 'Crowns',
     paths: [
-      // left branch — series of leaf shapes curving upward
-      'M 50,82 C 44,78 34,70 26,58 C 22,52 20,44 22,36 C 26,40 28,48 28,56 C 32,48 30,36 24,28 C 30,30 36,40 38,50 C 38,40 36,28 30,20 C 38,22 44,34 44,46 C 44,34 42,22 38,14 C 46,18 50,32 50,46 Z',
+      // left branch
+      'M 50,86 C 22,72 10,52 14,30 C 16,18 24,14 32,18 C 26,26 22,36 26,46 C 30,36 36,28 44,28 C 40,38 38,50 42,62 Z',
       // right branch
-      'M 50,82 C 56,78 66,70 74,58 C 78,52 80,44 78,36 C 74,40 72,48 72,56 C 68,48 70,36 76,28 C 70,30 64,40 62,50 C 62,40 64,28 70,20 C 62,22 56,34 56,46 C 56,34 58,22 62,14 C 54,18 50,32 50,46 Z',
+      'M 50,86 C 78,72 90,52 86,30 C 84,18 76,14 68,18 C 74,26 78,36 74,46 C 70,36 64,28 56,28 C 60,38 62,50 58,62 Z',
     ],
   },
-  {
-    id: 'shield-small',
-    label: 'Small Shield',
-    group: 'Crowns',
-    paths: ['M 12,12 L 88,12 L 88,58 C 88,80 70,92 50,96 C 30,92 12,80 12,58 Z'],
-  },
-
   // ── Weapons ────────────────────────────────────────────────────────────────
   {
     id: 'sword',
@@ -443,6 +438,60 @@ export const icons = [
       'M 47,82 L 50,92 L 53,82 Z',
       'M 64,86 L 67,94 L 70,86 Z',
     ],
+  },
+  // ── Shapes ─────────────────────────────────────────────────────────────────
+  {
+    id: 'triangle-up',
+    label: 'Triangle Up',
+    group: 'Shapes',
+    paths: ['M 50,8 L 92,88 L 8,88 Z'],
+  },
+  {
+    id: 'triangle-down',
+    label: 'Triangle Down',
+    group: 'Shapes',
+    paths: ['M 50,92 L 8,12 L 92,12 Z'],
+  },
+  {
+    id: 'pentagon',
+    label: 'Pentagon',
+    group: 'Shapes',
+    paths: ['M 50,8 L 90,37 L 75,84 L 25,84 L 10,37 Z'],
+  },
+  {
+    id: 'hexagon',
+    label: 'Hexagon',
+    group: 'Shapes',
+    paths: ['M 50,6 L 88,28 L 88,72 L 50,94 L 12,72 L 12,28 Z'],
+  },
+  {
+    id: 'heart',
+    label: 'Heart',
+    group: 'Shapes',
+    paths: ['M 50,88 C 28,72 8,58 8,36 C 8,18 22,10 36,14 C 43,16 48,22 50,26 C 52,22 57,16 64,14 C 78,10 92,18 92,36 C 92,58 72,72 50,88 Z'],
+  },
+  {
+    id: 'club',
+    label: 'Club',
+    group: 'Shapes',
+    paths: [
+      'M 50,8 A 20,20 0 1 0 50,48 A 20,20 0 1 0 50,8 Z',
+      'M 28,36 A 20,20 0 1 0 28,76 A 20,20 0 1 0 28,36 Z',
+      'M 72,36 A 20,20 0 1 0 72,76 A 20,20 0 1 0 72,36 Z',
+      'M 42,65 L 58,65 L 62,90 L 38,90 Z',
+    ],
+  },
+  {
+    id: 'diamond',
+    label: 'Diamond',
+    group: 'Shapes',
+    paths: ['M 50,6 L 90,50 L 50,94 L 10,50 Z'],
+  },
+  {
+    id: 'spade',
+    label: 'Spade',
+    group: 'Shapes',
+    paths: ['M 50,8 C 70,20 90,36 90,54 C 90,70 76,78 62,68 C 66,78 70,86 78,90 L 22,90 C 30,86 34,78 38,68 C 24,78 10,70 10,54 C 10,36 30,20 50,8 Z'],
   },
 ]
 
