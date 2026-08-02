@@ -167,7 +167,7 @@ function randomizeAll() {
   setPalette(club.colors.map(c => c.hex))
   setShape(shape.id)
   setBackgroundType(bgType)
-  setStripeCount(Math.floor(Math.random() * 11) + 2)
+  setStripeCount(Math.floor(Math.random() * 15) + 2)
   setBorderColor(third || '#ffffff')
   setBorderWidth(third ? Math.floor(Math.random() * 5) + 2 : 0)
   appBg.value = bgOptions[Math.floor(Math.random() * bgOptions.length)].id

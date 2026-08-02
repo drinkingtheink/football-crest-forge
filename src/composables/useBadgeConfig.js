@@ -75,7 +75,7 @@ export function useBadgeConfig() {
 
   // ── Background ────────────────────────────────────────────────────────────
   function setBackgroundType(type) { config.background.type = type }
-  function setStripeCount(n) { config.background.stripeCount = Math.min(12, Math.max(2, n)) }
+  function setStripeCount(n) { config.background.stripeCount = Math.min(16, Math.max(2, n)) }
 
   // ── Border ────────────────────────────────────────────────────────────────
   function setBorderColor(color) { config.border.color = color }
