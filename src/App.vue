@@ -72,7 +72,8 @@ const bgOptions = [
 ]
 
 const appBg = ref(bgOptions[Math.floor(Math.random() * bgOptions.length)].id)
-const overlay = reactive({ color: '#000000', opacity: 0.25 })
+const overlay = reactive({ color: config.palette[0] ?? '#000000', opacity: 0.25 })
+watch(() => config.palette[0], c => { if (c) overlay.color = c })
 
 const auroraThumb    = computed(() => auroraBg(config.palette))
 const wavesThumb     = computed(() => wavesBg(config.palette))
