@@ -12,6 +12,7 @@ import { shapes, shapeGroups } from './data/shapes.js'
 import { iconsById } from './data/icons.js'
 import { loadFont } from './utils/fonts.js'
 import { wavesBg, crisscrossBg } from './utils/patterns.js'
+import { burstParticles } from './utils/particles.js'
 
 const {
   config,
@@ -76,12 +77,6 @@ const overlay = reactive({ color: '#000000', opacity: 0.25 })
 const wavesThumb = computed(() => wavesBg(config.palette))
 const crisscrossThumb = computed(() => crisscrossBg(config.palette))
 
-onMounted(() => {
-  loadFont('EB Garamond')
-  window.addEventListener('keydown', onKeyDown)
-})
-onUnmounted(() => window.removeEventListener('keydown', onKeyDown))
-
 function onKeyDown(e) {
   if (e.key !== 'Delete' && e.key !== 'Backspace') return
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
@@ -89,10 +84,66 @@ function onKeyDown(e) {
   else if (selectedTextId.value) removeText(selectedTextId.value)
 }
 
-const controlsPane = ref(null)
+const controlsPane  = ref(null)
+const particleCanvas = ref(null)
+const badgeWrap      = ref(null)
+const isPulsing      = ref(false)
+let   stopParticles  = null
+let   pulseTimer     = null
+let   burstTimer     = null
+
 function forwardScroll(e) {
   controlsPane.value?.scrollBy({ top: e.deltaY, behavior: 'auto' })
 }
+
+function sizeCanvas() {
+  const c = particleCanvas.value
+  if (!c) return
+  c.width  = c.offsetWidth
+  c.height = c.offsetHeight
+}
+
+function triggerEffects() {
+  const c = particleCanvas.value
+  const b = badgeWrap.value
+  if (!c || !b) return
+
+  // Badge center in canvas coordinates
+  const cr = c.getBoundingClientRect()
+  const br = b.getBoundingClientRect()
+  const cx = br.left + br.width  / 2 - cr.left
+  const cy = br.top  + br.height / 2 - cr.top
+
+  stopParticles?.()
+  stopParticles = burstParticles(c, cx, cy, config.palette)
+
+  // Badge pulse
+  isPulsing.value = false
+  clearTimeout(pulseTimer)
+  nextTick(() => {
+    isPulsing.value = true
+    pulseTimer = setTimeout(() => { isPulsing.value = false }, 400)
+  })
+}
+
+// Debounced config watcher — fires after 120ms of silence
+watch(config, () => {
+  clearTimeout(burstTimer)
+  burstTimer = setTimeout(triggerEffects, 120)
+}, { deep: true })
+
+onMounted(() => {
+  loadFont('EB Garamond')
+  window.addEventListener('keydown', onKeyDown)
+  window.addEventListener('resize', sizeCanvas)
+  nextTick(sizeCanvas)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeyDown)
+  window.removeEventListener('resize', sizeCanvas)
+  stopParticles?.()
+})
 
 const showScene = ref(true)
 </script>
@@ -108,17 +159,20 @@ const showScene = ref(true)
     <main class="app-body">
       <!-- Preview -->
       <section class="preview-pane" @wheel.prevent="forwardScroll">
-        <BadgeComposer
-          :config="config"
-          :selected-symbol-id="selectedSymbolId"
-          :size="380"
-          uid="main"
-          @update-text="updateText"
-          @update-text-position="updateTextPosition"
-          @update-symbol-position="updateSymbolPosition"
-          @select-symbol="selectSymbol"
-          @select-text="selectText"
-        />
+        <canvas ref="particleCanvas" class="particle-canvas" />
+        <div ref="badgeWrap" :class="['badge-wrap', { pulsing: isPulsing }]">
+          <BadgeComposer
+            :config="config"
+            :selected-symbol-id="selectedSymbolId"
+            :size="380"
+            uid="main"
+            @update-text="updateText"
+            @update-text-position="updateTextPosition"
+            @update-symbol-position="updateSymbolPosition"
+            @select-symbol="selectSymbol"
+            @select-text="selectText"
+          />
+        </div>
         <div class="scene-wrap">
           <button class="scene-toggle hud-pill" @click="showScene = !showScene" title="Toggle scene controls">
             {{ showScene ? '▲ scene' : '▼ scene' }}
@@ -381,6 +435,29 @@ const showScene = ref(true)
   gap: 16px;
   padding: 40px;
   overflow: hidden;
+  position: relative;
+}
+
+.particle-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+}
+
+.badge-wrap {
+  display: inline-flex;
+}
+
+@keyframes badge-pulse {
+  0%   { transform: scale(1); filter: drop-shadow(0 0 0px rgba(232,200,74,0)); }
+  30%  { transform: scale(1.035); filter: drop-shadow(0 0 18px rgba(232,200,74,0.7)); }
+  100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(232,200,74,0)); }
+}
+.badge-wrap.pulsing {
+  animation: badge-pulse 0.35s ease-out forwards;
 }
 
 .hud-pill {

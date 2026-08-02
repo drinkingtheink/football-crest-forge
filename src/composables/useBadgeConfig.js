@@ -3,6 +3,9 @@ import { clubs } from '../data/clubs.js'
 
 const _randomClub = clubs[Math.floor(Math.random() * clubs.length)]
 
+const _BG_TYPES = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'striped-v', 'striped-h', 'striped-diagonal']
+const _randomBgType = _BG_TYPES[Math.floor(Math.random() * _BG_TYPES.length)]
+
 const DEFAULT_TEXT = () => ({
   fontFamily: 'EB Garamond',
   fontWeight: 'normal',
@@ -22,7 +25,7 @@ const config = reactive({
   shapeId: 'traditional-english',
   palette: _randomClub.colors.map(c => c.hex),
   background: {
-    type: 'halved-v',
+    type: _randomBgType,
     stripeCount: 4,
   },
   symbols: [],
