@@ -386,6 +386,7 @@ const bgElements = computed(() => {
       :font-size="text.fontSize"
       :font-weight="text.fontWeight"
       :letter-spacing="text.letterSpacing ?? 0"
+      text-anchor="middle"
       :style="{
         fill: text.color,
         cursor: 'pointer',
@@ -399,8 +400,7 @@ const bgElements = computed(() => {
     >
       <textPath
         :href="`#${arcPathId(text.id)}`"
-        start-offset="50%"
-        text-anchor="middle"
+        startOffset="50%"
       >{{ text.content }}</textPath>
     </text>
 
