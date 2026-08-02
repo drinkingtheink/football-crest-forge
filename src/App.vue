@@ -332,7 +332,7 @@ const showScene = ref(true)
 
           <Transition name="scene-fade">
           <div v-show="showScene" class="scene-controls">
-            <p class="drag-hint hud-pill">Drag or arrow-key symbols &amp; text &nbsp;·&nbsp; Shift+Arrow = 10px &nbsp;·&nbsp; Space to randomize &nbsp;·&nbsp; ⌘S to snapshot</p>
+            <p class="drag-hint hud-pill">Drag or arrow-key symbols &amp; text &nbsp;·&nbsp; Shift+Arrow = 10px &nbsp;·&nbsp; ⌘C / ⌘V to copy &amp; paste &nbsp;·&nbsp; Space to randomize &nbsp;·&nbsp; ⌘S to snapshot</p>
 
             <div class="bg-picker hud-pill">
               <button
