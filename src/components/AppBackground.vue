@@ -28,23 +28,24 @@ function hexRgba(hex, alpha) {
   return `rgba(${r},${g},${b},${alpha})`
 }
 
-// Each entry: offset position (%), palette color index, opacity
+// Horizontal ribbon bands — distinct from bokeh's floating circles
+// Each ribbon is a wide oval that drifts vertically like a northern-lights curtain
 const AURORA_DEFS = [
-  { x: -22, y: -28, ci: 0, a: 0.78 },
-  { x:  38, y:  -8, ci: 1, a: 0.68 },
-  { x:  20, y:  32, ci: 2, a: 0.58 },
-  { x: -12, y:  52, ci: 0, a: 0.48 },
-  { x:  58, y:  16, ci: 1, a: 0.42 },
+  { ci: 0, yPct:  6, hPct: 38, a: 0.72 },
+  { ci: 1, yPct: 28, hPct: 28, a: 0.62 },
+  { ci: 2, yPct: 52, hPct: 32, a: 0.58 },
+  { ci: 0, yPct: 16, hPct: 22, a: 0.46 },
+  { ci: 1, yPct: 64, hPct: 26, a: 0.52 },
 ]
 
-const auroraBlobs = computed(() => {
+const auroraRibbons = computed(() => {
   if (props.type !== 'aurora') return []
-  return AURORA_DEFS.map(({ x, y, ci, a }) => {
+  return AURORA_DEFS.map(({ ci, yPct, hPct, a }) => {
     const color = hexRgba(config.palette[ci % config.palette.length] || '#888888', a)
     return {
-      background: `radial-gradient(ellipse 88% 72% at 50% 50%, ${color} 0%, transparent 68%)`,
-      left: `${x}%`,
-      top:  `${y}%`,
+      top:        `${yPct}%`,
+      height:     `${hPct}%`,
+      background: color,
     }
   })
 })
@@ -88,11 +89,11 @@ onUnmounted(() => {
     <canvas v-if="type === 'bokeh'" ref="bokehCanvas" class="bokeh-canvas" />
     <div v-if="type === 'aurora'" class="aurora-layer">
       <div
-        v-for="(b, i) in auroraBlobs"
+        v-for="(r, i) in auroraRibbons"
         :key="i"
-        class="aurora-blob"
-        :class="`drift-${i}`"
-        :style="b"
+        class="aurora-ribbon"
+        :class="`ribbon-${i}`"
+        :style="r"
       />
     </div>
   </div>
@@ -133,50 +134,53 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.aurora-blob {
+/* Wide oval ribbons — border-radius creates soft oval edges, blur feathers them further */
+.aurora-ribbon {
   position: absolute;
-  width: 150%;
-  height: 150%;
+  left: -20%;
+  width: 140%;
+  border-radius: 50%;
   pointer-events: none;
-  will-change: transform;
+  filter: blur(42px);
+  will-change: transform, opacity;
 }
 
-.drift-0 { animation: aurora-drift-0 18s ease-in-out infinite;       animation-delay: -3s;  }
-.drift-1 { animation: aurora-drift-1 23s ease-in-out infinite;       animation-delay: -9s;  }
-.drift-2 { animation: aurora-drift-2 15s ease-in-out infinite;       animation-delay: -5s;  }
-.drift-3 { animation: aurora-drift-3 21s ease-in-out infinite;       animation-delay: -13s; }
-.drift-4 { animation: aurora-drift-4 27s ease-in-out infinite;       animation-delay: -7s;  }
+.ribbon-0 { animation: ribbon-0 26s ease-in-out infinite;       animation-delay:   0s; }
+.ribbon-1 { animation: ribbon-1 33s ease-in-out infinite;       animation-delay:  -9s; }
+.ribbon-2 { animation: ribbon-2 21s ease-in-out infinite;       animation-delay:  -5s; }
+.ribbon-3 { animation: ribbon-3 29s ease-in-out infinite;       animation-delay: -16s; }
+.ribbon-4 { animation: ribbon-4 24s ease-in-out infinite;       animation-delay:  -7s; }
 
-@keyframes aurora-drift-0 {
-  0%   { transform: translate(0%,   0%)   scale(1);    }
-  30%  { transform: translate(4%,  -3%)   scale(1.04); }
-  65%  { transform: translate(-2%,  5%)   scale(0.97); }
-  100% { transform: translate(0%,   0%)   scale(1);    }
+@keyframes ribbon-0 {
+  0%   { transform: translateY(0%)   scaleX(1.00); opacity: 0.80; }
+  28%  { transform: translateY(-5%)  scaleX(1.07); opacity: 1.00; }
+  62%  { transform: translateY(6%)   scaleX(0.94); opacity: 0.55; }
+  100% { transform: translateY(0%)   scaleX(1.00); opacity: 0.80; }
 }
-@keyframes aurora-drift-1 {
-  0%   { transform: translate(0%,   0%)   scale(1);    }
-  40%  { transform: translate(-5%,  4%)   scale(1.06); }
-  72%  { transform: translate(3%,  -3%)   scale(0.96); }
-  100% { transform: translate(0%,   0%)   scale(1);    }
+@keyframes ribbon-1 {
+  0%   { transform: translateY(0%)  scaleX(1.00); opacity: 0.75; }
+  38%  { transform: translateY(6%)  scaleX(0.93); opacity: 1.00; }
+  70%  { transform: translateY(-4%) scaleX(1.08); opacity: 0.50; }
+  100% { transform: translateY(0%)  scaleX(1.00); opacity: 0.75; }
 }
-@keyframes aurora-drift-2 {
-  0%   { transform: translate(0%,   0%)   scale(1);    }
-  25%  { transform: translate(3%,   6%)   scale(1.03); }
-  60%  { transform: translate(-4%, -2%)   scale(1.07); }
-  85%  { transform: translate(2%,  -4%)   scale(0.95); }
-  100% { transform: translate(0%,   0%)   scale(1);    }
+@keyframes ribbon-2 {
+  0%   { transform: translateY(0%)  scaleX(1.00); opacity: 0.70; }
+  22%  { transform: translateY(7%)  scaleX(1.05); opacity: 0.95; }
+  55%  { transform: translateY(-5%) scaleX(0.96); opacity: 1.00; }
+  82%  { transform: translateY(3%)  scaleX(0.92); opacity: 0.60; }
+  100% { transform: translateY(0%)  scaleX(1.00); opacity: 0.70; }
 }
-@keyframes aurora-drift-3 {
-  0%   { transform: translate(0%,   0%)   scale(1);    }
-  45%  { transform: translate(-4%, -5%)   scale(1.05); }
-  80%  { transform: translate(5%,   2%)   scale(0.98); }
-  100% { transform: translate(0%,   0%)   scale(1);    }
+@keyframes ribbon-3 {
+  0%   { transform: translateY(0%)   scaleX(1.00); opacity: 0.65; }
+  42%  { transform: translateY(-7%)  scaleX(1.06); opacity: 0.90; }
+  78%  { transform: translateY(5%)   scaleX(0.95); opacity: 0.45; }
+  100% { transform: translateY(0%)   scaleX(1.00); opacity: 0.65; }
 }
-@keyframes aurora-drift-4 {
-  0%   { transform: translate(0%,   0%)   scale(1);    }
-  35%  { transform: translate(6%,   3%)   scale(1.04); }
-  55%  { transform: translate(2%,  -5%)   scale(0.96); }
-  80%  { transform: translate(-3%,  4%)   scale(1.02); }
-  100% { transform: translate(0%,   0%)   scale(1);    }
+@keyframes ribbon-4 {
+  0%   { transform: translateY(0%)  scaleX(1.00); opacity: 0.78; }
+  32%  { transform: translateY(4%)  scaleX(1.07); opacity: 0.55; }
+  58%  { transform: translateY(-6%) scaleX(0.94); opacity: 1.00; }
+  80%  { transform: translateY(5%)  scaleX(1.03); opacity: 0.70; }
+  100% { transform: translateY(0%)  scaleX(1.00); opacity: 0.78; }
 }
 </style>
