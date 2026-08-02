@@ -711,6 +711,21 @@ export const icons = [
     group: 'Shapes',
     paths: ['M 50,8 C 70,20 90,36 90,54 C 90,70 76,78 62,68 C 66,78 70,86 78,90 L 22,90 C 30,86 34,78 38,68 C 24,78 10,70 10,54 C 10,36 30,20 50,8 Z'],
   },
+  {
+    id: 'circle',
+    label: 'Circle',
+    group: 'Shapes',
+    // Two CW semicircular arcs forming a filled disk
+    paths: ['M 6,50 A 44,44 0 1 1 94,50 A 44,44 0 1 1 6,50 Z'],
+  },
+  {
+    id: 'hoop',
+    label: 'Hoop',
+    group: 'Shapes',
+    // Outer circle CW + inner circle CCW in one compound path.
+    // Nonzero winding rule (SVG default) makes the inner region a transparent hole.
+    paths: ['M 6,50 A 44,44 0 1 1 94,50 A 44,44 0 1 1 6,50 Z M 22,50 A 28,28 0 1 0 78,50 A 28,28 0 1 0 22,50 Z'],
+  },
 
   // ── Birds ──────────────────────────────────────────────────────────────────
   {
