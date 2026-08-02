@@ -29,6 +29,7 @@ const DEFAULT_TEXT = () => ({
   arcRy: 78,
   arcX: 100,
   arcY: 120,
+  archHeight: 40,
   x: 100,
   y: 120,
 })

@@ -29,6 +29,7 @@ watch(() => props.selectedTextId, async (id) => {
 
 const ARC_OPTS = [
   { value: null,     label: 'Straight' },
+  { value: 'arch',   label: 'Arch' },
   { value: 'top',    label: 'Arc top' },
   { value: 'bottom', label: 'Arc bottom' },
 ]
@@ -156,26 +157,47 @@ async function onFontChange(textId, event) {
             </div>
           </label>
 
-          <!-- Arc controls (only when arc mode active) -->
+          <!-- Arc / Arch controls (only when not straight) -->
           <template v-if="text.arc">
-            <div class="field-row">
-              <label class="field field-half">
-                <span>Radius X <em>{{ text.arcRx ?? text.arcRadius ?? 78 }}</em></span>
-                <input
-                  type="range" min="20" max="120"
-                  :value="text.arcRx ?? text.arcRadius ?? 78"
-                  @input="$emit('update-text', text.id, { arcRx: Number($event.target.value) })"
-                />
-              </label>
-              <label class="field field-half">
-                <span>Radius Y <em>{{ text.arcRy ?? text.arcRadius ?? 78 }}</em></span>
-                <input
-                  type="range" min="20" max="120"
-                  :value="text.arcRy ?? text.arcRadius ?? 78"
-                  @input="$emit('update-text', text.id, { arcRy: Number($event.target.value) })"
-                />
-              </label>
-            </div>
+            <!-- Arch mode: single height slider -->
+            <label v-if="text.arc === 'arch'" class="field">
+              <span>Arch height <em>{{ text.archHeight ?? 40 }}</em></span>
+              <input
+                type="range" min="-80" max="80"
+                :value="text.archHeight ?? 40"
+                @input="$emit('update-text', text.id, { archHeight: Number($event.target.value) })"
+              />
+            </label>
+
+            <!-- Arc top / bottom: radius + fit controls -->
+            <template v-else>
+              <div class="field-row">
+                <label class="field field-half">
+                  <span>Radius X <em>{{ text.arcRx ?? text.arcRadius ?? 78 }}</em></span>
+                  <input
+                    type="range" min="20" max="120"
+                    :value="text.arcRx ?? text.arcRadius ?? 78"
+                    @input="$emit('update-text', text.id, { arcRx: Number($event.target.value) })"
+                  />
+                </label>
+                <label class="field field-half">
+                  <span>Radius Y <em>{{ text.arcRy ?? text.arcRadius ?? 78 }}</em></span>
+                  <input
+                    type="range" min="20" max="120"
+                    :value="text.arcRy ?? text.arcRadius ?? 78"
+                    @input="$emit('update-text', text.id, { arcRy: Number($event.target.value) })"
+                  />
+                </label>
+              </div>
+              <button
+                class="fit-arc-btn"
+                :disabled="!shapeFit"
+                :title="shapeFit ? 'Set arc curvature to match badge shape' : 'Only available on circular and oval badges'"
+                @click.stop="$emit('fit-arc', text.id)"
+              >Fit to badge</button>
+            </template>
+
+            <!-- Vertical position — all curved modes -->
             <label class="field">
               <span>Vertical position <em>{{ text.arcY }}</em></span>
               <input
@@ -184,12 +206,6 @@ async function onFontChange(textId, event) {
                 @input="$emit('update-text', text.id, { arcY: Number($event.target.value) })"
               />
             </label>
-            <button
-              class="fit-arc-btn"
-              :disabled="!shapeFit"
-              :title="shapeFit ? 'Set arc curvature to match badge shape' : 'Only available on circular and oval badges'"
-              @click.stop="$emit('fit-arc', text.id)"
-            >Fit to badge</button>
           </template>
 
           <!-- Straight text position (only when not arc) -->

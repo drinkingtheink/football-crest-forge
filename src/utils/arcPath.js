@@ -21,10 +21,19 @@
  * fallback so legacy snapshots continue to render correctly.
  */
 export function arcPathD(text) {
-  const rx = text.arcRx ?? text.arcRadius ?? 78
-  const ry = text.arcRy ?? text.arcRadius ?? 78
   const cx = text.arcX ?? 100
   const cy = text.arcY ?? 120
+
+  if (text.arc === 'arch') {
+    // Quadratic bezier arch spanning 180px centered at cx.
+    // Positive archHeight = arch up, negative = arch down.
+    // Symmetric about x=cx, so startOffset="50%" lands at the visual apex.
+    const h = text.archHeight ?? 40
+    return `M ${cx - 90},${cy} Q ${cx},${cy - h} ${cx + 90},${cy}`
+  }
+
+  const rx = text.arcRx ?? text.arcRadius ?? 78
+  const ry = text.arcRy ?? text.arcRadius ?? 78
   const s  = Math.sqrt(3) / 2   // sin(60°) ≈ 0.866
 
   if (text.arc === 'top') {
