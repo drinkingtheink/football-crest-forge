@@ -84,7 +84,8 @@ export function useBadgeConfig() {
   // ── Symbols ───────────────────────────────────────────────────────────────
   function addSymbol(iconId) {
     const instanceId = `sym-${nextId++}`
-    config.symbols.push({ instanceId, iconId, color: '#ffd700', x: 100, y: 105, size: 72 })
+    const color = config.palette[Math.floor(Math.random() * config.palette.length)] || '#ffffff'
+    config.symbols.push({ instanceId, iconId, color, x: 100, y: 105, size: 72 })
     selectedSymbolId.value = instanceId
   }
 
