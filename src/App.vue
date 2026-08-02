@@ -9,7 +9,7 @@ import ClubPicker from './components/ClubPicker.vue'
 import AppBackground from './components/AppBackground.vue'
 import { useBadgeConfig } from './composables/useBadgeConfig.js'
 import { clubs } from './data/clubs.js'
-import { shapes, shapeGroups } from './data/shapes.js'
+import { shapes } from './data/shapes.js'
 import { iconsById } from './data/icons.js'
 import { loadFont } from './utils/fonts.js'
 import { auroraBg, wavesBg, crisscrossBg } from './utils/patterns.js'
@@ -43,10 +43,6 @@ const {
 const bgTypes = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'striped-v', 'striped-h', 'striped-diagonal']
 const stripeTypes = new Set(['striped-v', 'striped-h', 'striped-diagonal'])
 const imageBgTypes = new Set(['grass', 'stadium', 'fabric', 'brick', 'pitch'])
-
-const shapesByGroup = computed(() =>
-  Object.fromEntries(shapeGroups.map(g => [g, shapes.filter(s => s.group === g)]))
-)
 
 // Auto-scroll sidebar to selected symbol row
 const symRefs = {}
@@ -298,22 +294,19 @@ const showScene = ref(true)
         <!-- Shape -->
         <div class="control-group">
           <h3 class="control-label">Shape</h3>
-          <div v-for="group in shapeGroups" :key="group" class="shape-group">
-            <p class="shape-group-label">{{ group }}</p>
-            <div class="shape-grid">
-              <button
-                v-for="s in shapesByGroup[group]"
-                :key="s.id"
-                class="shape-btn"
-                :class="{ active: config.shapeId === s.id }"
-                @click="setShape(s.id)"
-                :title="s.label"
-              >
-                <svg viewBox="0 0 200 240" width="40" height="48">
-                  <path :d="s.path" fill="currentColor" />
-                </svg>
-              </button>
-            </div>
+          <div class="shape-grid">
+            <button
+              v-for="s in shapes"
+              :key="s.id"
+              class="shape-btn"
+              :class="{ active: config.shapeId === s.id }"
+              @click="setShape(s.id)"
+              :title="s.label"
+            >
+              <svg viewBox="0 0 200 240" width="40" height="48">
+                <path :d="s.path" fill="currentColor" />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -698,14 +691,6 @@ const showScene = ref(true)
     0 0 12px rgba(232, 200, 74, 0.5),
     0 0 24px rgba(232, 200, 74, 0.2);
   margin: 0 0 10px;
-}
-
-.shape-group { margin-bottom: 12px; }
-.shape-group-label {
-  font-size: 11px;
-  color: #b89e50;
-  text-shadow: 0 0 8px rgba(232, 200, 74, 0.25);
-  margin: 0 0 6px;
 }
 
 .shape-grid { display: flex; flex-wrap: wrap; gap: 6px; }
