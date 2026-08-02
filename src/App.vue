@@ -126,11 +126,23 @@ function triggerEffects() {
   })
 }
 
-// Debounced config watcher — fires after 120ms of silence
-watch(config, () => {
+// Watch only design-relevant fields — excludes x/y positions so drag
+// events and range-slider scrubbing don't spam the particle burst.
+const _designFingerprint = computed(() => JSON.stringify({
+  shapeId:    config.shapeId,
+  palette:    config.palette,
+  background: config.background,
+  border:     config.border,
+  texts:   config.texts.map(({ id, content, fontFamily, fontWeight, fontSize, color, letterSpacing, arc, arcRadius }) =>
+             ({ id, content, fontFamily, fontWeight, fontSize, color, letterSpacing, arc, arcRadius })),
+  symbols: config.symbols.map(({ instanceId, iconId, color, size }) =>
+             ({ instanceId, iconId, color, size })),
+}))
+
+watch(_designFingerprint, () => {
   clearTimeout(burstTimer)
-  burstTimer = setTimeout(triggerEffects, 120)
-}, { deep: true })
+  burstTimer = setTimeout(triggerEffects, 350)
+})
 
 onMounted(() => {
   loadFont('EB Garamond')
