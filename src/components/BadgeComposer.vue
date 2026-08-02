@@ -414,6 +414,7 @@ const bgElements = computed(() => {
       :key="text.id"
       :x="text.x"
       :y="text.y"
+      :transform="text.rotation ? `rotate(${text.rotation}, ${text.x}, ${text.y})` : null"
       :font-family="text.fontFamily"
       :font-size="text.fontSize"
       :font-weight="text.fontWeight"

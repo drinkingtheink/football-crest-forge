@@ -157,6 +157,24 @@ async function onFontChange(textId, event) {
             </div>
           </label>
 
+          <!-- Rotation (straight text only) -->
+          <label v-if="!text.arc" class="field">
+            <span>Rotation <em>{{ text.rotation ?? 0 }}°</em></span>
+            <div class="rotation-row">
+              <input
+                type="range" min="-180" max="180"
+                :value="text.rotation ?? 0"
+                @input="$emit('update-text', text.id, { rotation: Number($event.target.value) })"
+              />
+              <button
+                type="button"
+                class="rotation-reset"
+                title="Reset rotation to 0°"
+                @click="$emit('update-text', text.id, { rotation: 0 })"
+              >⟲</button>
+            </div>
+          </label>
+
           <!-- Arc / Arch controls (only when not straight) -->
           <template v-if="text.arc">
             <!-- Arch mode: single height slider -->
@@ -288,6 +306,24 @@ async function onFontChange(textId, event) {
 }
 
 .field { display: flex; flex-direction: column; gap: 4px; }
+
+.rotation-row { display: flex; align-items: center; gap: 6px; }
+.rotation-row input { flex: 1; }
+.rotation-reset {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 4px;
+  border: 1px solid #2a2a35;
+  background: #1e1e28;
+  color: #888;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.rotation-reset:hover { border-color: #e8c84a; color: #e8c84a; }
 
 .field > span {
   color: #c8aa58;

@@ -24,6 +24,7 @@ const DEFAULT_TEXT = () => ({
   fontSize: 14,
   color: '#ffffff',
   letterSpacing: 0,
+  rotation: 0,
   arc: null,
   arcRx: 78,
   arcRy: 78,
