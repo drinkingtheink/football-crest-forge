@@ -91,6 +91,8 @@ const controlsPane = ref(null)
 function forwardScroll(e) {
   controlsPane.value?.scrollBy({ top: e.deltaY, behavior: 'auto' })
 }
+
+const showScene = ref(true)
 </script>
 
 <template>
@@ -115,39 +117,47 @@ function forwardScroll(e) {
           @select-symbol="selectSymbol"
           @select-text="selectText"
         />
-        <p class="drag-hint">Drag symbols and text to reposition</p>
-
-        <div class="bg-picker">
-          <button
-            v-for="opt in bgOptions"
-            :key="opt.id"
-            class="bg-opt"
-            :class="{ active: appBg === opt.id }"
-            :title="opt.label"
-            :style="opt.id === 'waves' ? wavesThumb : opt.id === 'crisscross' ? crisscrossThumb : {}"
-            @click="appBg = opt.id"
-          >
-            <img v-if="opt.thumb" :src="opt.thumb" class="bg-opt-thumb" />
-            <span v-else-if="opt.id === 'bokeh'"    class="bg-opt-bokeh" />
-            <span v-else-if="opt.id === 'none'"     class="bg-opt-none" />
+        <div class="scene-wrap">
+          <button class="scene-toggle hud-pill" @click="showScene = !showScene" title="Toggle scene controls">
+            {{ showScene ? '▲ scene' : '▼ scene' }}
           </button>
-        </div>
 
-        <div class="overlay-controls">
-          <input
-            type="color"
-            :value="overlay.color"
-            class="overlay-color"
-            title="Overlay color"
-            @input="overlay.color = $event.target.value"
-          />
-          <input
-            type="range" min="0" max="1" step="0.05"
-            :value="overlay.opacity"
-            class="overlay-opacity"
-            @input="overlay.opacity = Number($event.target.value)"
-          />
-          <span class="overlay-label">overlay</span>
+          <div v-show="showScene" class="scene-controls">
+            <p class="drag-hint hud-pill">Drag symbols and text to reposition</p>
+
+            <div class="bg-picker hud-pill">
+              <button
+                v-for="opt in bgOptions"
+                :key="opt.id"
+                class="bg-opt"
+                :class="{ active: appBg === opt.id }"
+                :title="opt.label"
+                :style="opt.id === 'waves' ? wavesThumb : opt.id === 'crisscross' ? crisscrossThumb : {}"
+                @click="appBg = opt.id"
+              >
+                <img v-if="opt.thumb" :src="opt.thumb" class="bg-opt-thumb" />
+                <span v-else-if="opt.id === 'bokeh'"    class="bg-opt-bokeh" />
+                <span v-else-if="opt.id === 'none'"     class="bg-opt-none" />
+              </button>
+            </div>
+
+            <div class="overlay-controls hud-pill">
+              <input
+                type="color"
+                :value="overlay.color"
+                class="overlay-color"
+                title="Overlay color"
+                @input="overlay.color = $event.target.value"
+              />
+              <input
+                type="range" min="0" max="1" step="0.05"
+                :value="overlay.opacity"
+                class="overlay-opacity"
+                @input="overlay.opacity = Number($event.target.value)"
+              />
+              <span class="overlay-label">overlay</span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -370,7 +380,37 @@ function forwardScroll(e) {
   overflow: hidden;
 }
 
-.drag-hint { font-size: 12px; color: rgb(185, 182, 182); padding: 5px 8px; background-color: rgba(0,0,0,0.5); border-radius: 6px; }
+.hud-pill {
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 6px;
+  padding: 5px 8px;
+}
+
+.scene-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.scene-toggle {
+  font-size: 11px;
+  color: #b9b6b6;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: color 0.15s;
+}
+.scene-toggle:hover { color: #fff; }
+
+.scene-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.drag-hint { font-size: 12px; color: #b9b6b6; margin: 0; }
 
 .app-overlay {
   position: fixed;
@@ -383,6 +423,8 @@ function forwardScroll(e) {
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .bg-opt {
@@ -428,7 +470,6 @@ function forwardScroll(e) {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 4px;
 }
 
 .overlay-color {
