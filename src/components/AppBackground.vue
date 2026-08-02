@@ -2,7 +2,7 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useBadgeConfig } from '../composables/useBadgeConfig.js'
 import { startBokeh } from '../utils/bokeh.js'
-import { hexagonsBg, topographyBg } from '../utils/patterns.js'
+import { wavesBg, crisscrossBg } from '../utils/patterns.js'
 
 const props = defineProps({
   type: { type: String, default: 'none' },
@@ -21,8 +21,8 @@ const imageMap = {
 }
 
 const patternStyle = computed(() => {
-  if (props.type === 'hexagons')   return hexagonsBg(config.palette)
-  if (props.type === 'topography') return topographyBg(config.palette)
+  if (props.type === 'waves')      return wavesBg(config.palette)
+  if (props.type === 'crisscross') return crisscrossBg(config.palette)
   if (imageMap[props.type])        return { backgroundImage: `url(${imageMap[props.type]})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }
   return {}
 })

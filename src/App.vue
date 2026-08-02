@@ -10,7 +10,7 @@ import { useBadgeConfig } from './composables/useBadgeConfig.js'
 import { shapes, shapeGroups } from './data/shapes.js'
 import { iconsById } from './data/icons.js'
 import { loadFont } from './utils/fonts.js'
-import { hexagonsBg, topographyBg } from './utils/patterns.js'
+import { wavesBg, crisscrossBg } from './utils/patterns.js'
 
 const {
   config,
@@ -64,15 +64,15 @@ const bgOptions = [
   { id: 'brick',       label: 'Brick',      thumb: '/backgrounds/brick.jpg', isImgOption: true },
   { id: 'pitch',       label: 'Pitch',      thumb: '/backgrounds/pitch.png', isImgOption: true },
   { id: 'bokeh',       label: 'Bokeh' },
-  { id: 'hexagons',    label: 'Hexagons' },
-  { id: 'topography',  label: 'Topography' },
+  { id: 'waves',       label: 'Waves' },
+  { id: 'crisscross',  label: 'Criss-Cross' },
 ]
 
 const appBg = ref(bgOptions[Math.floor(Math.random() * bgOptions.length)].id)
 const overlay = reactive({ color: '#000000', opacity: 0.25 })
 
-const hexThumb = computed(() => hexagonsBg(config.palette))
-const topoThumb = computed(() => topographyBg(config.palette))
+const wavesThumb = computed(() => wavesBg(config.palette))
+const crisscrossThumb = computed(() => crisscrossBg(config.palette))
 
 onMounted(() => {
   loadFont('EB Garamond')
@@ -124,7 +124,7 @@ function forwardScroll(e) {
             class="bg-opt"
             :class="{ active: appBg === opt.id }"
             :title="opt.label"
-            :style="opt.id === 'hexagons' ? hexThumb : opt.id === 'topography' ? topoThumb : {}"
+            :style="opt.id === 'waves' ? wavesThumb : opt.id === 'crisscross' ? crisscrossThumb : {}"
             @click="appBg = opt.id"
           >
             <img v-if="opt.thumb" :src="opt.thumb" class="bg-opt-thumb" />
