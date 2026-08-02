@@ -18,6 +18,9 @@ A browser-based football badge creator for designing custom club crests. Combine
     <td align="center"><img src="designs/fc-cf-star-diamond1.png" width="220" alt="FC Crest Forge — Diamond badge, free star above" /><br/><sub>Diamond · free star above</sub></td>
     <td align="center"><img src="designs/fc-cf-aac-pennant1.png" width="220" alt="FC Crest Forge — AAC pennant badge, crown, fabric background" /><br/><sub>AAC · pennant · fabric bg</sub></td>
   </tr>
+  <tr>
+    <td align="center"><img src="designs/fc-cf-spartan-sun1.png" width="220" alt="FC Crest Forge — Spartan helmet on sun burst, stadium background" /><br/><sub>Spartan · sun burst · stadium bg</sub></td>
+  </tr>
 </table>
 
 ---
