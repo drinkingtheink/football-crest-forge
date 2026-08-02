@@ -10,7 +10,7 @@ import AppBackground from './components/AppBackground.vue'
 import { useBadgeConfig } from './composables/useBadgeConfig.js'
 import { clubs } from './data/clubs.js'
 import { shapes } from './data/shapes.js'
-import { iconsById } from './data/icons.js'
+import { icons, iconsById } from './data/icons.js'
 import { loadFont } from './utils/fonts.js'
 import { auroraBg, wavesBg, crisscrossBg } from './utils/patterns.js'
 import { burstParticles } from './utils/particles.js'
@@ -169,8 +169,17 @@ function randomizeAll() {
   setBackgroundType(bgType)
   setStripeCount(Math.floor(Math.random() * 15) + 2)
   setBorderColor(third || '#ffffff')
-  setBorderWidth(third ? Math.floor(Math.random() * 5) + 2 : 0)
+  setBorderWidth(third ? Math.floor(Math.random() * 5) + 4 : 0)
   appBg.value = bgOptions[Math.floor(Math.random() * bgOptions.length)].id
+
+  ;[...config.symbols].forEach(s => removeSymbol(s.instanceId))
+  if (Math.random() < 1/3) {
+    addSymbol(icons[Math.floor(Math.random() * icons.length)].id)
+    updateSymbol(selectedSymbolId.value, { strokeWidth: 8, strokeColor: '#000000' })
+  }
+
+  updateText('club-name', { y: 55 })
+  updateText('year', { y: 185 })
 }
 
 const showScene = ref(true)
@@ -677,6 +686,14 @@ const showScene = ref(true)
   display: flex;
   flex-direction: column;
   gap: 28px;
+}
+
+@media (min-width: 1440px) {
+  .controls-pane { width: 360px; }
+}
+
+@media (min-width: 1920px) {
+  .controls-pane { width: 420px; }
 }
 
 .control-group {}

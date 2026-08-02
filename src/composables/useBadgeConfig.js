@@ -1,14 +1,17 @@
 import { reactive, ref } from 'vue'
 import { clubs } from '../data/clubs.js'
+import { icons } from '../data/icons.js'
 
 const _randomClub = clubs[Math.floor(Math.random() * clubs.length)]
+const _randomIcon = icons[Math.floor(Math.random() * icons.length)]
+const _addInitialSymbol = Math.random() < 1/3
 
 const _BG_TYPES = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'striped-v', 'striped-h', 'striped-diagonal']
 const _randomBgType = _BG_TYPES[Math.floor(Math.random() * _BG_TYPES.length)]
 
 const _thirdColor = _randomClub.colors[2]?.hex
 const _defaultBorder = _thirdColor
-  ? { color: _thirdColor, width: Math.floor(Math.random() * 5) + 2 }
+  ? { color: _thirdColor, width: Math.floor(Math.random() * 5) + 4 }
   : { color: '#ffffff', width: 0 }
 
 const DEFAULT_TEXT = () => ({
@@ -33,7 +36,16 @@ const config = reactive({
     type: _randomBgType,
     stripeCount: 4,
   },
-  symbols: [],
+  symbols: _addInitialSymbol ? [{
+    instanceId: 'sym-init',
+    iconId: _randomIcon.id,
+    color: _randomClub.colors[0]?.hex || '#ffffff',
+    x: 100,
+    y: 120,
+    size: 72,
+    strokeColor: '#000000',
+    strokeWidth: 8,
+  }] : [],
   texts: [
     {
       ...DEFAULT_TEXT(),
@@ -43,7 +55,7 @@ const config = reactive({
       fontWeight: 'bold',
       letterSpacing: 2,
       x: 100,
-      y: 110,
+      y: 55,
     },
     {
       ...DEFAULT_TEXT(),
@@ -53,7 +65,7 @@ const config = reactive({
       fontWeight: 'normal',
       letterSpacing: 3,
       x: 100,
-      y: 158,
+      y: 185,
     },
   ],
   border: _defaultBorder,
