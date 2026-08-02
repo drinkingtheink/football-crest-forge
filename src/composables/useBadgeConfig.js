@@ -50,6 +50,7 @@ export function useBadgeConfig() {
   function setPaletteColor(index, color) { config.palette[index] = color }
   function addPaletteColor() { if (config.palette.length < 6) config.palette.push('#cccccc') }
   function removePaletteColor(index) { if (config.palette.length > 1) config.palette.splice(index, 1) }
+  function setPalette(hexArray) { config.palette.splice(0, config.palette.length, ...hexArray.slice(0, 6)) }
 
   // ── Shape ─────────────────────────────────────────────────────────────────
   function setShape(shapeId) { config.shapeId = shapeId }
@@ -121,6 +122,7 @@ export function useBadgeConfig() {
     setPaletteColor,
     addPaletteColor,
     removePaletteColor,
+    setPalette,
     setShape,
     setBackgroundType,
     setStripeCount,

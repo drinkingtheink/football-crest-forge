@@ -5,6 +5,7 @@ import IconPicker from './components/IconPicker.vue'
 import TextEditor from './components/TextEditor.vue'
 import ToastContainer from './components/ToastContainer.vue'
 import ColorPicker from './components/ColorPicker.vue'
+import ClubPicker from './components/ClubPicker.vue'
 import AppBackground from './components/AppBackground.vue'
 import { useBadgeConfig } from './composables/useBadgeConfig.js'
 import { shapes, shapeGroups } from './data/shapes.js'
@@ -19,6 +20,7 @@ const {
   setPaletteColor,
   addPaletteColor,
   removePaletteColor,
+  setPalette,
   setShape,
   setBackgroundType,
   setStripeCount,
@@ -169,7 +171,8 @@ const showScene = ref(true)
         <!-- Club Colors / Palette -->
         <div class="control-group">
           <h3 class="control-label">Club Colors</h3>
-          <div class="palette-editor">
+          <ClubPicker @apply="setPalette" />
+          <div class="palette-editor" style="margin-top: 10px;">
             <div
               v-for="(color, i) in config.palette"
               :key="i"
