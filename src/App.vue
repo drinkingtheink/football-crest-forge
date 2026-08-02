@@ -11,7 +11,7 @@ import SnapshotPanel from './components/SnapshotPanel.vue'
 import { useBadgeConfig } from './composables/useBadgeConfig.js'
 import { saveSnapshot } from './utils/snapshots.js'
 import { clubs } from './data/clubs.js'
-import { shapes } from './data/shapes.js'
+import { shapes, shapesById } from './data/shapes.js'
 import { icons, iconsById } from './data/icons.js'
 import { auroraBg, wavesBg, crisscrossBg } from './utils/patterns.js'
 import { burstParticles } from './utils/particles.js'
@@ -222,8 +222,8 @@ const _designFingerprint = computed(() => JSON.stringify({
   palette:    config.palette,
   background: config.background,
   border:     config.border,
-  texts:   config.texts.map(({ id, content, fontFamily, fontWeight, fontSize, color, letterSpacing, arc, arcRadius }) =>
-             ({ id, content, fontFamily, fontWeight, fontSize, color, letterSpacing, arc, arcRadius })),
+  texts:   config.texts.map(({ id, content, fontFamily, fontWeight, fontSize, color, letterSpacing, arc, arcRx, arcRy }) =>
+             ({ id, content, fontFamily, fontWeight, fontSize, color, letterSpacing, arc, arcRx, arcRy })),
   symbols: config.symbols.map(({ instanceId, iconId, color, size }) =>
              ({ instanceId, iconId, color, size })),
 }))
@@ -233,15 +233,32 @@ watch(_designFingerprint, () => {
   burstTimer = setTimeout(triggerEffects, 350)
 })
 
+const currentShapeFit = computed(() => shapesById[config.shapeId]?.arcFit ?? null)
+
+function fitArcToShape(textId) {
+  const fit = currentShapeFit.value
+  if (!fit) return
+  updateText(textId, { arcRx: fit.rx, arcRy: fit.ry, arcX: fit.cx, arcY: fit.cy })
+}
+
+function onDocumentClick(e) {
+  if (!selectedSymbolId.value && !selectedTextId.value) return
+  if (e.target.closest('svg')) return
+  if (e.target.closest('.symbol-item, .text-item')) return
+  deselectAll()
+}
+
 onMounted(() => {
   window.addEventListener('keydown', onKeyDown)
   window.addEventListener('resize', sizeCanvas)
+  document.addEventListener('click', onDocumentClick)
   nextTick(sizeCanvas)
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', onKeyDown)
   window.removeEventListener('resize', sizeCanvas)
+  document.removeEventListener('click', onDocumentClick)
   stopParticles?.()
 })
 
@@ -475,10 +492,12 @@ const showScene = ref(true)
           <TextEditor
             :texts="config.texts"
             :selected-text-id="selectedTextId"
+            :shape-fit="currentShapeFit"
             @add-text="addText"
             @remove-text="removeText"
             @update-text="updateText"
             @select-text="selectText"
+            @fit-arc="fitArcToShape"
           />
         </div>
 

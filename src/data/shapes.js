@@ -95,11 +95,13 @@ export const shapes = [
     id: 'circular',
     label: 'Circle',
     path: 'M 0,120 A 100,100 0 0 1 200,120 A 100,100 0 0 1 0,120 Z',
+    arcFit: { cx: 100, cy: 120, rx: 100, ry: 100 },
   },
   {
     id: 'oval-portrait',
     label: 'Oval Portrait',
     path: 'M 20,120 A 80,105 0 0 1 180,120 A 80,105 0 0 1 20,120 Z',
+    arcFit: { cx: 100, cy: 120, rx: 80, ry: 105 },
   },
 
   // Geometric

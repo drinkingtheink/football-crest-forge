@@ -139,7 +139,7 @@ function onTextWheel(e, textId) {
   emit('update-text', textId, { fontSize: newSize })
 
   const hx = text.arc ? (text.arcX ?? 100) : text.x
-  const hy = text.arc ? (text.arcY ?? 120) - (text.arcRadius ?? 78) - 10 : text.y - newSize / 2 - 8
+  const hy = text.arc ? (text.arcY ?? 120) - (text.arcRy ?? text.arcRadius ?? 78) - 10 : text.y - newSize / 2 - 8
   sizeHint.value = { x: hx, y: hy, size: newSize }
   clearTimeout(sizeHintTimer)
   sizeHintTimer = setTimeout(() => { sizeHint.value = null }, 900)
