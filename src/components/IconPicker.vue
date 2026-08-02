@@ -36,22 +36,24 @@ const filtered = computed(() => {
       >{{ g }}</button>
     </div>
 
-    <div class="icon-grid">
-      <button
-        v-for="ic in filtered"
-        :key="ic.id"
-        class="icon-btn"
-        :title="`Add ${ic.label}`"
-        @click="$emit('add-icon', ic.id)"
-      >
-        <svg
-          :viewBox="ic.viewBox ? `0 0 ${ic.viewBox[0]} ${ic.viewBox[1]}` : '0 0 100 100'"
-          width="34" height="34"
+    <!-- Scroll wrapper separate from flex grid so tooltips aren't clipped -->
+    <div class="icon-grid-scroll">
+      <div class="icon-grid">
+        <button
+          v-for="ic in filtered"
+          :key="ic.id"
+          class="icon-btn"
+          :data-label="ic.label"
+          @click="$emit('add-icon', ic.id)"
         >
-          <path v-for="(p, i) in ic.paths" :key="i" :d="p" fill="currentColor" />
-        </svg>
-        <span class="icon-label">{{ ic.label }}</span>
-      </button>
+          <svg
+            :viewBox="ic.viewBox ? `0 0 ${ic.viewBox[0]} ${ic.viewBox[1]}` : '0 0 100 100'"
+            width="34" height="34"
+          >
+            <path v-for="(p, i) in ic.paths" :key="i" :d="p" fill="currentColor" />
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -96,40 +98,57 @@ const filtered = computed(() => {
 .group-tab:hover { border-color: #555; color: #ccc; }
 .group-tab.active { border-color: #e8c84a; color: #e8c84a; }
 
-.icon-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
+.icon-grid-scroll {
   max-height: 200px;
   overflow-y: auto;
 }
 
+.icon-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  /* overflow visible so ::after tooltips aren't clipped by the scroll container */
+  overflow: visible;
+  padding-bottom: 2px;
+}
+
 .icon-btn {
+  position: relative;
   background: #1e1e28;
   border: 1px solid #2a2a35;
   border-radius: 6px;
   color: #778;
   cursor: pointer;
-  padding: 5px 4px 4px;
+  padding: 4px;
   transition: border-color 0.15s, color 0.15s, background 0.15s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  width: 54px;
 }
 .icon-btn:hover {
   background: #252530;
   border-color: #e8c84a;
   color: #e8c84a;
 }
-.icon-label {
-  font-size: 9px;
-  line-height: 1.1;
-  text-align: center;
-  color: #666;
-  word-break: break-word;
-  max-width: 100%;
+
+/* CSS tooltip */
+.icon-btn::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0f0f13;
+  border: 1px solid #3a3a48;
+  border-radius: 4px;
+  color: #e8e8ec;
+  font-size: 11px;
+  font-family: system-ui, sans-serif;
+  padding: 3px 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+  z-index: 10;
 }
-.icon-btn:hover .icon-label { color: #b89a30; }
+.icon-btn:hover::after {
+  opacity: 1;
+}
 </style>
