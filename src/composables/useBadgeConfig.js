@@ -94,7 +94,7 @@ function remapColor(color, oldPalette, newPalette) {
 export function useBadgeConfig() {
   // ── Palette ───────────────────────────────────────────────────────────────
   function setPaletteColor(index, color) { config.palette[index] = color }
-  function addPaletteColor() { if (config.palette.length < 6) config.palette.push('#cccccc') }
+  function addPaletteColor() { if (config.palette.length < 6) config.palette.push('#ffffff') }
   function removePaletteColor(index) { if (config.palette.length > 1) config.palette.splice(index, 1) }
   function movePaletteColor(from, to) {
     if (from === to || from == null || to == null) return
