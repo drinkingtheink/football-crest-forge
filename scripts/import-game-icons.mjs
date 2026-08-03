@@ -91,6 +91,67 @@ const MANIFEST = [
   { file: 'lorc/mining.svg',            id: 'gi-pickaxe',      label: 'Pickaxe',        group: 'Industrial' },
   { file: 'delapouite/factory.svg',     id: 'gi-factory',      label: 'Factory',        group: 'Industrial' },
   { file: 'lorc/gear-hammer.svg',       id: 'gi-gear-hammer',  label: 'Gear & Hammer',  group: 'Industrial' },
+
+  // ══ Batch 2 ══════════════════════════════════════════════════════════════
+
+  // ── Mythical (new group) ──
+  { file: 'delapouite/griffin-symbol.svg', id: 'gi-griffin',   label: 'Griffin',        group: 'Mythical' },
+  { file: 'delapouite/unicorn.svg',     id: 'gi-unicorn',      label: 'Unicorn',        group: 'Mythical' },
+  { file: 'skoll/pegasus.svg',          id: 'gi-pegasus',      label: 'Pegasus',        group: 'Mythical' },
+  { file: 'lorc/minotaur.svg',          id: 'gi-minotaur',     label: 'Minotaur',       group: 'Mythical' },
+  { file: 'delapouite/centaur.svg',     id: 'gi-centaur',      label: 'Centaur',        group: 'Mythical' },
+  { file: 'lorc/hydra.svg',             id: 'gi-hydra',        label: 'Hydra',          group: 'Mythical' },
+  { file: 'lorc/sea-serpent.svg',       id: 'gi-sea-serpent',  label: 'Sea Serpent',    group: 'Mythical' },
+
+  // ── Beasts ──
+  { file: 'lorc/ram.svg',               id: 'gi-ram',          label: 'Ram',            group: 'Beasts' },
+  { file: 'skoll/cobra.svg',            id: 'gi-cobra',        label: 'Cobra',          group: 'Beasts' },
+  { file: 'lorc/snake.svg',             id: 'gi-snake',        label: 'Snake',          group: 'Beasts' },
+  { file: 'lorc/scorpion.svg',          id: 'gi-scorpion',     label: 'Scorpion',       group: 'Beasts' },
+  { file: 'lorc/octopus.svg',           id: 'gi-octopus',      label: 'Octopus',        group: 'Beasts' },
+  { file: 'delapouite/elephant-head.svg', id: 'gi-elephant-head', label: 'Elephant Head', group: 'Beasts' },
+  { file: 'lorc/shark-jaws.svg',        id: 'gi-shark',        label: 'Shark',          group: 'Beasts' },
+
+  // ── Emblems (new group) ──
+  { file: 'lorc/ribbon.svg',            id: 'gi-ribbon',       label: 'Ribbon',         group: 'Emblems' },
+  { file: 'lorc/scroll-unfurled.svg',   id: 'gi-scroll',       label: 'Scroll',         group: 'Emblems' },
+  { file: 'delapouite/fleur-de-lys.svg', id: 'gi-fleur-de-lis', label: 'Fleur-de-lis',  group: 'Emblems' },
+  { file: 'caro-asercion/heraldic-sun.svg', id: 'gi-heraldic-sun', label: 'Heraldic Sun', group: 'Emblems' },
+  { file: 'delapouite/flag-objective.svg', id: 'gi-flag',      label: 'Flag',           group: 'Emblems' },
+  { file: 'lorc/winged-emblem.svg',     id: 'gi-winged-emblem', label: 'Winged Emblem', group: 'Emblems' },
+
+  // ── Weapons ──
+  { file: 'lorc/crossed-swords.svg',    id: 'gi-crossed-swords', label: 'Crossed Blades', group: 'Weapons' },
+  { file: 'lorc/battle-axe.svg',        id: 'gi-battle-axe',   label: 'Battle Axe',     group: 'Weapons' },
+  { file: 'delapouite/two-handed-sword.svg', id: 'gi-greatsword', label: 'Greatsword',  group: 'Weapons' },
+  { file: 'lorc/winged-sword.svg',      id: 'gi-winged-sword', label: 'Winged Sword',   group: 'Weapons' },
+  { file: 'lorc/scythe.svg',            id: 'gi-scythe',       label: 'Scythe',         group: 'Weapons' },
+
+  // ── Industrial ──
+  { file: 'sbed/wrench.svg',            id: 'gi-wrench',       label: 'Wrench',         group: 'Industrial' },
+  { file: 'lorc/screwdriver.svg',       id: 'gi-screwdriver',  label: 'Screwdriver',    group: 'Industrial' },
+  { file: 'delapouite/sickle.svg',      id: 'gi-sickle',       label: 'Sickle',         group: 'Industrial' },
+  { file: 'delapouite/pitchfork.svg',   id: 'gi-pitchfork',    label: 'Pitchfork',      group: 'Industrial' },
+
+  // ── Sport ──
+  { file: 'delapouite/soccer-ball.svg', id: 'gi-soccer-ball',  label: 'Soccer Ball',    group: 'Sport' },
+  { file: 'lorc/trophy.svg',            id: 'gi-trophy',       label: 'Trophy',         group: 'Sport' },
+  { file: 'delapouite/whistle.svg',     id: 'gi-whistle',      label: 'Whistle',        group: 'Sport' },
+  { file: 'lorc/boots.svg',             id: 'gi-boots',        label: 'Boots',          group: 'Sport' },
+  { file: 'lorc/medal.svg',             id: 'gi-medal',        label: 'Medal',          group: 'Sport' },
+  { file: 'lorc/stopwatch.svg',         id: 'gi-stopwatch',    label: 'Stopwatch',      group: 'Sport' },
+  { file: 'delapouite/podium.svg',      id: 'gi-podium',       label: 'Podium',         group: 'Sport' },
+
+  // ── Heraldic ──
+  { file: 'sbed/key.svg',               id: 'gi-key',          label: 'Key',            group: 'Heraldic' },
+  { file: 'lorc/hand.svg',              id: 'gi-hand',         label: 'Hand',           group: 'Heraldic' },
+  { file: 'lorc/fist.svg',              id: 'gi-fist',         label: 'Fist',           group: 'Heraldic' },
+  { file: 'lorc/open-book.svg',         id: 'gi-open-book',    label: 'Open Book',      group: 'Heraldic' },
+  { file: 'delapouite/torch.svg',       id: 'gi-torch',        label: 'Torch',          group: 'Heraldic' },
+
+  // ── Nature (new group) ──
+  { file: 'lorc/mountains.svg',         id: 'gi-mountains',    label: 'Mountains',      group: 'Nature' },
+  { file: 'lorc/mountaintop.svg',       id: 'gi-mountaintop',  label: 'Mountain Peak',  group: 'Nature' },
 ]
 
 function ensureRepo() {
