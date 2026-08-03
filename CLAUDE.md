@@ -42,7 +42,7 @@ src/
     useBadgeConfig.js   # All reactive badge state + mutations
   data/
     shapes.js           # 20 SVG shield shape path definitions (VIEWBOX: 200×240)
-    icons.js            # ~35 heraldic SVG icons (VIEWBOX: 0 0 100 100, single fill)
+    icons.js            # ~270 heraldic SVG icons (single fill; viewBox 0 0 100 100, or per-icon `viewBox: [w, h]`)
   utils/
     arcPath.js          # Pure fn: generates SVG arc path string for textPath
     exportBadge.js      # (planned) PNG + SVG export, opentype.js outlining
@@ -116,6 +116,14 @@ Dynamic refs collected via `:ref="el => setRowRef(el, id)"`.
 - **Utils are pure functions** — no Vue imports in `src/utils/`
 - New icons: add to `src/data/icons.js`, same `{ id, label, group, paths[] }` shape, viewBox `0 0 100 100`
 - New shapes: add to `src/data/shapes.js`, same `{ id, label, group, path }` shape, viewBox `0 0 200 240`
+
+## Icons
+
+Icons live in `src/data/icons.js` as `{ id, label, group, paths[] }`, single fill color, viewBox `0 0 100 100` — or an optional per-icon `viewBox: [w, h]` for icons authored at a different scale (both `IconPicker.vue` and `BadgeComposer.vue` read this array and fall back to `100×100`).
+
+Most icons (those with `gi-` IDs) are imported from [game-icons.net](https://game-icons.net) via `scripts/import-game-icons.mjs` — an authoring tool, **not** a runtime dependency. It shallow-clones the icon repo to `/tmp`, strips the background rect, and bakes the shape paths into `icons.js` as `viewBox: [512, 512]` entries. To pull more: add rows to the script's `MANIFEST` and run `node scripts/import-game-icons.mjs` (it's idempotent — skips IDs already present).
+
+game-icons are **CC BY 3.0**, which requires attribution. Credited authors are listed in `src/components/AboutModal.vue` (shown via the ⓘ button). When importing icons from a new author folder, add that author to the modal's `iconAuthors` list.
 
 ## Dark theme palette
 

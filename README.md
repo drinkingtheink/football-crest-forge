@@ -27,7 +27,7 @@ A browser-based football badge creator for designing custom club crests. Combine
 
 - **Shield shapes** — multiple traditional badge silhouettes
 - **Background patterns** — solid, halved, quartered, diagonal, chevron, sash, and striped variants
-- **Heraldic symbols** — 80+ SVG icons across groups: Crowns, Beasts, Birds, Maritime, Weapons, Buildings, Heraldic, Celestial, Shapes, and Flora
+- **Heraldic symbols** — 260+ SVG icons across groups: Crowns, Beasts, Birds, Maritime, Weapons, Buildings, Heraldic, Celestial, Shapes, Flora, Industrial, Mythical, Emblems, Nature, Insects, and Sport
 - **Text layers** — straight or arc text with font, size, weight, letter-spacing, and color controls; drag to reposition, scroll to resize
 - **Border** — adjustable color and thickness
 - **Club color palette** — load real club colors or build a custom palette of up to 6 colors
@@ -61,7 +61,7 @@ src/
     useBadgeConfig.js       # All reactive badge state + mutations
   data/
     clubs.js                # Real club color palettes
-    icons.js                # 80+ heraldic SVG symbols
+    icons.js                # 260+ heraldic SVG symbols (many imported from game-icons.net)
     shapes.js               # Shield shape path definitions
     symbols-to-be-processed/  # Staging directory for incoming SVGs
   utils/
@@ -70,6 +70,8 @@ src/
     exportBadge.js          # PNG + SVG export (planned)
   App.vue
   style.css
+scripts/
+  import-game-icons.mjs     # Authoring tool: import icons from game-icons.net into icons.js
 designs/                    # Saved badge screenshots
 ```
 
@@ -96,3 +98,9 @@ npm run dev
 | Cmd/Ctrl + S | Save snapshot |
 | Escape | Deselect |
 | Delete / Backspace | Remove selected element |
+
+---
+
+## Credits
+
+Many heraldic symbols are imported from [game-icons.net](https://game-icons.net), licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). Authors: carl-olsen, caro-asercion, delapouite, lorc, sbed, skoll, and sparker. These are also credited in-app via the ⓘ About dialog. Icons are pulled in with `scripts/import-game-icons.mjs` (a build-time authoring tool, not a runtime dependency).
