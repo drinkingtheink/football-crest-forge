@@ -58,40 +58,37 @@ function select(club) {
     </div>
 
     <Transition name="dropdown-fade">
-    <TransitionGroup
-      v-if="open && results.length"
-      tag="ul"
-      name="club-swap"
-      class="cp-dropdown"
-    >
-      <li
-        v-for="(club, i) in results"
-        :key="club.id"
-        class="cp-result"
-        :style="{ '--i': i }"
-        @mousedown.prevent="select(club)"
-      >
-        <span class="cp-name">{{ club.name }}</span>
-        <span class="cp-swatches">
-          <span
-            v-for="color in club.colors"
-            :key="color.hex"
-            class="cp-swatch"
-            :style="{ background: color.hex }"
-            :title="color.name"
-          />
-        </span>
-      </li>
-      <li key="reshuffle" class="cp-reshuffle" @mousedown.prevent="reshuffle" title="Show different clubs">
-        <svg width="13" height="11" viewBox="0 0 20 16" fill="none">
-          <path d="M1 4 C7 4 10 12 16 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-          <polyline points="14,10 16,12 14,14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M1 12 C7 12 10 4 16 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-          <polyline points="14,2 16,4 14,6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <small>Get Fresh Clubs</small>
-      </li>
-    </TransitionGroup>
+    <div v-if="open && results.length" class="cp-dropdown">
+      <TransitionGroup tag="ul" name="club-swap" class="cp-list">
+        <li
+          v-for="(club, i) in results"
+          :key="club.id"
+          class="cp-result"
+          :style="{ '--i': i }"
+          @mousedown.prevent="select(club)"
+        >
+          <span class="cp-name">{{ club.name }}</span>
+          <span class="cp-swatches">
+            <span
+              v-for="color in club.colors"
+              :key="color.hex"
+              class="cp-swatch"
+              :style="{ background: color.hex }"
+              :title="color.name"
+            />
+          </span>
+        </li>
+        <li key="reshuffle" class="cp-reshuffle" @mousedown.prevent="reshuffle" title="Show different clubs">
+          <svg width="13" height="11" viewBox="0 0 20 16" fill="none">
+            <path d="M1 4 C7 4 10 12 16 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            <polyline points="14,10 16,12 14,14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M1 12 C7 12 10 4 16 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            <polyline points="14,2 16,4 14,6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <small>Get Fresh Clubs</small>
+        </li>
+      </TransitionGroup>
+    </div>
     </Transition>
   </div>
 </template>
@@ -143,29 +140,33 @@ function select(club) {
   background: #1a1a24;
   border: 1px solid #2a2a35;
   border-radius: 6px;
-  list-style: none;
-  margin: 0;
-  padding: 4px 0;
   z-index: 100;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   max-height: 260px;
   overflow-y: auto;
 }
 
+.cp-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  position: relative;
+}
+
 /* Sleek staggered swap when "Get Fresh Clubs" replaces the list */
-.club-swap-move { transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
+.club-swap-move { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
 .club-swap-enter-active {
-  transition: opacity 0.32s ease, transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: calc(var(--i, 0) * 0.035s);
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--i, 0) * 0.045s);
 }
 .club-swap-leave-active {
-  transition: opacity 0.18s ease, transform 0.18s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
   position: absolute;
   left: 0;
   right: 0;
 }
-.club-swap-enter-from { opacity: 0; transform: translateY(10px); }
-.club-swap-leave-to   { opacity: 0; transform: translateY(-8px); }
+.club-swap-enter-from { opacity: 0; transform: translateX(-14px); }
+.club-swap-leave-to   { opacity: 0; transform: translateX(14px); }
 
 .cp-result {
   display: flex;
