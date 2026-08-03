@@ -2,7 +2,7 @@
 defineProps({ open: Boolean })
 defineEmits(['close'])
 
-const iconAuthors = ['caro-asercion', 'delapouite', 'lorc', 'sbed', 'skoll', 'sparker']
+const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'sbed', 'skoll', 'sparker']
 </script>
 
 <template>

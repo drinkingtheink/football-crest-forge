@@ -152,6 +152,60 @@ const MANIFEST = [
   // ── Nature (new group) ──
   { file: 'lorc/mountains.svg',         id: 'gi-mountains',    label: 'Mountains',      group: 'Nature' },
   { file: 'lorc/mountaintop.svg',       id: 'gi-mountaintop',  label: 'Mountain Peak',  group: 'Nature' },
+
+  // ══ Batch 3 ══════════════════════════════════════════════════════════════
+
+  // ── Beasts ──
+  { file: 'delapouite/tiger-head.svg',  id: 'gi-tiger',        label: 'Tiger',          group: 'Beasts' },
+  { file: 'lorc/hound.svg',             id: 'gi-hound',        label: 'Hound',          group: 'Beasts' },
+
+  // ── Birds ──
+  { file: 'lorc/dove.svg',              id: 'gi-dove',         label: 'Dove',           group: 'Birds' },
+  { file: 'delapouite/seagull.svg',     id: 'gi-seagull',      label: 'Seagull',        group: 'Birds' },
+  { file: 'delapouite/crane.svg',       id: 'gi-crane',        label: 'Crane',          group: 'Birds' },
+  { file: 'caro-asercion/heron.svg',    id: 'gi-heron',        label: 'Heron',          group: 'Birds' },
+  { file: 'delapouite/falcon-moon.svg', id: 'gi-falcon',       label: 'Falcon',         group: 'Birds' },
+
+  // ── Maritime ──
+  { file: 'lorc/galleon.svg',           id: 'gi-galleon',      label: 'Galleon',        group: 'Maritime' },
+  { file: 'delapouite/caravel.svg',     id: 'gi-caravel',      label: 'Caravel',        group: 'Maritime' },
+  { file: 'delapouite/drakkar.svg',     id: 'gi-drakkar',      label: 'Longship',       group: 'Maritime' },
+  { file: 'delapouite/ship-bow.svg',    id: 'gi-ship-bow',     label: 'Ship Bow',       group: 'Maritime' },
+
+  // ── Flora ──
+  { file: 'delapouite/shamrock.svg',    id: 'gi-shamrock',     label: 'Shamrock',       group: 'Flora' },
+  { file: 'lorc/pine-tree.svg',         id: 'gi-pine-tree',    label: 'Pine Tree',      group: 'Flora' },
+  { file: 'delapouite/palm-tree.svg',   id: 'gi-palm-tree',    label: 'Palm Tree',      group: 'Flora' },
+  { file: 'delapouite/fern.svg',        id: 'gi-fern',         label: 'Fern',           group: 'Flora' },
+  { file: 'lorc/grapes.svg',            id: 'gi-grapes',       label: 'Grapes',         group: 'Flora' },
+  { file: 'delapouite/corn.svg',        id: 'gi-corn',         label: 'Corn',           group: 'Flora' },
+  { file: 'lorc/sprout.svg',            id: 'gi-sprout',       label: 'Sprout',         group: 'Flora' },
+  { file: 'delapouite/vines.svg',       id: 'gi-vines',        label: 'Vines',          group: 'Flora' },
+
+  // ── Buildings ──
+  { file: 'delapouite/church.svg',      id: 'gi-church',       label: 'Church',         group: 'Buildings' },
+  { file: 'delapouite/watchtower.svg',  id: 'gi-watchtower',   label: 'Watchtower',     group: 'Buildings' },
+  { file: 'delapouite/house.svg',       id: 'gi-house',        label: 'House',          group: 'Buildings' },
+  { file: 'delapouite/obelisk.svg',     id: 'gi-obelisk',      label: 'Obelisk',        group: 'Buildings' },
+  { file: 'delapouite/barn.svg',        id: 'gi-barn',         label: 'Barn',           group: 'Buildings' },
+
+  // ── Weapons ──
+  { file: 'lorc/crossed-axes.svg',      id: 'gi-crossed-axes', label: 'Crossed Axes',   group: 'Weapons' },
+  { file: 'lorc/crossed-sabres.svg',    id: 'gi-crossed-sabres', label: 'Crossed Sabres', group: 'Weapons' },
+  { file: 'lorc/cannon.svg',            id: 'gi-cannon',       label: 'Cannon',         group: 'Weapons' },
+  { file: 'carl-olsen/crossbow.svg',    id: 'gi-crossbow',     label: 'Crossbow',       group: 'Weapons' },
+  { file: 'delapouite/katana.svg',      id: 'gi-katana',       label: 'Katana',         group: 'Weapons' },
+  { file: 'delapouite/flail.svg',       id: 'gi-flail',        label: 'Flail',          group: 'Weapons' },
+
+  // ── Heraldic ──
+  { file: 'delapouite/horseshoe.svg',   id: 'gi-horseshoe',    label: 'Horseshoe',      group: 'Heraldic' },
+
+  // ── Nature ──
+  { file: 'lorc/volcano.svg',           id: 'gi-volcano',      label: 'Volcano',        group: 'Nature' },
+  { file: 'lorc/tornado.svg',           id: 'gi-tornado',      label: 'Tornado',        group: 'Nature' },
+  { file: 'delapouite/island.svg',      id: 'gi-island',       label: 'Island',         group: 'Nature' },
+  { file: 'sbed/water-drop.svg',        id: 'gi-water-drop',   label: 'Water Drop',     group: 'Nature' },
+  { file: 'lorc/snowflake-1.svg',       id: 'gi-snowflake',    label: 'Snowflake',      group: 'Nature' },
 ]
 
 function ensureRepo() {
