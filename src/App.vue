@@ -969,23 +969,7 @@ function stepBg(dir) {
   align-items: center;
   gap: 8px;
 }
-.start-over-btn {
-  font-size: 10px;
-  font-weight: 600;
-  color: #c98a8a;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(224, 85, 85, 0.4);
-  border-radius: 6px;
-  padding: 4px 9px;
-  cursor: pointer;
-  letter-spacing: 0.03em;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
-}
-.start-over-btn:hover {
-  color: #fff;
-  background: rgba(224, 85, 85, 0.9);
-  border-color: #e05555;
-}
+.start-over-btn,
 .swap-colors-btn {
   font-size: 10px;
   font-weight: 600;
@@ -998,6 +982,7 @@ function stepBg(dir) {
   letter-spacing: 0.03em;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
+.start-over-btn:hover,
 .swap-colors-btn:hover {
   color: #111;
   background: rgba(232, 200, 74, 0.9);
