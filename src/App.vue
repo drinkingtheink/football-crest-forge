@@ -970,13 +970,13 @@ function stepBg(dir) {
   gap: 8px;
 }
 .start-over-btn {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  color: #e6a5a5;
+  color: #c98a8a;
   background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(224, 85, 85, 0.55);
+  border: 1px solid rgba(224, 85, 85, 0.4);
   border-radius: 6px;
-  padding: 5px 11px;
+  padding: 4px 9px;
   cursor: pointer;
   letter-spacing: 0.03em;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
