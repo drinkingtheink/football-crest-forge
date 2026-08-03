@@ -206,6 +206,42 @@ const MANIFEST = [
   { file: 'delapouite/island.svg',      id: 'gi-island',       label: 'Island',         group: 'Nature' },
   { file: 'sbed/water-drop.svg',        id: 'gi-water-drop',   label: 'Water Drop',     group: 'Nature' },
   { file: 'lorc/snowflake-1.svg',       id: 'gi-snowflake',    label: 'Snowflake',      group: 'Nature' },
+
+  // ══ Batch 4 (focused: celestial, heraldic charges, standout animals) ══════
+
+  // ── Celestial ──
+  { file: 'lorc/sun.svg',               id: 'gi-sun',          label: 'Sun',            group: 'Celestial' },
+  { file: 'lorc/sunrise.svg',           id: 'gi-sunrise',      label: 'Sunrise',        group: 'Celestial' },
+  { file: 'lorc/eclipse.svg',           id: 'gi-eclipse',      label: 'Eclipse',        group: 'Celestial' },
+  { file: 'delapouite/falling-star.svg', id: 'gi-falling-star', label: 'Shooting Star', group: 'Celestial' },
+
+  // ── Heraldic (helms & charges) ──
+  { file: 'lorc/visored-helm.svg',      id: 'gi-visored-helm', label: 'Visored Helm',   group: 'Heraldic' },
+  { file: 'lorc/crested-helmet.svg',    id: 'gi-crested-helm', label: 'Crested Helm',   group: 'Heraldic' },
+  { file: 'lorc/barbute.svg',           id: 'gi-barbute',      label: 'Barbute Helm',   group: 'Heraldic' },
+  { file: 'sbed/helmet.svg',            id: 'gi-great-helm',   label: 'Great Helm',     group: 'Heraldic' },
+  { file: 'skoll/chess-rook.svg',       id: 'gi-rook',         label: 'Rook',           group: 'Heraldic' },
+  { file: 'skoll/chess-knight.svg',     id: 'gi-chess-knight', label: 'Knight',         group: 'Heraldic' },
+  { file: 'skoll/chess-king.svg',       id: 'gi-chess-king',   label: 'King',           group: 'Heraldic' },
+  { file: 'delapouite/gauntlet.svg',    id: 'gi-gauntlet',     label: 'Gauntlet',       group: 'Heraldic' },
+
+  // ── Weapons ──
+  { file: 'lorc/arrowhead.svg',         id: 'gi-arrowhead',    label: 'Arrowhead',      group: 'Weapons' },
+
+  // ── Shapes ──
+  { file: 'skoll/diamonds.svg',         id: 'gi-diamond',      label: 'Diamond',        group: 'Shapes' },
+
+  // ── Emblems ──
+  { file: 'lorc/ankh.svg',              id: 'gi-ankh',         label: 'Ankh',           group: 'Emblems' },
+  { file: 'delapouite/knight-banner.svg', id: 'gi-banner',     label: 'Banner',         group: 'Emblems' },
+
+  // ── Beasts ──
+  { file: 'delapouite/dolphin.svg',     id: 'gi-dolphin',      label: 'Dolphin',        group: 'Beasts' },
+  { file: 'delapouite/whale-tail.svg',  id: 'gi-whale',        label: 'Whale',          group: 'Beasts' },
+  { file: 'lorc/wolf-howl.svg',         id: 'gi-wolf-howl',    label: 'Howling Wolf',   group: 'Beasts' },
+
+  // ── Insects ──
+  { file: 'lorc/butterfly.svg',         id: 'gi-butterfly',    label: 'Butterfly',      group: 'Insects' },
 ]
 
 function ensureRepo() {
