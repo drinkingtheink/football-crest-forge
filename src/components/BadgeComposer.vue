@@ -22,9 +22,20 @@ function arcPathId(textId) { return `arcpath-${props.uid}-${textId}` }
 const shape = computed(() => shapesById[props.config.shapeId])
 const clipId = computed(() => `clip-${props.uid}`)
 
+function chevronPath(t) {
+  // Down-pointing chevron band; t = thickness (apex gap). Inner edges kept
+  // parallel to the outer edges so the band stays constant-width.
+  const apexY = 72, topY = 28, halfW = 36, span = apexY - topY
+  const s = Math.max(0, (span - t) / span)
+  const irx = 50 + halfW * s
+  const ilx = 50 - halfW * s
+  return `M 50,${apexY} L ${50 + halfW},${topY} L ${irx},${topY} L 50,${apexY - t} L ${ilx},${topY} L ${50 - halfW},${topY} Z`
+}
+
 function symPaths(sym) {
   const icon = iconsById[sym.iconId]
   if (!icon?.supportsRing || sym.ringThickness == null) return icon?.paths ?? []
+  if (icon.thicknessShape === 'chevron') return [chevronPath(sym.ringThickness)]
   const cx = 50, cy = 50, outerR = 44
   const outer = `M ${cx - outerR},${cy} A ${outerR},${outerR} 0 1 1 ${cx + outerR},${cy} A ${outerR},${outerR} 0 1 1 ${cx - outerR},${cy} Z`
   const innerR = outerR - sym.ringThickness

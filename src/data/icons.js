@@ -385,6 +385,17 @@ export const icons = [
     paths: ['M 50,8 L 90,37 L 75,84 L 25,84 L 10,37 Z'],
   },
   {
+    id: 'chevron',
+    label: 'Chevron',
+    group: 'Shapes',
+    // Down-pointing chevron. Static fallback path; symPaths regenerates it
+    // from ringThickness when thicknessShape is 'chevron'.
+    paths: ['M 50,72 L 86,28 L 68,28 L 50,50 L 32,28 L 14,28 Z'],
+    supportsRing: true,
+    defaultRingThickness: 22,
+    thicknessShape: 'chevron',
+  },
+  {
     id: 'hexagon',
     label: 'Hexagon',
     group: 'Shapes',
