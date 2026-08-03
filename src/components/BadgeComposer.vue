@@ -21,6 +21,7 @@ function arcPathId(textId) { return `arcpath-${props.uid}-${textId}` }
 
 const shape = computed(() => shapesById[props.config.shapeId])
 const clipId = computed(() => `clip-${props.uid}`)
+const elementsClipId = computed(() => `elements-clip-${props.uid}`)
 
 function chevronPath(t) {
   // Down-pointing chevron band; t = thickness (apex gap). Inner edges kept
@@ -305,6 +306,17 @@ const bgElements = computed(() => {
       <clipPath :id="clipId">
         <path v-if="shape" :d="shape.path" />
       </clipPath>
+      <!-- Symbol silhouettes — used to clip the shimmer over elements in No Shield mode -->
+      <clipPath :id="elementsClipId">
+        <template v-for="sym in config.symbols" :key="sym.instanceId">
+          <path
+            v-for="(p, i) in symPaths(sym)"
+            :key="`${sym.instanceId}-${i}`"
+            :d="p"
+            :transform="symbolTransform(sym)"
+          />
+        </template>
+      </clipPath>
       <!-- Arc paths for textPath elements -->
       <path
         v-for="text in config.texts.filter(t => t.arc)"
@@ -405,8 +417,9 @@ const bgElements = computed(() => {
       }"
     />
 
-    <!-- Shimmer (decorative sheen sweep, clipped to shield) -->
-    <g v-if="!config.noShield" :clip-path="`url(#${clipId})`" style="pointer-events:none">
+    <!-- Shimmer (decorative sheen sweep) — clipped to the shield, or to the
+         symbol silhouettes in No Shield mode -->
+    <g :clip-path="`url(#${config.noShield ? elementsClipId : clipId})`" style="pointer-events:none">
       <g>
         <animateTransform
           attributeName="transform"
