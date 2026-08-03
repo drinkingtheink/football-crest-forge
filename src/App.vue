@@ -972,13 +972,17 @@ function stepBg(dir) {
 .start-over-btn,
 .swap-colors-btn,
 .scene-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 10px;
   font-weight: 600;
+  line-height: 1;
   color: #cdb24a;
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(232, 200, 74, 0.4);
   border-radius: 6px;
-  padding: 4px 9px;
+  padding: 5px 9px;
   cursor: pointer;
   letter-spacing: 0.03em;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
