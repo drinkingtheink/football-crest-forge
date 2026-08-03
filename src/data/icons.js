@@ -326,49 +326,6 @@ export const icons = [
       'M 48,24 L 48,14 C 48,10 52,8 56,10 C 58,12 58,16 56,18 L 52,20 L 52,24 Z',
     ],
   },
-  {
-    id: 'oak-leaf',
-    label: 'Oak Leaf',
-    group: 'Flora',
-    paths: [
-      'M 50,5 C 56,14 66,14 70,22 C 74,30 68,38 60,36 C 68,42 72,52 68,60 C 64,68 54,68 50,62 C 46,68 36,68 32,60 C 28,52 32,42 40,36 C 32,38 26,30 30,22 C 34,14 44,14 50,5 Z',
-      'M 48,62 L 48,92 L 52,92 L 52,62 Z',
-    ],
-  },
-  {
-    id: 'shamrock',
-    label: 'Shamrock',
-    group: 'Flora',
-    paths: [
-      // top leaf: center (50,33), r=20
-      'M 50,13 A 20,20 0 1 0 50,53 A 20,20 0 1 0 50,13 Z',
-      // left leaf: center (33,55), r=20
-      'M 13,55 A 20,20 0 1 0 53,55 A 20,20 0 1 0 13,55 Z',
-      // right leaf: center (67,55), r=20
-      'M 47,55 A 20,20 0 1 0 87,55 A 20,20 0 1 0 47,55 Z',
-      // stem
-      'M 47,56 L 47,90 L 53,90 L 53,56 Z',
-    ],
-  },
-  {
-    id: 'thistle',
-    label: 'Thistle',
-    group: 'Flora',
-    paths: [
-      // bulb
-      'M 50,10 C 62,10 70,20 70,32 C 70,44 62,52 50,52 C 38,52 30,44 30,32 C 30,20 38,10 50,10 Z',
-      // spines on bulb
-      'M 50,6 L 52,14 L 48,14 Z',
-      'M 32,14 L 36,22 L 32,24 Z',
-      'M 68,14 L 64,22 L 68,24 Z',
-      // stem
-      'M 47,52 L 47,88 L 53,88 L 53,52 Z',
-      // left leaf
-      'M 47,64 C 36,58 24,62 20,72 C 28,64 40,64 47,72 Z',
-      // right leaf
-      'M 53,72 C 60,62 72,60 78,70 C 72,62 62,62 53,70 Z',
-    ],
-  },
   // ── Maritime ───────────────────────────────────────────────────────────────
 
   {
@@ -742,41 +699,6 @@ export const icons = [
     label: 'Latin Cross',
     group: 'Heraldic',
     paths: ['M 40,8 L 60,8 L 60,38 L 88,38 L 88,58 L 60,58 L 60,92 L 40,92 L 40,58 L 12,58 L 12,38 L 40,38 Z'],
-  },
-  {
-    id: 'saltire',
-    label: 'Saltire',
-    group: 'Heraldic',
-    paths: ['M 14,8 L 50,38 L 86,8 L 92,14 L 62,50 L 92,86 L 86,92 L 50,62 L 14,92 L 8,86 L 38,50 L 8,14 Z'],
-  },
-  {
-    id: 'fleur-de-lis',
-    label: 'Fleur-de-lis',
-    group: 'Heraldic',
-    paths: [
-      // central petal
-      'M 50,8 C 62,8 70,20 70,36 C 70,48 62,56 50,58 C 38,56 30,48 30,36 C 30,20 38,8 50,8 Z',
-      // left petal
-      'M 30,58 C 20,58 10,65 8,74 C 6,82 12,88 20,86 C 28,84 35,76 37,67 L 40,58 Z',
-      // right petal
-      'M 70,58 C 80,58 90,65 92,74 C 94,82 88,88 80,86 C 72,84 65,76 63,67 L 60,58 Z',
-      // collar
-      'M 34,55 L 66,55 L 66,65 L 34,65 Z',
-      // stem
-      'M 44,65 L 44,84 C 44,88 47,92 50,92 C 53,92 56,88 56,84 L 56,65 Z',
-    ],
-  },
-  {
-    id: 'lozenge',
-    label: 'Lozenge',
-    group: 'Heraldic',
-    paths: ['M 50,5 L 92,50 L 50,95 L 8,50 Z'],
-  },
-  {
-    id: 'roundel',
-    label: 'Roundel',
-    group: 'Heraldic',
-    paths: ['M 50,8 A 42,42 0 1 0 50,92 A 42,42 0 1 0 50,8 Z'],
   },
   {
     id: 'helm',
