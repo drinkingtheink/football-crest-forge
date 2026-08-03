@@ -58,11 +58,17 @@ function select(club) {
     </div>
 
     <Transition name="dropdown-fade">
-    <ul v-if="open && results.length" class="cp-dropdown">
+    <TransitionGroup
+      v-if="open && results.length"
+      tag="ul"
+      name="club-swap"
+      class="cp-dropdown"
+    >
       <li
-        v-for="club in results"
+        v-for="(club, i) in results"
         :key="club.id"
         class="cp-result"
+        :style="{ '--i': i }"
         @mousedown.prevent="select(club)"
       >
         <span class="cp-name">{{ club.name }}</span>
@@ -76,7 +82,7 @@ function select(club) {
           />
         </span>
       </li>
-      <li class="cp-reshuffle" @mousedown.prevent="reshuffle" title="Show different clubs">
+      <li key="reshuffle" class="cp-reshuffle" @mousedown.prevent="reshuffle" title="Show different clubs">
         <svg width="13" height="11" viewBox="0 0 20 16" fill="none">
           <path d="M1 4 C7 4 10 12 16 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           <polyline points="14,10 16,12 14,14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -85,7 +91,7 @@ function select(club) {
         </svg>
         <small>Get Fresh Clubs</small>
       </li>
-    </ul>
+    </TransitionGroup>
     </Transition>
   </div>
 </template>
@@ -145,6 +151,21 @@ function select(club) {
   max-height: 260px;
   overflow-y: auto;
 }
+
+/* Sleek staggered swap when "Get Fresh Clubs" replaces the list */
+.club-swap-move { transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
+.club-swap-enter-active {
+  transition: opacity 0.32s ease, transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--i, 0) * 0.035s);
+}
+.club-swap-leave-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.club-swap-enter-from { opacity: 0; transform: translateY(10px); }
+.club-swap-leave-to   { opacity: 0; transform: translateY(-8px); }
 
 .cp-result {
   display: flex;
