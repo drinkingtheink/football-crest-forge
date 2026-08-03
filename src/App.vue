@@ -95,6 +95,13 @@ const activeClubModified = computed(() => {
   return original.some((c, i) => c !== config.palette[i]?.toLowerCase())
 })
 
+// Count of each iconId currently placed in the design, for the picker to flag
+const placedIconCounts = computed(() => {
+  const counts = {}
+  for (const s of config.symbols) counts[s.iconId] = (counts[s.iconId] ?? 0) + 1
+  return counts
+})
+
 function applyClub(club) {
   setPalette(club.colors.map(c => c.hex))
   activeClub.value = club
@@ -615,7 +622,7 @@ function stepBg(dir) {
         <!-- Symbol Gallery -->
         <div class="control-group">
           <h3 class="control-label">Add Symbol</h3>
-          <IconPicker @add-icon="onPickIcon" />
+          <IconPicker :placed-counts="placedIconCounts" @add-icon="onPickIcon" />
         </div>
 
         <!-- Placed Symbols -->

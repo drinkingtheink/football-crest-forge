@@ -2,6 +2,10 @@
 import { ref, computed } from 'vue'
 import { icons, iconGroups } from '../data/icons.js'
 
+const props = defineProps({
+  // { [iconId]: count } — how many of each symbol are currently in the design
+  placedCounts: { type: Object, default: () => ({}) },
+})
 const emit = defineEmits(['add-icon'])
 
 const search = ref('')
@@ -43,6 +47,7 @@ const filtered = computed(() => {
           v-for="ic in filtered"
           :key="ic.id"
           class="icon-btn"
+          :class="{ placed: placedCounts[ic.id] > 0 }"
           :data-label="ic.label"
           @click="$emit('add-icon', ic.id)"
         >
@@ -52,6 +57,11 @@ const filtered = computed(() => {
           >
             <path v-for="(p, i) in ic.paths" :key="i" :d="p" fill="currentColor" />
           </svg>
+          <span
+            v-if="placedCounts[ic.id]"
+            class="placed-badge"
+            :title="`${placedCounts[ic.id]} in design`"
+          >{{ placedCounts[ic.id] }}</span>
         </button>
       </div>
     </div>
@@ -126,6 +136,32 @@ const filtered = computed(() => {
   background: #252530;
   border-color: #e8c84a;
   color: #e8c84a;
+}
+
+/* Symbols already placed in the design */
+.icon-btn.placed {
+  border-color: rgba(232, 200, 74, 0.55);
+  background: rgba(232, 200, 74, 0.08);
+  color: #cdb96a;
+}
+.placed-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 15px;
+  height: 15px;
+  box-sizing: border-box;
+  padding: 0 3px;
+  border-radius: 8px;
+  background: #e8c84a;
+  border: 1px solid #13131a;
+  color: #111;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 13px;
+  text-align: center;
+  font-family: system-ui, sans-serif;
+  z-index: 11;
 }
 
 /* CSS tooltip */
