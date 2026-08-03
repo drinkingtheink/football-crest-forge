@@ -120,7 +120,7 @@ function onMove(e) {
     const newY = drag.value.oy + dy
     emit('update-symbol-position', drag.value.instanceId, newX, newY)
     const sym = props.config.symbols.find(s => s.instanceId === drag.value.instanceId)
-    if (sym?.clipped !== false && shapePathEl.value && outsidePromptedId.value !== drag.value.instanceId) {
+    if (!props.config.noBadge && sym?.clipped !== false && shapePathEl.value && outsidePromptedId.value !== drag.value.instanceId) {
       if (!shapePathEl.value.isPointInFill(new DOMPoint(newX, newY))) {
         outsidePromptedId.value = drag.value.instanceId
         emit('symbol-outside-bounds', drag.value.instanceId)
@@ -292,7 +292,7 @@ const bgElements = computed(() => {
     :width="size"
     :viewBox="`0 0 ${VIEWBOX_W} ${VIEWBOX_H}`"
     xmlns="http://www.w3.org/2000/svg"
-    style="user-select: none; display: block; overflow: visible; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.38)) drop-shadow(0 10px 28px rgba(0,0,0,0.42)) drop-shadow(0 22px 48px rgba(0,0,0,0.22));"
+    :style="{ userSelect: 'none', display: 'block', overflow: 'visible', filter: config.noBadge ? 'none' : 'drop-shadow(0 2px 6px rgba(0,0,0,0.38)) drop-shadow(0 10px 28px rgba(0,0,0,0.42)) drop-shadow(0 22px 48px rgba(0,0,0,0.22))' }"
     @mousemove="onMove"
     @mouseup="stopDrag"
     @mouseleave="stopDrag"
@@ -347,7 +347,7 @@ const bgElements = computed(() => {
     </defs>
 
     <!-- Background -->
-    <g :clip-path="`url(#${clipId})`">
+    <g v-if="!config.noBadge" :clip-path="`url(#${clipId})`">
       <rect
         v-for="(r, i) in bgElements.rects" :key="`r${i}`"
         :x="r.x" :y="r.y" :width="r.w" :height="r.h"
@@ -360,11 +360,11 @@ const bgElements = computed(() => {
       />
     </g>
 
-    <!-- Symbols clipped to badge shape -->
+    <!-- Symbols clipped to badge shape (unclipped in No Badge mode) -->
     <g
       v-for="sym in config.symbols.filter(s => s.clipped !== false)"
       :key="sym.instanceId"
-      :clip-path="`url(#${clipId})`"
+      :clip-path="config.noBadge ? null : `url(#${clipId})`"
       :style="{
         cursor: drag?.instanceId === sym.instanceId ? 'grabbing' : 'grab',
         filter: hoveredSymbolId === sym.instanceId ? 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' : 'none',
@@ -394,7 +394,7 @@ const bgElements = computed(() => {
 
     <!-- Border -->
     <path
-      v-if="shape"
+      v-if="shape && !config.noBadge"
       :d="shape.path"
       fill="none"
       stroke-linejoin="round"
@@ -406,7 +406,7 @@ const bgElements = computed(() => {
     />
 
     <!-- Shimmer (decorative sheen sweep, clipped to shield) -->
-    <g :clip-path="`url(#${clipId})`" style="pointer-events:none">
+    <g v-if="!config.noBadge" :clip-path="`url(#${clipId})`" style="pointer-events:none">
       <g>
         <animateTransform
           attributeName="transform"
@@ -426,7 +426,7 @@ const bgElements = computed(() => {
     </g>
 
     <!-- 3D depth overlay (presentation only — excluded from export) -->
-    <g :clip-path="`url(#${clipId})`" style="pointer-events:none">
+    <g v-if="!config.noBadge" :clip-path="`url(#${clipId})`" style="pointer-events:none">
       <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-radial-${uid})`" />
       <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-left-${uid})`"   />
       <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-right-${uid})`"  />
