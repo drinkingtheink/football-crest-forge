@@ -21,6 +21,7 @@ const { addToast } = useToast()
 
 const {
   config,
+  initialClub,
   selectedSymbolId,
   selectedTextId,
   setPaletteColor,
@@ -87,7 +88,7 @@ const bgOptions = [
 const appBg = ref(bgOptions[Math.floor(Math.random() * bgOptions.length)].id)
 const overlay = reactive({ color: config.palette[0] ?? '#000000', opacity: 0.7 })
 
-const activeClub = ref(null)
+const activeClub = ref(initialClub)
 const activeClubModified = computed(() => {
   if (!activeClub.value) return false
   const original = activeClub.value.colors.map(c => c.hex.toLowerCase())

@@ -251,6 +251,7 @@ export function useBadgeConfig() {
 
   return {
     config,
+    initialClub: _randomClub,
     selectedSymbolId,
     selectedTextId,
     setPaletteColor,
