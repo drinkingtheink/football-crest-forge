@@ -421,7 +421,7 @@ function stepBg(dir) {
             <button class="swap-colors-btn" @click="randomizeColors" title="Load a random club's colors">
               ⇄ Swap Colors
             </button>
-            <button class="scene-toggle hud-pill" @click="showScene = !showScene" title="Toggle scene controls">
+            <button class="scene-toggle" @click="showScene = !showScene" title="Toggle scene controls">
               {{ showScene ? '▲ scene' : '▼ scene' }}
             </button>
           </div>
@@ -970,7 +970,8 @@ function stepBg(dir) {
   gap: 8px;
 }
 .start-over-btn,
-.swap-colors-btn {
+.swap-colors-btn,
+.scene-toggle {
   font-size: 10px;
   font-weight: 600;
   color: #cdb24a;
@@ -983,20 +984,12 @@ function stepBg(dir) {
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 .start-over-btn:hover,
-.swap-colors-btn:hover {
+.swap-colors-btn:hover,
+.scene-toggle:hover {
   color: #111;
   background: rgba(232, 200, 74, 0.9);
   border-color: #e8c84a;
 }
-.scene-toggle {
-  font-size: 11px;
-  color: #b9b6b6;
-  border: none;
-  cursor: pointer;
-  letter-spacing: 0.05em;
-  transition: color 0.15s;
-}
-.scene-toggle:hover { color: #fff; }
 
 .scene-controls {
   display: flex;
