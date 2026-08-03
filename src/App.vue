@@ -477,7 +477,7 @@ function stepBg(dir) {
       <aside class="controls-pane" ref="controlsPane">
 
         <div class="logo-row">
-          <p class="logo">⚔ Crest Forge</p>
+          <p class="logo">⚔ Crest Foundry</p>
           <button class="randomize-btn" title="Randomize everything" @click="randomizeAll">⚡</button>
         </div>
 

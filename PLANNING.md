@@ -1,4 +1,4 @@
-# Crest Forge — Feature Roadmap
+# Crest Foundry — Feature Roadmap
 
 > Live planning document. Update this when features are completed or priorities shift.
 
@@ -21,7 +21,7 @@
 - [x] **Auto-scroll sidebar** — selecting symbol/text in badge scrolls corresponding sidebar row into view
 - [x] **`src/utils/arcPath.js`** — pure arc path calculation extracted from BadgeComposer
 - [x] **`CLAUDE.md`** — project context loaded in every session
-- [x] **Git history** — 3 commits pushed to `github.com/drinkingtheink/football-crest-forge`
+- [x] **Git history** — 3 commits pushed to `github.com/drinkingtheink/football-crest-foundry`
 
 ---
 
@@ -122,7 +122,7 @@ Two buttons beneath the badge:
 ## Phase 2 (future — requires Supabase)
 
 - [ ] **Save badge** — serialize `config` as JSON → Supabase row → return short ID
-- [ ] **Share via URL** — `crestforge.io/b/ABC123` → loads config by short ID
+- [ ] **Share via URL** — `crestfoundry.io/b/ABC123` → loads config by short ID
 - [ ] **Public gallery** — browsable grid of public badges
 - [ ] **Remix** — "Edit this badge" from gallery → fork config into editor
 - [ ] **User accounts** — optional; needed for "my badges" view

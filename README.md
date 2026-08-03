@@ -1,4 +1,4 @@
-# Crest Forge
+# Crest Foundry
 
 A browser-based football badge creator for designing custom club crests. Combine shield shapes, heraldic symbols, background patterns, text, and borders — then snapshot your work for later.
 
@@ -8,16 +8,16 @@ A browser-based football badge creator for designing custom club crests. Combine
 
 <table>
   <tr>
-    <td align="center"><img src="designs/fc-cf-flamingo1.png" width="220" alt="FC Crest Forge — Flamingo, diagonal stripes" /><br/><sub>Flamingo · diagonal stripes</sub></td>
-    <td align="center"><img src="designs/fc-cf-unicorn-crown1.png" width="220" alt="FC Crest Forge — Unicorn with free crown above badge" /><br/><sub>Unicorn · free crown above badge</sub></td>
-    <td align="center"><img src="designs/fc-cf-starburst-sash1.png" width="220" alt="FC Crest Forge — Star burst in circle, diagonal sash, fabric background" /><br/><sub>Star burst · sash · fabric bg</sub></td>
-    <td align="center"><img src="designs/fc-cf-spade-crown-banner1.png" width="220" alt="FC Crest Forge — Spade with crown, checkered banner shape, brick background" /><br/><sub>Spade · crown · checkered · brick bg</sub></td>
+    <td align="center"><img src="designs/fc-cf-flamingo1.png" width="220" alt="FC Crest Foundry — Flamingo, diagonal stripes" /><br/><sub>Flamingo · diagonal stripes</sub></td>
+    <td align="center"><img src="designs/fc-cf-unicorn-crown1.png" width="220" alt="FC Crest Foundry — Unicorn with free crown above badge" /><br/><sub>Unicorn · free crown above badge</sub></td>
+    <td align="center"><img src="designs/fc-cf-starburst-sash1.png" width="220" alt="FC Crest Foundry — Star burst in circle, diagonal sash, fabric background" /><br/><sub>Star burst · sash · fabric bg</sub></td>
+    <td align="center"><img src="designs/fc-cf-spade-crown-banner1.png" width="220" alt="FC Crest Foundry — Spade with crown, checkered banner shape, brick background" /><br/><sub>Spade · crown · checkered · brick bg</sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="designs/fc-cf-star-diamond1.png" width="220" alt="FC Crest Forge — Diamond badge, free star above" /><br/><sub>Diamond · free star above</sub></td>
-    <td align="center"><img src="designs/fc-cf-aac-pennant1.png" width="220" alt="FC Crest Forge — AAC pennant badge, crown, fabric background" /><br/><sub>AAC · pennant · fabric bg</sub></td>
-    <td align="center"><img src="designs/fc-cf-spartan-sun1.png" width="220" alt="FC Crest Forge — Spartan helmet on sun burst, stadium background" /><br/><sub>Spartan · sun burst · stadium bg</sub></td>
-    <td align="center"><img src="designs/fc-cf-swallow-circle1.png" width="220" alt="FC Crest Forge — Swallow, circular badge, arc text, grass background" /><br/><sub>Swallow · circular · arc text · grass bg</sub></td>
+    <td align="center"><img src="designs/fc-cf-star-diamond1.png" width="220" alt="FC Crest Foundry — Diamond badge, free star above" /><br/><sub>Diamond · free star above</sub></td>
+    <td align="center"><img src="designs/fc-cf-aac-pennant1.png" width="220" alt="FC Crest Foundry — AAC pennant badge, crown, fabric background" /><br/><sub>AAC · pennant · fabric bg</sub></td>
+    <td align="center"><img src="designs/fc-cf-spartan-sun1.png" width="220" alt="FC Crest Foundry — Spartan helmet on sun burst, stadium background" /><br/><sub>Spartan · sun burst · stadium bg</sub></td>
+    <td align="center"><img src="designs/fc-cf-swallow-circle1.png" width="220" alt="FC Crest Foundry — Swallow, circular badge, arc text, grass background" /><br/><sub>Swallow · circular · arc text · grass bg</sub></td>
   </tr>
 </table>
 

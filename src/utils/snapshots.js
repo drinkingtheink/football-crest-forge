@@ -1,4 +1,5 @@
-const PREFIX = 'crest-forge:snap:'
+const PREFIX = 'crest-foundry:snap:'
+const LEGACY_PREFIX = 'crest-forge:snap:'
 
 export async function saveSnapshot(name, config, svgEl) {
   const thumbnail = svgEl ? await captureThumb(svgEl) : null
@@ -23,11 +24,14 @@ export function listSnapshots() {
   const results = []
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i)
-    if (!key?.startsWith(PREFIX)) continue
+    const matchedPrefix = key?.startsWith(PREFIX) ? PREFIX
+      : key?.startsWith(LEGACY_PREFIX) ? LEGACY_PREFIX
+      : null
+    if (!matchedPrefix) continue
     try {
       const entry = JSON.parse(localStorage.getItem(key))
       // Legacy snapshots were keyed by name and have no id — derive it from the key
-      entry.id = entry.id ?? key.slice(PREFIX.length)
+      entry.id = entry.id ?? key.slice(matchedPrefix.length)
       results.push(entry)
     } catch {}
   }
@@ -36,6 +40,7 @@ export function listSnapshots() {
 
 export function deleteSnapshot(id) {
   localStorage.removeItem(PREFIX + id)
+  localStorage.removeItem(LEGACY_PREFIX + id)
 }
 
 function isQuotaError(e) {

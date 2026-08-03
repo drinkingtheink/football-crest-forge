@@ -55,8 +55,8 @@ const config = reactive({
     {
       ...DEFAULT_TEXT(),
       id: 'club-name',
-      content: 'FC CREST FORGE',
-      fontSize: 15,
+      content: 'FC CREST FOUNDRY',
+      fontSize: 13,
       fontWeight: 'bold',
       letterSpacing: 2,
       x: 100,
@@ -223,7 +223,7 @@ export function useBadgeConfig() {
     Object.assign(config.background, { type: 'solid', stripeCount: 4, sashWidth: 174, sunburstRays: 12 })
     config.symbols.splice(0, config.symbols.length)
     config.texts.splice(0, config.texts.length,
-      { ...DEFAULT_TEXT(), id: 'club-name', content: 'FC CREST FORGE', fontSize: 15, fontWeight: 'bold', letterSpacing: 2, x: 100, y: 55 },
+      { ...DEFAULT_TEXT(), id: 'club-name', content: 'FC CREST FOUNDRY', fontSize: 13, fontWeight: 'bold', letterSpacing: 2, x: 100, y: 55 },
       { ...DEFAULT_TEXT(), id: 'year', content: String(new Date().getFullYear()), fontSize: 11, letterSpacing: 3, x: 100, y: 185 },
     )
     Object.assign(config.border, { color: '#ffffff', width: 0 })
