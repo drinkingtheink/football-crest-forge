@@ -447,7 +447,39 @@ const bgElements = computed(() => {
       <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-bottom-${uid})`" />
     </g>
 
-    <!-- Straight text (draggable, scroll to resize) — above depth overlay -->
+    <!-- Free symbols (unclipped — may extend outside badge bounds) -->
+    <g
+      v-for="sym in config.symbols.filter(s => s.clipped === false)"
+      :key="sym.instanceId"
+      :style="{
+        cursor: drag?.instanceId === sym.instanceId ? 'grabbing' : 'grab',
+        filter: hoveredSymbolId === sym.instanceId ? 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' : 'none',
+        transition: 'filter 0.15s ease',
+      }"
+      @click.stop
+      @mousedown="startSymbolDrag($event, sym.instanceId)"
+      @mouseenter="hoveredSymbolId = sym.instanceId"
+      @mouseleave="hoveredSymbolId = null"
+      @wheel.stop.prevent="onSymbolWheel($event, sym.instanceId)"
+    >
+      <g :transform="symbolTransform(sym)">
+        <path
+          v-for="(p, i) in symPaths(sym)"
+          :key="i"
+          :d="p"
+          :stroke-width="sym.strokeWidth"
+          paint-order="stroke fill"
+          :style="{
+            fill: sym.color,
+            stroke: sym.strokeWidth > 0 ? sym.strokeColor : 'none',
+            transition: 'fill 0.35s ease, stroke 0.35s ease',
+          }"
+        />
+      </g>
+    </g>
+
+    <!-- Text renders last so it always sits above every badge element -->
+    <!-- Straight text (draggable, scroll to resize) -->
     <text
       v-for="text in config.texts.filter(t => !t.arc)"
       :key="text.id"
@@ -499,37 +531,6 @@ const bgElements = computed(() => {
         startOffset="50%"
       >{{ text.content }}</textPath>
     </text>
-
-    <!-- Free symbols (unclipped — may extend outside badge bounds) -->
-    <g
-      v-for="sym in config.symbols.filter(s => s.clipped === false)"
-      :key="sym.instanceId"
-      :style="{
-        cursor: drag?.instanceId === sym.instanceId ? 'grabbing' : 'grab',
-        filter: hoveredSymbolId === sym.instanceId ? 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' : 'none',
-        transition: 'filter 0.15s ease',
-      }"
-      @click.stop
-      @mousedown="startSymbolDrag($event, sym.instanceId)"
-      @mouseenter="hoveredSymbolId = sym.instanceId"
-      @mouseleave="hoveredSymbolId = null"
-      @wheel.stop.prevent="onSymbolWheel($event, sym.instanceId)"
-    >
-      <g :transform="symbolTransform(sym)">
-        <path
-          v-for="(p, i) in symPaths(sym)"
-          :key="i"
-          :d="p"
-          :stroke-width="sym.strokeWidth"
-          paint-order="stroke fill"
-          :style="{
-            fill: sym.color,
-            stroke: sym.strokeWidth > 0 ? sym.strokeColor : 'none',
-            transition: 'fill 0.35s ease, stroke 0.35s ease',
-          }"
-        />
-      </g>
-    </g>
 
     <!-- Size hint bubble (shown while scroll-resizing) -->
     <g v-if="sizeHint" :transform="`translate(${sizeHint.x}, ${sizeHint.y})`" style="pointer-events:none">
