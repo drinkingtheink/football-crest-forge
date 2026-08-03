@@ -153,20 +153,24 @@ function select(club) {
   position: relative;
 }
 
-/* Sleek staggered swap when "Get Fresh Clubs" replaces the list */
-.club-swap-move { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+/* Sleek staggered swap when "Get Fresh Clubs" replaces the list.
+   Outgoing rows cascade out to the right, fresh rows cascade in from the
+   left — both staggered by row index (--i) so the switch is easy to follow. */
+.club-swap-move { transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1); }
 .club-swap-enter-active {
-  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: calc(var(--i, 0) * 0.045s);
+  transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  /* Fresh rows wait for the old set to clear, then cascade in */
+  transition-delay: calc(0.28s + var(--i, 0) * 0.08s);
 }
 .club-swap-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition-delay: calc(var(--i, 0) * 0.06s);
   position: absolute;
   left: 0;
   right: 0;
 }
-.club-swap-enter-from { opacity: 0; transform: translateX(-14px); }
-.club-swap-leave-to   { opacity: 0; transform: translateX(14px); }
+.club-swap-enter-from { opacity: 0; transform: translateX(-26px); }
+.club-swap-leave-to   { opacity: 0; transform: translateX(26px); }
 
 .cp-result {
   display: flex;
