@@ -8,6 +8,7 @@ import ColorPicker from './components/ColorPicker.vue'
 import ClubPicker from './components/ClubPicker.vue'
 import AppBackground from './components/AppBackground.vue'
 import SnapshotPanel from './components/SnapshotPanel.vue'
+import AboutModal from './components/AboutModal.vue'
 import { useBadgeConfig } from './composables/useBadgeConfig.js'
 import { saveSnapshot } from './utils/snapshots.js'
 import { clubs } from './data/clubs.js'
@@ -361,6 +362,7 @@ function randomizeAll() {
 }
 
 const showScene = ref(true)
+const showAbout = ref(false)
 
 function stepBg(dir) {
   const idx = bgOptions.findIndex(o => o.id === appBg.value)
@@ -478,7 +480,10 @@ function stepBg(dir) {
 
         <div class="logo-row">
           <p class="logo">⚔ Crest Foundry</p>
-          <button class="randomize-btn" title="Randomize everything" @click="randomizeAll">⚡</button>
+          <div class="logo-actions">
+            <button class="about-btn" title="About &amp; credits" @click="showAbout = true">ⓘ</button>
+            <button class="randomize-btn" title="Randomize everything" @click="randomizeAll">⚡</button>
+          </div>
         </div>
 
         <!-- Shield / No Shield mode -->
@@ -772,6 +777,8 @@ function stepBg(dir) {
 
       </aside>
     </main>
+
+    <AboutModal :open="showAbout" @close="showAbout = false" />
   </div>
 </template>
 
@@ -840,7 +847,14 @@ function stepBg(dir) {
   margin: 0;
 }
 
-.randomize-btn {
+.logo-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.randomize-btn,
+.about-btn {
   background: none;
   border: 1px solid #3a3a4a;
   border-radius: 6px;
@@ -851,10 +865,13 @@ function stepBg(dir) {
   padding: 3px 7px;
   transition: border-color 0.15s, color 0.15s;
 }
-.randomize-btn:hover {
+.randomize-btn:hover,
+.about-btn:hover {
   border-color: #e8c84a;
   color: #e8c84a;
 }
+
+.about-btn { font-size: 15px; }
 
 .preview-pane {
   flex: 1;
