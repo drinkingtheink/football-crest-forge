@@ -676,6 +676,15 @@ function stepBg(dir) {
                     :title="sym.clipped === false ? 'Click to clip to badge shape' : 'Click to allow outside badge bounds'"
                   >{{ sym.clipped === false ? 'Free' : 'Clipped' }}</button>
                 </div>
+                <div class="sym-field sym-clip-row">
+                  <span>Flip</span>
+                  <button
+                    class="sym-clip-toggle"
+                    :class="{ free: sym.flipH }"
+                    @click.stop="updateSymbol(sym.instanceId, { flipH: !sym.flipH })"
+                    title="Flip symbol horizontally"
+                  >{{ sym.flipH ? 'Flipped ⇋' : 'Normal ⇋' }}</button>
+                </div>
                 <div class="sym-field sym-stroke-row">
                   <span>Border</span>
                   <ColorPicker
