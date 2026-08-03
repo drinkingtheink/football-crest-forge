@@ -394,6 +394,8 @@ const bgElements = computed(() => {
           :key="i"
           :d="p"
           :stroke-width="sym.strokeWidth"
+          stroke-linejoin="round"
+          stroke-linecap="round"
           paint-order="stroke fill"
           :style="{
             fill: sym.color,
@@ -468,6 +470,8 @@ const bgElements = computed(() => {
           :key="i"
           :d="p"
           :stroke-width="sym.strokeWidth"
+          stroke-linejoin="round"
+          stroke-linecap="round"
           paint-order="stroke fill"
           :style="{
             fill: sym.color,
