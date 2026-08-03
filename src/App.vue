@@ -50,6 +50,7 @@ const {
   pasteText,
   deselectAll,
   loadConfig,
+  resetConfig,
 } = useBadgeConfig()
 
 const clipboard = ref(null)
@@ -310,6 +311,12 @@ function randomizeColors() {
   activeClub.value = club
 }
 
+function startOver() {
+  if (!window.confirm('Start over? This clears the current design.')) return
+  resetConfig()
+  activeClub.value = null
+}
+
 function randomizeAll() {
   const club     = clubs[Math.floor(Math.random() * clubs.length)]
   const shape    = shapes[Math.floor(Math.random() * shapes.length)]
@@ -397,9 +404,14 @@ function stepBg(dir) {
         </div>
         </div>
         <div class="scene-wrap">
-          <button class="scene-toggle hud-pill" @click="showScene = !showScene" title="Toggle scene controls">
-            {{ showScene ? '▲ scene' : '▼ scene' }}
-          </button>
+          <div class="scene-actions">
+            <button class="start-over-btn" @click="startOver" title="Clear the current design and start fresh">
+              ↺ Start Over
+            </button>
+            <button class="scene-toggle hud-pill" @click="showScene = !showScene" title="Toggle scene controls">
+              {{ showScene ? '▲ scene' : '▼ scene' }}
+            </button>
+          </div>
 
           <Transition name="scene-fade">
           <div v-show="showScene" class="scene-controls">
@@ -924,6 +936,28 @@ function stepBg(dir) {
   gap: 8px;
 }
 
+.scene-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.start-over-btn {
+  font-size: 11px;
+  font-weight: 600;
+  color: #e6a5a5;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(224, 85, 85, 0.55);
+  border-radius: 6px;
+  padding: 5px 11px;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.start-over-btn:hover {
+  color: #fff;
+  background: rgba(224, 85, 85, 0.9);
+  border-color: #e05555;
+}
 .scene-toggle {
   font-size: 11px;
   color: #b9b6b6;
