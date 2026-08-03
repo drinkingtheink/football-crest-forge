@@ -987,13 +987,13 @@ function stepBg(dir) {
   border-color: #e05555;
 }
 .swap-colors-btn {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  color: #e8c84a;
+  color: #cdb24a;
   background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(232, 200, 74, 0.55);
+  border: 1px solid rgba(232, 200, 74, 0.4);
   border-radius: 6px;
-  padding: 5px 11px;
+  padding: 4px 9px;
   cursor: pointer;
   letter-spacing: 0.03em;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
