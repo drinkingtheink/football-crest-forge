@@ -38,7 +38,7 @@ const DEFAULT_TEXT = () => ({
 // ── Singleton state (module-level so any component gets the same instance) ──
 const config = reactive({
   shapeId: 'traditional-english',
-  noBadge: false,
+  noShield: false,
   palette: _randomClub.colors.map(c => c.hex),
   background: {
     type: _randomBgType,
@@ -129,7 +129,7 @@ export function useBadgeConfig() {
 
   // ── Shape ─────────────────────────────────────────────────────────────────
   function setShape(shapeId) { config.shapeId = shapeId }
-  function setNoBadge(on) { config.noBadge = !!on }
+  function setNoShield(on) { config.noShield = !!on }
 
   // ── Background ────────────────────────────────────────────────────────────
   function setBackgroundType(type) { config.background.type = type }
@@ -218,7 +218,7 @@ export function useBadgeConfig() {
 
   function loadConfig(saved) {
     config.shapeId = saved.shapeId
-    config.noBadge = saved.noBadge ?? false
+    config.noShield = saved.noShield ?? false
     config.palette.splice(0, config.palette.length, ...saved.palette)
     Object.assign(config.background, saved.background)
     config.symbols.splice(0, config.symbols.length, ...saved.symbols)
@@ -244,7 +244,7 @@ export function useBadgeConfig() {
     movePaletteColor,
     setPalette,
     setShape,
-    setNoBadge,
+    setNoShield,
     setBackgroundType,
     setStripeCount,
     setSashWidth,

@@ -29,6 +29,7 @@ const {
   movePaletteColor,
   setPalette,
   setShape,
+  setNoShield,
   setBackgroundType,
   setStripeCount,
   setSashWidth,
@@ -460,6 +461,20 @@ function stepBg(dir) {
           <button class="randomize-btn" title="Randomize everything" @click="randomizeAll">⚡</button>
         </div>
 
+        <!-- Shield / No Shield mode -->
+        <div class="mode-switch" role="group" aria-label="Shield mode">
+          <button
+            class="mode-opt"
+            :class="{ active: !config.noShield }"
+            @click="setNoShield(false)"
+          >Shield</button>
+          <button
+            class="mode-opt"
+            :class="{ active: config.noShield }"
+            @click="setNoShield(true)"
+          >No Shield</button>
+        </div>
+
         <!-- Club Colors / Palette -->
         <div class="control-group">
           <h3 class="control-label">Club Colors</h3>
@@ -511,7 +526,7 @@ function stepBg(dir) {
         </div>
 
         <!-- Shape -->
-        <div class="control-group">
+        <div class="control-group" :class="{ 'group-disabled': config.noShield }">
           <h3 class="control-label">Shape</h3>
           <div class="shape-grid">
             <button
@@ -530,7 +545,7 @@ function stepBg(dir) {
         </div>
 
         <!-- Background -->
-        <div class="control-group">
+        <div class="control-group" :class="{ 'group-disabled': config.noShield }">
           <h3 class="control-label">Background</h3>
           <div class="bg-type-grid">
             <button
@@ -706,7 +721,7 @@ function stepBg(dir) {
         </div>
 
         <!-- Border -->
-        <div class="control-group">
+        <div class="control-group" :class="{ 'group-disabled': config.noShield }">
           <h3 class="control-label">Border</h3>
           <div class="bg-color-row" style="margin-bottom: 10px">
             <span class="color-label">Color</span>
@@ -764,6 +779,37 @@ function stepBg(dir) {
   margin: 0 0 8px;
   padding-bottom: 16px;
   border-bottom: 1px solid #2a2a35;
+}
+
+.mode-switch {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: #13131a;
+  border: 1px solid #2a2a35;
+  border-radius: 8px;
+}
+.mode-opt {
+  flex: 1;
+  padding: 7px 0;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: #888;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.mode-opt:hover { color: #ccc; }
+.mode-opt.active {
+  background: #e8c84a;
+  color: #111;
+}
+
+.group-disabled {
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 .logo {
