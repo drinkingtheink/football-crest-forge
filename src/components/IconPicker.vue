@@ -111,6 +111,25 @@ const filtered = computed(() => {
 .icon-grid-scroll {
   max-height: 200px;
   overflow-y: auto;
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a48 transparent;
+}
+.icon-grid-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.icon-grid-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.icon-grid-scroll::-webkit-scrollbar-thumb {
+  background: #2f2f3b;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.icon-grid-scroll::-webkit-scrollbar-thumb:hover {
+  background: #e8c84a;
+  background-clip: content-box;
 }
 
 .icon-grid {
