@@ -242,6 +242,48 @@ const MANIFEST = [
 
   // ── Insects ──
   { file: 'lorc/butterfly.svg',         id: 'gi-butterfly',    label: 'Butterfly',      group: 'Insects' },
+
+  // ══ Batch 5 (crest staples: helms, football-native, regional) ═════════════
+  { file: 'delapouite/spartan-helmet.svg',   id: 'gi-spartan-helm',   label: 'Spartan Helm',   group: 'Heraldic' },
+  { file: 'delapouite/viking-helmet.svg',    id: 'gi-viking-helm',    label: 'Viking Helm',    group: 'Heraldic' },
+  { file: 'delapouite/centurion-helmet.svg', id: 'gi-centurion-helm', label: 'Centurion Helm', group: 'Heraldic' },
+  { file: 'delapouite/samurai-helmet.svg',   id: 'gi-samurai-helm',   label: 'Samurai Helm',   group: 'Heraldic' },
+  { file: 'lucasms/shirt.svg',               id: 'gi-jersey',         label: 'Jersey',         group: 'Sport' },
+  { file: 'delapouite/corner-flag.svg',      id: 'gi-corner-flag',    label: 'Corner Flag',    group: 'Sport' },
+  { file: 'delapouite/soccer-field.svg',     id: 'gi-pitch',          label: 'Pitch',          group: 'Sport' },
+  { file: 'various-artists/salmon.svg',      id: 'gi-salmon',         label: 'Salmon',         group: 'Maritime' },
+  { file: 'delapouite/leek.svg',             id: 'gi-leek',           label: 'Leek',           group: 'Flora' },
+  { file: 'delapouite/sunflower.svg',        id: 'gi-sunflower',      label: 'Sunflower',      group: 'Flora' },
+  { file: 'lorc/lyre.svg',                   id: 'gi-lyre',           label: 'Lyre',           group: 'Emblems' },
+  { file: 'lorc/moon.svg',                   id: 'gi-moon',           label: 'Moon',           group: 'Celestial' },
+
+  // ══ Batch 6 — Sci-Fi (new group) ══════════════════════════════════════════
+  { file: 'lorc/rocket.svg',                 id: 'gi-rocket',         label: 'Rocket',         group: 'Sci-Fi' },
+  { file: 'delapouite/ufo.svg',              id: 'gi-ufo',            label: 'UFO',            group: 'Sci-Fi' },
+  { file: 'delapouite/spaceship.svg',        id: 'gi-spaceship',      label: 'Spaceship',      group: 'Sci-Fi' },
+  { file: 'delapouite/astronaut-helmet.svg', id: 'gi-astronaut',      label: 'Astronaut',      group: 'Sci-Fi' },
+  { file: 'lorc/ringed-planet.svg',          id: 'gi-ringed-planet',  label: 'Ringed Planet',  group: 'Sci-Fi' },
+  { file: 'lorc/satellite.svg',              id: 'gi-satellite',      label: 'Satellite',      group: 'Sci-Fi' },
+  { file: 'delapouite/telescope.svg',        id: 'gi-telescope',      label: 'Telescope',      group: 'Sci-Fi' },
+  { file: 'skoll/atom.svg',                  id: 'gi-atom',           label: 'Atom',           group: 'Sci-Fi' },
+  { file: 'delapouite/robot-helmet.svg',     id: 'gi-robot',          label: 'Robot',          group: 'Sci-Fi' },
+  { file: 'lorc/ray-gun.svg',                id: 'gi-ray-gun',        label: 'Ray Gun',        group: 'Sci-Fi' },
+  { file: 'lorc/portal.svg',                 id: 'gi-portal',         label: 'Portal',         group: 'Sci-Fi' },
+  { file: 'lorc/dna1.svg',                   id: 'gi-dna',            label: 'DNA',            group: 'Sci-Fi' },
+
+  // ══ Batch 6 — Fantasy (new group) ═════════════════════════════════════════
+  { file: 'lorc/crystal-ball.svg',           id: 'gi-crystal-ball',   label: 'Crystal Ball',   group: 'Fantasy' },
+  { file: 'delapouite/magic-hat.svg',        id: 'gi-wizard-hat',     label: 'Wizard Hat',     group: 'Fantasy' },
+  { file: 'delapouite/magic-potion.svg',     id: 'gi-potion',         label: 'Potion',         group: 'Fantasy' },
+  { file: 'delapouite/spell-book.svg',       id: 'gi-spell-book',     label: 'Spell Book',     group: 'Fantasy' },
+  { file: 'lorc/fairy.svg',                  id: 'gi-fairy',          label: 'Fairy',          group: 'Fantasy' },
+  { file: 'lorc/ghost.svg',                  id: 'gi-ghost',          label: 'Ghost',          group: 'Fantasy' },
+  { file: 'lorc/mushroom.svg',               id: 'gi-mushroom',       label: 'Mushroom',       group: 'Fantasy' },
+  { file: 'lorc/sword-in-stone.svg',         id: 'gi-sword-in-stone', label: 'Sword in Stone', group: 'Fantasy' },
+  { file: 'lorc/wyvern.svg',                 id: 'gi-wyvern',         label: 'Wyvern',         group: 'Fantasy' },
+  { file: 'lorc/crystal-cluster.svg',        id: 'gi-crystal',        label: 'Crystal',        group: 'Fantasy' },
+  { file: 'lorc/fairy-wand.svg',             id: 'gi-magic-wand',     label: 'Magic Wand',     group: 'Fantasy' },
+  { file: 'delapouite/ogre.svg',             id: 'gi-ogre',           label: 'Ogre',           group: 'Fantasy' },
 ]
 
 function ensureRepo() {
