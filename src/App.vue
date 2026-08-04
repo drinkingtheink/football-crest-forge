@@ -344,6 +344,8 @@ function randomizeAll() {
   if (Math.random() < 2/3) {
     addSymbol(icons[Math.floor(Math.random() * icons.length)].id)
     const sym = config.symbols.find(s => s.instanceId === selectedSymbolId.value)
+    // Random badges get a bolder symbol than a manual picker-add (default 72).
+    updateSymbol(selectedSymbolId.value, { size: 110 + Math.floor(Math.random() * 50) })
     if (third && config.palette.length > 2 && Math.random() < 0.4) {
       const strokeColor = config.palette.find(c => c.toLowerCase() !== third.toLowerCase()) ?? config.palette[0]
       updateSymbol(selectedSymbolId.value, { color: third, strokeWidth: 8, strokeColor })
