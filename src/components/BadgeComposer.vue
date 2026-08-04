@@ -45,6 +45,17 @@ function symPaths(sym) {
   return [`${outer} ${inner}`]
 }
 
+// Symbol paths are scaled by size/max(vw,vh), and stroke-width is in the icon's
+// own viewBox coords — so a fixed strokeWidth renders thin on big-viewBox icons
+// (e.g. 512) and thick on small ones (100). Author strokeWidth in 100-unit space
+// and scale it to the icon's viewBox here, so on-badge thickness stays consistent.
+function symbolStroke(sym) {
+  const icon = iconsById[sym.iconId]
+  const vw = icon?.viewBox?.[0] ?? 100
+  const vh = icon?.viewBox?.[1] ?? 100
+  return sym.strokeWidth * Math.max(vw, vh) / 100
+}
+
 function symbolTransform(sym) {
   const icon = iconsById[sym.iconId]
   const vw = icon?.viewBox?.[0] ?? 100
@@ -393,7 +404,7 @@ const bgElements = computed(() => {
           v-for="(p, i) in symPaths(sym)"
           :key="i"
           :d="p"
-          :stroke-width="sym.strokeWidth"
+          :stroke-width="symbolStroke(sym)"
           stroke-linejoin="round"
           stroke-linecap="round"
           paint-order="stroke fill"
@@ -469,7 +480,7 @@ const bgElements = computed(() => {
           v-for="(p, i) in symPaths(sym)"
           :key="i"
           :d="p"
-          :stroke-width="sym.strokeWidth"
+          :stroke-width="symbolStroke(sym)"
           stroke-linejoin="round"
           stroke-linecap="round"
           paint-order="stroke fill"

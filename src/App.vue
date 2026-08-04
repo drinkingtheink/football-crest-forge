@@ -147,6 +147,17 @@ function onPickIcon(iconId) {
   }
 }
 
+// Placed-symbols thumbnail: use the icon's own viewBox, and scale strokeWidth
+// (authored in 100-unit space) to it so the preview matches the badge.
+function symPreviewVB(iconId) {
+  const vb = iconsById[iconId]?.viewBox
+  return vb ? `0 0 ${vb[0]} ${vb[1]}` : '0 0 100 100'
+}
+function symPreviewStroke(sym) {
+  const vb = iconsById[sym.iconId]?.viewBox ?? [100, 100]
+  return sym.strokeWidth * Math.max(vb[0], vb[1]) / 100
+}
+
 function onKeyDown(e) {
   if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return
 
@@ -649,14 +660,14 @@ function stepBg(dir) {
               @click="selectSymbol(sym.instanceId)"
             >
               <div class="sym-row">
-                <svg viewBox="0 0 100 100" width="28" height="28" class="sym-preview">
+                <svg :viewBox="symPreviewVB(sym.iconId)" width="28" height="28" class="sym-preview">
                   <path
                     v-for="(p, i) in iconsById[sym.iconId]?.paths"
                     :key="i"
                     :d="p"
                     :fill="sym.color"
                     :stroke="sym.strokeWidth > 0 ? sym.strokeColor : 'none'"
-                    :stroke-width="sym.strokeWidth"
+                    :stroke-width="symPreviewStroke(sym)"
                     paint-order="stroke fill"
                   />
                 </svg>
