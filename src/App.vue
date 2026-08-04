@@ -589,7 +589,10 @@ function stepBg(dir) {
       <aside class="controls-pane" ref="controlsPane">
 
         <div class="logo-row">
-          <p class="logo">⚒ Crest Foundry</p>
+          <div class="logo-block">
+            <p class="logo">⚒ Crest Foundry</p>
+            <a class="logo-byline" href="https://www.drinkingtheink.com/" target="_blank" rel="noopener">A project by Jason M Harrison</a>
+          </div>
           <div class="logo-actions">
             <button class="about-btn" title="About &amp; credits" @click="showAbout = true">ⓘ</button>
             <button class="randomize-btn" title="Forge a new crest" @click="randomizeAll">⚡</button>
@@ -917,6 +920,20 @@ function stepBg(dir) {
   padding-bottom: 16px;
   border-bottom: 1px solid #2a2a35;
 }
+
+.logo-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.logo-byline {
+  font-size: 10px;
+  color: #888;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: color 0.15s;
+}
+.logo-byline:hover { color: #e8c84a; }
 
 .mode-switch {
   display: flex;
