@@ -21,6 +21,7 @@ A browser-based football badge creator for designing custom club crests. Combine
   </tr>
   <tr>
     <td align="center"><img src="designs/fc-cf-angel-checkered1.png" width="220" alt="Crest Foundry FC — Winged angel emblem, red/blue checkered field, gold border, star with year, arc text" /><br/><sub>Angel emblem · checkered · gold border · arc text</sub></td>
+    <td align="center"><img src="designs/fc-cf-griffin-diagonal1.png" width="220" alt="Crest Foundry FC — Gold griffin on a diagonal-split light blue and navy shield, star, blurred pitch background" /><br/><sub>Griffin · diagonal split · star</sub></td>
   </tr>
 </table>
 
