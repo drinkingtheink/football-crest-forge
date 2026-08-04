@@ -4,7 +4,6 @@ import { icons } from '../data/icons.js'
 
 const _randomClub = clubs[Math.floor(Math.random() * clubs.length)]
 const _randomIcon = icons[Math.floor(Math.random() * icons.length)]
-const _addInitialSymbol = Math.random() < 2/3
 function _contrastColor(fill, palette) {
   const alt = palette.find(c => c.toLowerCase() !== fill.toLowerCase())
   return alt ?? (fill.toLowerCase() === '#000000' ? '#ffffff' : '#000000')
@@ -46,11 +45,12 @@ const config = reactive({
     sashWidth: 174,
     sunburstRays: 12,
   },
-  symbols: _addInitialSymbol ? (() => {
+  // Always start with a random symbol on app boot.
+  symbols: (() => {
     const fill = _randomClub.colors[0]?.hex || '#ffffff'
     const palette = _randomClub.colors.map(c => c.hex)
     return [{ instanceId: 'sym-init', iconId: _randomIcon.id, color: fill, x: 100, y: 120, size: 72, strokeColor: _contrastColor(fill, palette), strokeWidth: 8 }]
-  })() : [],
+  })(),
   texts: [
     {
       ...DEFAULT_TEXT(),

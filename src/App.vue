@@ -341,7 +341,9 @@ function randomizeAll() {
   appBg.value = bgOptions[Math.floor(Math.random() * bgOptions.length)].id
 
   ;[...config.symbols].forEach(s => removeSymbol(s.instanceId))
-  if (Math.random() < 2/3) {
+  // Symbols are the exception when randomizing — most badges come out clean,
+  // with a symbol added only occasionally.
+  if (Math.random() < 0.2) {
     addSymbol(icons[Math.floor(Math.random() * icons.length)].id)
     const sym = config.symbols.find(s => s.instanceId === selectedSymbolId.value)
     if (third && config.palette.length > 2 && Math.random() < 0.4) {
