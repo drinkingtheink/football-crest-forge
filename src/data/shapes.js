@@ -19,11 +19,6 @@ export const shapes = [
     path: 'M 8,35 L 192,35 L 192,155 C 192,195 150,218 100,226 C 50,218 8,195 8,155 Z',
   },
   {
-    id: 'tall-narrow',
-    label: 'Tall Narrow',
-    path: 'M 55,15 L 145,15 L 145,165 C 145,200 125,220 100,228 C 75,220 55,200 55,165 Z',
-  },
-  {
     id: 'chevron-bottom',
     label: 'Chevron Bottom',
     path: 'M 15,15 L 185,15 L 185,170 L 100,218 L 15,170 Z',
