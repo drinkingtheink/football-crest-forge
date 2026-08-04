@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { icons, iconGroups } from '../data/icons.js'
+import { icons, iconGroups, iconCats } from '../data/icons.js'
 
 const props = defineProps({
   // { [iconId]: count } — how many of each symbol are currently in the design
@@ -14,7 +14,7 @@ const activeGroup = ref('All')
 const filtered = computed(() => {
   const q = search.value.toLowerCase().trim()
   return icons.filter(ic => {
-    const matchGroup = activeGroup.value === 'All' || ic.group === activeGroup.value
+    const matchGroup = activeGroup.value === 'All' || iconCats(ic).includes(activeGroup.value)
     const matchSearch = !q || ic.label.toLowerCase().includes(q)
     return matchGroup && matchSearch
   })
