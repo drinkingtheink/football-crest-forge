@@ -299,6 +299,18 @@ function onDragEmber(clientX, clientY) {
   sparkField.emit(clientX - cr.left, clientY - cr.top, 2 + Math.floor(Math.random() * 2), 1)
 }
 
+// Intermittent embers drifting up from the forge glow at the base of the stage.
+let emberTimer = null
+function spitEmber() {
+  const c = particleCanvas.value
+  if (sparkField && c) {
+    const w = c.width, h = c.height
+    sparkField.float(w * (0.12 + Math.random() * 0.76), h - (8 + Math.random() * 34))
+    if (Math.random() < 0.25) sparkField.float(w * (0.12 + Math.random() * 0.76), h - (8 + Math.random() * 34))
+  }
+  emberTimer = setTimeout(spitEmber, 500 + Math.random() * 1300)
+}
+
 function forwardScroll(e) {
   controlsPane.value?.scrollBy({ top: e.deltaY, behavior: 'auto' })
 }
@@ -371,7 +383,10 @@ onMounted(() => {
   document.addEventListener('click', onDocumentClick)
   nextTick(() => {
     sizeCanvas()
-    if (particleCanvas.value) sparkField = createSparkField(particleCanvas.value)
+    if (particleCanvas.value) {
+      sparkField = createSparkField(particleCanvas.value)
+      if (!reduceMotion) spitEmber()
+    }
   })
 })
 
@@ -379,6 +394,7 @@ onUnmounted(() => {
   window.removeEventListener('keydown', onKeyDown)
   window.removeEventListener('resize', sizeCanvas)
   document.removeEventListener('click', onDocumentClick)
+  clearTimeout(emberTimer)
   sparkField?.stop()
 })
 

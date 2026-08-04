@@ -31,17 +31,27 @@ export function createSparkField(canvas) {
       alive = true
       p.vy += p.grav
       p.vx *= 0.985
+      if (p.dot) p.x += Math.sin((1 - p.life) * 22 + p.wob) * 0.35 // gentle wobble as it rises
       p.x += p.vx
       p.y += p.vy
       p.life -= p.decay
       const flicker = 0.6 + Math.random() * 0.4
       ctx.globalAlpha = Math.max(0, p.life) * flicker
-      ctx.strokeStyle = p.color
-      ctx.lineWidth = p.size
-      ctx.beginPath()
-      ctx.moveTo(p.x, p.y)
-      ctx.lineTo(p.x - p.vx * 1.6, p.y - p.vy * 1.6) // streak along velocity
-      ctx.stroke()
+      if (p.dot) {
+        // Floating ember — a soft glowing point
+        ctx.fillStyle = p.color
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+        ctx.fill()
+      } else {
+        // Struck spark — a streak along its velocity
+        ctx.strokeStyle = p.color
+        ctx.lineWidth = p.size
+        ctx.beginPath()
+        ctx.moveTo(p.x, p.y)
+        ctx.lineTo(p.x - p.vx * 1.6, p.y - p.vy * 1.6)
+        ctx.stroke()
+      }
     }
     ctx.globalAlpha = 1
     ctx.globalCompositeOperation = 'source-over'
@@ -96,6 +106,23 @@ export function createSparkField(canvas) {
           grav: 0.13 + Math.random() * 0.08,
         })
       }
+      ensureRunning()
+    },
+    // A single ember that floats up from (x,y), wobbling and fading — from the coals.
+    float(x, y) {
+      const v = 0.4 + Math.random() * 0.5
+      particles.push({
+        x, y,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: -v, // upward
+        size: 0.9 + Math.random() * 1,
+        color: pick(),
+        life: 1,
+        decay: 0.004 + Math.random() * 0.004,
+        grav: 0.0018, // slight settle near the top of its arc
+        dot: true,
+        wob: Math.random() * Math.PI * 2,
+      })
       ensureRunning()
     },
     stop() {
