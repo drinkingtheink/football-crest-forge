@@ -13,6 +13,8 @@ const props = defineProps({
   selectedSymbolId: { type: String, default: null },
   size: { type: Number, default: 380 },
   uid: { type: String, default: 'b0' },
+  // Pointer-driven gloss: { x, y } normalised 0–1 over the badge, `on` toggles it.
+  specular: { type: Object, default: () => ({ x: 0.5, y: 0.32, on: false }) },
 })
 
 const emit = defineEmits(['update-text-position', 'update-symbol-position', 'update-text', 'update-symbol', 'select-symbol', 'select-text', 'deselect', 'symbol-outside-bounds'])
@@ -345,6 +347,19 @@ const bgElements = computed(() => {
         <stop offset="100%" stop-color="white" stop-opacity="0" />
       </linearGradient>
 
+      <!-- Specular gloss that follows the pointer (presentation only) -->
+      <radialGradient
+        :id="`specular-grad-${uid}`"
+        gradientUnits="userSpaceOnUse"
+        :cx="specular.x * VIEWBOX_W" :cy="specular.y * VIEWBOX_H"
+        :fx="specular.x * VIEWBOX_W" :fy="specular.y * VIEWBOX_H"
+        :r="VIEWBOX_W * 0.6"
+      >
+        <stop offset="0%"  stop-color="white" stop-opacity="0.6" />
+        <stop offset="22%" stop-color="white" stop-opacity="0.22" />
+        <stop offset="55%" stop-color="white" stop-opacity="0" />
+      </radialGradient>
+
       <!-- 3D depth gradients (presentation only — not exported) -->
       <radialGradient :id="`depth-radial-${uid}`" gradientUnits="userSpaceOnUse" cx="100" cy="90" r="135" fx="100" fy="68">
         <stop offset="0%"   stop-color="white" stop-opacity="0.06" />
@@ -458,6 +473,14 @@ const bgElements = computed(() => {
       <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-right-${uid})`"  />
       <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-top-${uid})`"    />
       <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-bottom-${uid})`" />
+    </g>
+
+    <!-- Specular gloss (pointer-driven, presentation only) — clipped to shield -->
+    <g
+      :clip-path="`url(#${config.noShield ? elementsClipId : clipId})`"
+      :style="{ pointerEvents: 'none', opacity: specular.on ? 1 : 0, transition: 'opacity 0.4s ease' }"
+    >
+      <rect x="0" y="0" :width="VIEWBOX_W" :height="VIEWBOX_H" :fill="`url(#specular-grad-${uid})`" />
     </g>
 
     <!-- Free symbols (unclipped — may extend outside badge bounds) -->
