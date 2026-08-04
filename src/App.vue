@@ -461,6 +461,8 @@ function stepBg(dir) {
       <!-- Preview -->
       <section class="preview-pane" @wheel.prevent="forwardScroll" @mousemove="onStageMove" @mouseenter="isBadgeActive = true" @mouseleave="isBadgeActive = false">
         <canvas ref="particleCanvas" class="particle-canvas" />
+        <!-- Warm forge glow at the base of the stage (behind the badge, above the background) -->
+        <div class="forge-glow" />
 
         <button
           class="bg-arrow bg-arrow-left"
@@ -986,6 +988,26 @@ function stepBg(dir) {
   height: 100%;
 }
 
+/* Warm coal-glow at the base of the crest stage — subtle, breathing */
+.forge-glow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 180px;
+  pointer-events: none;
+  background:
+    radial-gradient(70% 85% at 32% 118%, rgba(255, 145, 48, 0.42), transparent 60%),
+    radial-gradient(70% 85% at 68% 122%, rgba(255, 88, 20, 0.42), transparent 60%),
+    radial-gradient(150% 115% at 50% 128%, rgba(255, 120, 30, 0.34), transparent 64%);
+  filter: blur(7px);
+  animation: forge-breathe 5s ease-in-out infinite;
+}
+@keyframes forge-breathe {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+
 .bg-arrow {
   position: absolute;
   top: 50%;
@@ -1050,6 +1072,7 @@ function stepBg(dir) {
   .badge-float-wrap { animation: none; }
   .badge-tilt { transition: none; }
   .badge-wrap.pulsing { animation: none; }
+  .forge-glow { animation: none; opacity: 0.8; }
 }
 
 .hud-pill {
