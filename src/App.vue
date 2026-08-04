@@ -402,16 +402,16 @@ function randomizeAll() {
     addSymbol(icons[Math.floor(Math.random() * icons.length)].id)
     const sym = config.symbols.find(s => s.instanceId === selectedSymbolId.value)
     // Random badges get a bolder symbol than a manual picker-add (default 72).
-    updateSymbol(selectedSymbolId.value, { size: 110 + Math.floor(Math.random() * 50) })
+    updateSymbol(selectedSymbolId.value, { size: 90 + Math.floor(Math.random() * 45) })
     if (third && config.palette.length > 2 && Math.random() < 0.4) {
       const strokeColor = config.palette.find(c => c.toLowerCase() !== third.toLowerCase()) ?? config.palette[0]
-      updateSymbol(selectedSymbolId.value, { color: third, strokeWidth: 8, strokeColor })
+      updateSymbol(selectedSymbolId.value, { color: third, strokeWidth: 6, strokeColor })
     } else {
       // Two-colour palettes (and the non-accent case) always get a stroke in
       // the other palette colour so it never matches the fill.
       const strokeColor = config.palette.find(c => c.toLowerCase() !== sym.color.toLowerCase())
         ?? (sym.color.toLowerCase() === '#000000' ? '#ffffff' : '#000000')
-      updateSymbol(selectedSymbolId.value, { strokeWidth: 8, strokeColor })
+      updateSymbol(selectedSymbolId.value, { strokeWidth: 6, strokeColor })
     }
   }
 
