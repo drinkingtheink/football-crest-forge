@@ -15,6 +15,7 @@ import { clubs } from './data/clubs.js'
 import { shapes, shapesById } from './data/shapes.js'
 import { icons, iconsById } from './data/icons.js'
 import { auroraBg, wavesBg, crisscrossBg } from './utils/patterns.js'
+import { fonts, loadFont } from './utils/fonts.js'
 import { createSparkField } from './utils/particles.js'
 import { useToast } from './composables/useToast.js'
 
@@ -450,8 +451,12 @@ function randomizeAll() {
     }
   }
 
-  updateText('club-name', { y: 55 })
-  updateText('year', { y: 185 })
+  const nameFont = fonts[Math.floor(Math.random() * fonts.length)].family
+  const yearFont = fonts[Math.floor(Math.random() * fonts.length)].family
+  loadFont(nameFont)
+  loadFont(yearFont)
+  updateText('club-name', { y: 55, fontFamily: nameFont })
+  updateText('year', { y: 185, fontFamily: yearFont })
   activeClub.value = club
 }
 
