@@ -19,6 +19,9 @@ A browser-based football badge creator for designing custom club crests. Combine
     <td align="center"><img src="designs/fc-cf-spartan-sun1.png" width="220" alt="FC Crest Foundry — Spartan helmet on sun burst, stadium background" /><br/><sub>Spartan · sun burst · stadium bg</sub></td>
     <td align="center"><img src="designs/fc-cf-swallow-circle1.png" width="220" alt="FC Crest Foundry — Swallow, circular badge, arc text, grass background" /><br/><sub>Swallow · circular · arc text · grass bg</sub></td>
   </tr>
+  <tr>
+    <td align="center"><img src="designs/fc-cf-angel-checkered1.png" width="220" alt="Crest Foundry FC — Winged angel emblem, red/blue checkered field, gold border, star with year, arc text" /><br/><sub>Angel emblem · checkered · gold border · arc text</sub></td>
+  </tr>
 </table>
 
 ---
