@@ -15,7 +15,7 @@ const props = defineProps({
   uid: { type: String, default: 'b0' },
 })
 
-const emit = defineEmits(['update-text-position', 'update-symbol-position', 'update-text', 'update-symbol', 'select-symbol', 'select-text', 'deselect', 'symbol-outside-bounds', 'ember'])
+const emit = defineEmits(['update-text-position', 'update-symbol-position', 'update-text', 'update-symbol', 'select-symbol', 'select-text', 'deselect', 'symbol-outside-bounds', 'ember', 'drag-start', 'drag-end'])
 
 function arcPathId(textId) { return `arcpath-${props.uid}-${textId}` }
 
@@ -102,6 +102,7 @@ function startTextDrag(e, textId) {
   } else {
     drag.value = { type: 'text', id: textId, sx: pt.x, sy: pt.y, ox: text.x, oy: text.y, isArc: false }
   }
+  emit('drag-start')
   e.preventDefault()
 }
 
@@ -112,6 +113,7 @@ function startSymbolDrag(e, instanceId) {
   drag.value = { type: 'symbol', instanceId, sx: pt.x, sy: pt.y, ox: sym.x, oy: sym.y }
   outsidePromptedId.value = null
   emit('select-symbol', instanceId)
+  emit('drag-start')
   e.preventDefault()
 }
 
@@ -142,7 +144,11 @@ function onMove(e) {
   }
 }
 
-function stopDrag() { drag.value = null; guides.value = { x: false, y: false } }
+function stopDrag() {
+  if (drag.value) emit('drag-end')
+  drag.value = null
+  guides.value = { x: false, y: false }
+}
 
 // ── Hover highlight ────────────────────────────────────────────────────────
 const hoveredSymbolId = ref(null)

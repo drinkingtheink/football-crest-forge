@@ -163,9 +163,15 @@ const badgeTiltRef = ref(null)
 const reduceMotion = typeof window !== 'undefined'
   && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 const tilt = reactive({ rx: 0, ry: 0 })
+const isDraggingEl = ref(false)
+
+// Tilt is a hover-only affordance — flatten and suspend it while dragging so
+// it doesn't fight precise alignment.
+function onElDragStart() { isDraggingEl.value = true; tilt.rx = 0; tilt.ry = 0 }
+function onElDragEnd() { isDraggingEl.value = false }
 
 function onBadgeMove(e) {
-  if (reduceMotion || !badgeTiltRef.value) return
+  if (reduceMotion || isDraggingEl.value || !badgeTiltRef.value) return
   const r = badgeTiltRef.value.getBoundingClientRect()
   const px = (e.clientX - r.left) / r.width
   const py = (e.clientY - r.top) / r.height
@@ -490,6 +496,8 @@ function stepBg(dir) {
             @deselect="deselectAll"
             @symbol-outside-bounds="onSymbolOutsideBounds"
             @ember="onDragEmber"
+            @drag-start="onElDragStart"
+            @drag-end="onElDragEnd"
           />
         </div>
         </div>
