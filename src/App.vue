@@ -158,12 +158,11 @@ function symPreviewStroke(sym) {
   return sym.strokeWidth * Math.max(vb[0], vb[1]) / 100
 }
 
-// ── Crest stage: pointer tilt + palette-reactive glow ──────────────────────
+// ── Crest stage: pointer tilt ──────────────────────────────────────────────
 const badgeTiltRef = ref(null)
 const reduceMotion = typeof window !== 'undefined'
   && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 const tilt = reactive({ rx: 0, ry: 0 })
-const specular = reactive({ x: 0.5, y: 0.3, on: false })
 
 function onBadgeMove(e) {
   if (reduceMotion || !badgeTiltRef.value) return
@@ -173,28 +172,10 @@ function onBadgeMove(e) {
   const MAX = 7 // degrees
   tilt.ry = (px - 0.5) * 2 * MAX
   tilt.rx = -(py - 0.5) * 2 * MAX
-  specular.x = px; specular.y = py; specular.on = true
 }
 function onBadgeLeave() {
-  tilt.rx = 0; tilt.ry = 0; specular.on = false
+  tilt.rx = 0; tilt.ry = 0
 }
-
-function _hexToRgb(h) { const s = h.replace('#', ''); return [0, 2, 4].map(i => parseInt(s.slice(i, i + 2), 16)) }
-function _vividness([r, g, b]) {
-  r /= 255; g /= 255; b /= 255
-  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2
-  const s = mx === mn ? 0 : (l > 0.5 ? (mx - mn) / (2 - mx - mn) : (mx - mn) / (mx + mn))
-  return s * (1 - Math.abs(l - 0.55)) // favour vivid, mid-light colours
-}
-// The most vivid palette colour drives the ambient glow, as "r, g, b".
-const glowRgb = computed(() => {
-  let best = '#e8c84a', bestScore = -1
-  for (const hex of config.palette) {
-    const score = _vividness(_hexToRgb(hex))
-    if (score > bestScore) { bestScore = score; best = hex }
-  }
-  return _hexToRgb(best).join(', ')
-})
 
 function onKeyDown(e) {
   if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return
@@ -446,8 +427,7 @@ function stepBg(dir) {
           @click="stepBg(1)"
         >›</button>
 
-        <div class="badge-float-wrap" :class="{ active: isBadgeActive }" :style="{ '--glow': glowRgb }">
-        <div class="badge-aura" />
+        <div class="badge-float-wrap" :class="{ active: isBadgeActive }">
         <div
           ref="badgeTiltRef"
           class="badge-tilt"
@@ -461,7 +441,6 @@ function stepBg(dir) {
             :selected-symbol-id="selectedSymbolId"
             :size="380"
             uid="main"
-            :specular="specular"
             @update-text="updateText"
             @update-text-position="updateTextPosition"
             @update-symbol-position="updateSymbolPosition"
@@ -989,41 +968,23 @@ function stepBg(dir) {
 }
 
 @keyframes badge-pulse {
-  0%   { transform: scale(1);    filter: drop-shadow(0 0 0px  rgba(var(--glow), 0));    }
-  30%  { transform: scale(1.015); filter: drop-shadow(0 0 13px rgba(var(--glow), 0.5)); }
-  100% { transform: scale(1);    filter: drop-shadow(0 0 0px  rgba(var(--glow), 0));    }
+  0%   { transform: scale(1);    filter: drop-shadow(0 0 0px  rgba(232,200,74,0));    }
+  30%  { transform: scale(1.015); filter: drop-shadow(0 0 9px rgba(232,200,74,0.38)); }
+  100% { transform: scale(1);    filter: drop-shadow(0 0 0px  rgba(232,200,74,0));    }
 }
 
 .badge-float-wrap {
   position: relative;
   perspective: 1100px;
-  --glow: 232, 200, 74;
   animation: badge-float 3.4s ease-in-out infinite alternate;
 }
 .badge-float-wrap.active {
   animation-play-state: paused;
 }
 
-/* Palette-tinted ambient glow behind the crest */
-.badge-aura {
-  position: absolute;
-  left: 50%;
-  top: 47%;
-  width: 320px;
-  height: 320px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(var(--glow), 0.45) 0%, rgba(var(--glow), 0.12) 42%, transparent 70%);
-  filter: blur(42px);
-  pointer-events: none;
-  z-index: 0;
-  transition: background 0.6s ease;
-}
-
 /* Pointer-driven 3D tilt layer */
 .badge-tilt {
   position: relative;
-  z-index: 1;
   transform-style: preserve-3d;
   transition: transform 0.2s ease-out;
   will-change: transform;
