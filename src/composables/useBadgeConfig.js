@@ -50,7 +50,7 @@ const config = reactive({
     const fill = _randomClub.colors[0]?.hex || '#ffffff'
     const palette = _randomClub.colors.map(c => c.hex)
     const size = 90 + Math.floor(Math.random() * 45) // 90–134, larger than a manual add
-    return [{ instanceId: 'sym-init', iconId: _randomIcon.id, color: fill, x: 100, y: 120, size, strokeColor: _contrastColor(fill, palette), strokeWidth: 6 }]
+    return [{ instanceId: 'sym-init', iconId: _randomIcon.id, color: fill, x: 100, y: 120, size, strokeColor: _contrastColor(fill, palette), strokeWidth: 3 }]
   })(),
   texts: [
     {
