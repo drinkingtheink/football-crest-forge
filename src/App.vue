@@ -15,7 +15,7 @@ import { clubs } from './data/clubs.js'
 import { shapes, shapesById } from './data/shapes.js'
 import { icons, iconsById } from './data/icons.js'
 import { auroraBg, wavesBg, crisscrossBg } from './utils/patterns.js'
-import { burstParticles } from './utils/particles.js'
+import { createSparkField } from './utils/particles.js'
 import { useToast } from './composables/useToast.js'
 
 const { addToast } = useToast()
@@ -251,9 +251,34 @@ async function doSaveSnapshot(name) {
 }
 const isPulsing      = ref(false)
 const isBadgeActive  = ref(false)
-let   stopParticles  = null
+let   sparkField     = null
 let   pulseTimer     = null
 let   burstTimer     = null
+
+// Foundry sparks off the moving cursor — throttled, intermittent, speed-scaled.
+let _lastSparkT = 0
+let _lastSparkPos = null
+function onStageMove(e) {
+  if (reduceMotion || !sparkField) return
+  const c = particleCanvas.value
+  if (!c) return
+  const cr = c.getBoundingClientRect()
+  const x = e.clientX - cr.left
+  const y = e.clientY - cr.top
+  const now = performance.now()
+  let speed = 0
+  if (_lastSparkPos) {
+    const dt = Math.max(1, now - _lastSparkPos.t)
+    speed = Math.hypot(x - _lastSparkPos.x, y - _lastSparkPos.y) / dt // px/ms
+  }
+  _lastSparkPos = { x, y, t: now }
+  if (now - _lastSparkT < 50) return  // throttle
+  if (speed < 0.06) return            // near-still → no sparks
+  if (Math.random() < 0.45) return    // skip ~45% → intermittent
+  _lastSparkT = now
+  const n = speed > 0.5 ? 2 : 1
+  sparkField.emit(x, y, n, Math.min(1.5, 0.65 + speed))
+}
 
 function forwardScroll(e) {
   controlsPane.value?.scrollBy({ top: e.deltaY, behavior: 'auto' })
@@ -277,8 +302,7 @@ function triggerEffects() {
   const cx = br.left + br.width  / 2 - cr.left
   const cy = br.top  + br.height / 2 - cr.top
 
-  stopParticles?.()
-  stopParticles = burstParticles(c, cx, cy, config.palette)
+  sparkField?.burst(cx, cy)
 
   // Badge pulse
   isPulsing.value = false
@@ -326,14 +350,17 @@ onMounted(() => {
   window.addEventListener('keydown', onKeyDown)
   window.addEventListener('resize', sizeCanvas)
   document.addEventListener('click', onDocumentClick)
-  nextTick(sizeCanvas)
+  nextTick(() => {
+    sizeCanvas()
+    if (particleCanvas.value) sparkField = createSparkField(particleCanvas.value)
+  })
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', onKeyDown)
   window.removeEventListener('resize', sizeCanvas)
   document.removeEventListener('click', onDocumentClick)
-  stopParticles?.()
+  sparkField?.stop()
 })
 
 function onSymbolOutsideBounds(instanceId) {
@@ -413,7 +440,7 @@ function stepBg(dir) {
     <ToastContainer />
     <main class="app-body">
       <!-- Preview -->
-      <section class="preview-pane" @wheel.prevent="forwardScroll" @mouseenter="isBadgeActive = true" @mouseleave="isBadgeActive = false">
+      <section class="preview-pane" @wheel.prevent="forwardScroll" @mousemove="onStageMove" @mouseenter="isBadgeActive = true" @mouseleave="isBadgeActive = false">
         <canvas ref="particleCanvas" class="particle-canvas" />
 
         <button

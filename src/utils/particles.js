@@ -1,92 +1,108 @@
-const GOLD = '#e8c84a'
+// Unified foundry-spark engine on a transparent canvas overlay.
+// A single persistent rAF loop drives both the pointer sparks (emit) and the
+// on-change burst (burst): warm forge colours, gravity, streak trails, additive
+// glow. The loop parks itself when no sparks are alive.
 
-// One-shot particle burst on a transparent canvas overlay.
-// cx/cy: badge center in canvas pixel coordinates.
-export function burstParticles(canvas, cx, cy, palette) {
+const SPARK_COLORS = ['#ffffff', '#fff2cc', '#ffd36e', '#ffab2e', '#ff7a1a', '#e8c84a']
+const pick = () => SPARK_COLORS[Math.floor(Math.random() * SPARK_COLORS.length)]
+
+export function createSparkField(canvas) {
   const ctx = canvas.getContext('2d')
-  const colors = [
-    ...palette.filter(c => c && c.toUpperCase() !== '#000000'),
-    GOLD, GOLD, '#ffffff',
-  ]
+  let particles = []
+  let flash = 0
+  let raf = null
+  let running = false
 
-  const particles = []
-  const count = 32
-
-  for (let i = 0; i < count; i++) {
-    const angle  = Math.random() * Math.PI * 2
-    const speed  = 2.5 + Math.random() * 5.5
-    const radius = 50 + Math.random() * 100
-
-    particles.push({
-      x:     cx + Math.cos(angle) * radius * 0.4,
-      y:     cy + Math.sin(angle) * radius * 0.4,
-      vx:    Math.cos(angle) * speed,
-      vy:    Math.sin(angle) * speed - 1,
-      size:  1.2 + Math.random() * 2.8,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      life:  1,
-      decay: 0.02 + Math.random() * 0.028,
-      cross: Math.random() > 0.5,
-    })
-  }
-
-  // Brief flash on the canvas — the "hit" feeling
-  ctx.fillStyle = 'rgba(232, 200, 74, 0.12)'
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-  let rafId = null
-  let flashAlpha = 0.12
-
-  function frame() {
+  function step() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    // Fade out the initial flash
-    if (flashAlpha > 0) {
-      flashAlpha = Math.max(0, flashAlpha - 0.012)
-      ctx.fillStyle = `rgba(232, 200, 74, ${flashAlpha})`
+    // Warm flash from an anvil strike, fading out
+    if (flash > 0) {
+      flash = Math.max(0, flash - 0.012)
+      ctx.fillStyle = `rgba(255, 140, 40, ${flash})`
       ctx.fillRect(0, 0, canvas.width, canvas.height)
     }
 
-    let any = false
+    ctx.globalCompositeOperation = 'lighter'
+    ctx.lineCap = 'round'
+    let alive = false
     for (const p of particles) {
       if (p.life <= 0) continue
-      any = true
-
-      p.x  += p.vx
-      p.y  += p.vy
-      p.vx *= 0.91
-      p.vy *= 0.91
+      alive = true
+      p.vy += p.grav
+      p.vx *= 0.985
+      p.x += p.vx
+      p.y += p.vy
       p.life -= p.decay
-
-      const a = Math.max(0, p.life)
-      ctx.globalAlpha = a
-      ctx.fillStyle   = p.color
-
-      if (p.cross) {
-        const s = p.size * 1.5
-        ctx.fillRect(p.x - s * 0.18, p.y - s * 0.65, s * 0.36, s * 1.3)
-        ctx.fillRect(p.x - s * 0.65, p.y - s * 0.18, s * 1.3, s * 0.36)
-      } else {
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, Math.max(0.1, p.size * a), 0, Math.PI * 2)
-        ctx.fill()
-      }
+      const flicker = 0.6 + Math.random() * 0.4
+      ctx.globalAlpha = Math.max(0, p.life) * flicker
+      ctx.strokeStyle = p.color
+      ctx.lineWidth = p.size
+      ctx.beginPath()
+      ctx.moveTo(p.x, p.y)
+      ctx.lineTo(p.x - p.vx * 1.6, p.y - p.vy * 1.6) // streak along velocity
+      ctx.stroke()
     }
-
     ctx.globalAlpha = 1
+    ctx.globalCompositeOperation = 'source-over'
+    particles = particles.filter(p => p.life > 0)
 
-    if (any || flashAlpha > 0) {
-      rafId = requestAnimationFrame(frame)
+    if (alive || flash > 0) {
+      raf = requestAnimationFrame(step)
     } else {
+      running = false
       ctx.clearRect(0, 0, canvas.width, canvas.height)
     }
   }
 
-  cancelAnimationFrame(rafId)
-  rafId = requestAnimationFrame(frame)
+  function ensureRunning() {
+    if (!running) { running = true; raf = requestAnimationFrame(step) }
+  }
 
-  return () => {
-    cancelAnimationFrame(rafId)
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
+  return {
+    // Pointer sparks: a few embers thrown off (x,y), popping up/out then falling.
+    emit(x, y, n = 2, speed = 1) {
+      for (let i = 0; i < n; i++) {
+        const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI // mostly upward, spread
+        const v = (1 + Math.random() * 2.2) * speed
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * v + (Math.random() - 0.5),
+          vy: Math.sin(angle) * v,
+          size: 0.7 + Math.random() * 1.2,
+          color: pick(),
+          life: 1,
+          decay: 0.03 + Math.random() * 0.028,
+          grav: 0.10 + Math.random() * 0.09,
+        })
+      }
+      ensureRunning()
+    },
+    // On-change burst: sparks fly off an anvil strike from (cx,cy).
+    burst(cx, cy) {
+      flash = 0.14
+      for (let i = 0; i < 44; i++) {
+        const angle = Math.random() * Math.PI * 2
+        const v = 3 + Math.random() * 6.5
+        particles.push({
+          x: cx + (Math.random() - 0.5) * 20,
+          y: cy + (Math.random() - 0.5) * 20,
+          vx: Math.cos(angle) * v,
+          vy: Math.sin(angle) * v - 2.5, // bias upward like struck sparks
+          size: 0.8 + Math.random() * 1.7,
+          color: pick(),
+          life: 1,
+          decay: 0.016 + Math.random() * 0.018,
+          grav: 0.13 + Math.random() * 0.08,
+        })
+      }
+      ensureRunning()
+    },
+    stop() {
+      cancelAnimationFrame(raf)
+      running = false
+      particles = []
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height)
+    },
   }
 }
