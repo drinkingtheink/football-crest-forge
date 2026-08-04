@@ -485,8 +485,8 @@ function stepBg(dir) {
             <button class="start-over-btn" @click="startOver" title="Clear the current design and start fresh">
               ↺ Start Over
             </button>
-            <button class="swap-colors-btn" @click="randomizeColors" title="Load a random club's colors">
-              ⇄ Swap Colors
+            <button class="swap-colors-btn" @click="randomizeColors" title="Recast the palette">
+              ⇄ Recast
             </button>
             <button class="scene-toggle" @click="showScene = !showScene" title="Toggle scene controls">
               {{ showScene ? '▲ scene' : '▼ scene' }}
@@ -495,7 +495,7 @@ function stepBg(dir) {
 
           <Transition name="scene-fade">
           <div v-show="showScene" class="scene-controls">
-            <p class="drag-hint hud-pill">Drag or arrow-key symbols &amp; text &nbsp;·&nbsp; Shift+Arrow = 10px &nbsp;·&nbsp; ⌘C / ⌘V to copy &amp; paste &nbsp;·&nbsp; Space to randomize &nbsp;·&nbsp; ⌘S to snapshot</p>
+            <p class="drag-hint hud-pill">Drag or arrow-key symbols &amp; text &nbsp;·&nbsp; Shift+Arrow = 10px &nbsp;·&nbsp; ⌘C / ⌘V to copy &amp; paste &nbsp;·&nbsp; Space to forge &nbsp;·&nbsp; ⌘S to snapshot</p>
 
             <div class="bg-picker hud-pill">
               <button
@@ -549,10 +549,10 @@ function stepBg(dir) {
       <aside class="controls-pane" ref="controlsPane">
 
         <div class="logo-row">
-          <p class="logo">⚔ Crest Foundry</p>
+          <p class="logo">⚒ Crest Foundry</p>
           <div class="logo-actions">
             <button class="about-btn" title="About &amp; credits" @click="showAbout = true">ⓘ</button>
-            <button class="randomize-btn" title="Randomize everything" @click="randomizeAll">⚡</button>
+            <button class="randomize-btn" title="Forge a new crest" @click="randomizeAll">⚡</button>
           </div>
         </div>
 
@@ -574,7 +574,7 @@ function stepBg(dir) {
         <div class="control-group">
           <h3 class="control-label">Club Colors</h3>
           <ClubPicker @apply="applyClub" />
-          <button class="random-colors-btn" @click="randomizeColors" title="Load a random club's colors">⚡ Random Club Colors</button>
+          <button class="random-colors-btn" @click="randomizeColors" title="Recast with a random club's colors">⚡ Recast Colors</button>
           <div v-if="activeClub" class="active-club">
             <span class="active-club-dot" />
             <span class="active-club-label">Showing</span>

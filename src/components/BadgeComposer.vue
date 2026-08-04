@@ -367,6 +367,15 @@ const bgElements = computed(() => {
         <stop offset="0%"   stop-color="black" stop-opacity="0.28" />
         <stop offset="30%"  stop-color="black" stop-opacity="0"    />
       </linearGradient>
+
+      <!-- Metallic bevel: specular edge highlight from a top-left light (presentation only) -->
+      <filter :id="`bevel-${uid}`" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2.4" result="blur" />
+        <feSpecularLighting in="blur" surfaceScale="4" specularConstant="0.85" specularExponent="22" lighting-color="#ffffff" result="spec">
+          <feDistantLight azimuth="235" elevation="58" />
+        </feSpecularLighting>
+        <feComposite in="spec" in2="SourceAlpha" operator="in" />
+      </filter>
     </defs>
 
     <!-- Background -->
@@ -458,6 +467,11 @@ const bgElements = computed(() => {
       <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-right-${uid})`"  />
       <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-top-${uid})`"    />
       <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-bottom-${uid})`" />
+    </g>
+
+    <!-- Metallic bevel (presentation only) — raised edge highlight, clipped to shield -->
+    <g v-if="!config.noShield" :clip-path="`url(#${clipId})`" style="pointer-events:none">
+      <path :d="shape.path" fill="#000" :filter="`url(#bevel-${uid})`" :style="{ opacity: 0.6 }" />
     </g>
 
     <!-- Free symbols (unclipped — may extend outside badge bounds) -->
