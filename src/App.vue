@@ -280,6 +280,19 @@ function onStageMove(e) {
   sparkField.emit(x, y, n, Math.min(1.5, 0.65 + speed))
 }
 
+// Denser ember trail while dragging a symbol/text — like moving hot metal.
+let _emberT = 0
+function onDragEmber(clientX, clientY) {
+  if (reduceMotion || !sparkField) return
+  const c = particleCanvas.value
+  if (!c) return
+  const now = performance.now()
+  if (now - _emberT < 28) return
+  _emberT = now
+  const cr = c.getBoundingClientRect()
+  sparkField.emit(clientX - cr.left, clientY - cr.top, 2 + Math.floor(Math.random() * 2), 1)
+}
+
 function forwardScroll(e) {
   controlsPane.value?.scrollBy({ top: e.deltaY, behavior: 'auto' })
 }
@@ -476,6 +489,7 @@ function stepBg(dir) {
             @select-text="selectText"
             @deselect="deselectAll"
             @symbol-outside-bounds="onSymbolOutsideBounds"
+            @ember="onDragEmber"
           />
         </div>
         </div>

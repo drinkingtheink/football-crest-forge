@@ -15,7 +15,7 @@ const props = defineProps({
   uid: { type: String, default: 'b0' },
 })
 
-const emit = defineEmits(['update-text-position', 'update-symbol-position', 'update-text', 'update-symbol', 'select-symbol', 'select-text', 'deselect', 'symbol-outside-bounds'])
+const emit = defineEmits(['update-text-position', 'update-symbol-position', 'update-text', 'update-symbol', 'select-symbol', 'select-text', 'deselect', 'symbol-outside-bounds', 'ember'])
 
 function arcPathId(textId) { return `arcpath-${props.uid}-${textId}` }
 
@@ -117,6 +117,7 @@ function startSymbolDrag(e, instanceId) {
 
 function onMove(e) {
   if (!drag.value) return
+  emit('ember', e.clientX, e.clientY) // shed a hot-metal ember trail while dragging
   const pt = toSVGPoint(e.currentTarget, e.clientX, e.clientY)
   const dx = pt.x - drag.value.sx
   const dy = pt.y - drag.value.sy
