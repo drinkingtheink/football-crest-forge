@@ -18,9 +18,10 @@ const ICONS_JS = join(ROOT, 'src/data/icons.js')
 const STAGING = join(ROOT, 'src/data/symbols-to-be-processed')
 
 const MANIFEST = [
-  { file: 'dragon.svg',   id: 'dragon-5', label: 'Dragon 5', group: 'Beasts' },
-  { file: 'dragon-2.svg', id: 'dragon-6', label: 'Dragon 6', group: 'Beasts' },
-  { file: 'gryphon.svg',  id: 'gryphon',  label: 'Gryphon',  group: 'Beasts' },
+  { file: 'emblem.svg',   id: 'emblem',   label: 'Emblem',   group: 'Emblems', extraGroups: ['Heraldic'] },
+  { file: 'emblem-2.svg', id: 'emblem-2', label: 'Emblem 2', group: 'Emblems', extraGroups: ['Heraldic'] },
+  { file: 'emblem-3.svg', id: 'emblem-3', label: 'Emblem 3', group: 'Emblems', extraGroups: ['Heraldic'] },
+  { file: 'emblem-4.svg', id: 'emblem-4', label: 'Emblem 4', group: 'Emblems', extraGroups: ['Heraldic'] },
 ]
 
 function parseViewBox(svg) {
@@ -38,12 +39,15 @@ function extractPaths(svg) {
   return ds
 }
 
-function formatEntry({ id, label, group }, viewBox, paths) {
+function formatEntry({ id, label, group, extraGroups }, viewBox, paths) {
   const pathsLiteral = paths.map(d => `'${d}'`).join(',\n      ')
+  const extra = extraGroups?.length
+    ? `\n    extraGroups: [${extraGroups.map(g => `'${g}'`).join(', ')}],`
+    : ''
   return `  {
     id: '${id}',
     label: '${label}',
-    group: '${group}',
+    group: '${group}',${extra}
     viewBox: [${viewBox[0]}, ${viewBox[1]}],
     paths: [
       ${pathsLiteral},
