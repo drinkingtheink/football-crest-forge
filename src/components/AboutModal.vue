@@ -12,8 +12,9 @@ const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'lucas
         <div class="about-modal" role="dialog" aria-label="About Crest Foundry">
           <button class="about-close" title="Close" @click="$emit('close')">×</button>
 
-          <h2 class="about-title">⚔ Crest Foundry</h2>
+          <h2 class="about-title">⚒ Crest Foundry</h2>
           <p class="about-tagline">Design and export your own football club crest.</p>
+          <p class="about-byline">A project by <a href="https://www.drinkingtheink.com/" target="_blank" rel="noopener">Jason M Harrison</a></p>
 
           <div class="about-section">
             <h3 class="about-heading">Credits</h3>
@@ -80,10 +81,22 @@ const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'lucas
 }
 
 .about-tagline {
-  margin: 0 0 20px;
+  margin: 0 0 3px;
   font-size: 13px;
   color: #888;
 }
+
+.about-byline {
+  margin: 0 0 20px;
+  font-size: 12px;
+  color: #888;
+}
+.about-byline a {
+  color: #e8c84a;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(232, 200, 74, 0.35);
+}
+.about-byline a:hover { border-bottom-color: #e8c84a; }
 
 .about-heading {
   margin: 0 0 6px;
