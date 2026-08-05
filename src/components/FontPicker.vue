@@ -7,8 +7,7 @@ const emit = defineEmits(['change', 'preview'])
 
 const open = ref(false)
 const search = ref('')
-let originalValue = ''   // font when the panel opened, for revert-on-cancel
-let committed = false
+let baseline = ''   // last committed font — the revert target when closing without a pick
 const triggerRef = ref(null)
 const panelRef = ref(null)
 const listRef = ref(null)
@@ -52,8 +51,7 @@ function observeRows() {
 
 async function openPanel() {
   open.value = true
-  originalValue = props.value
-  committed = false
+  baseline = props.value
   if (props.value) loadFont(props.value)
   await nextTick()
   position()
@@ -63,8 +61,8 @@ async function openPanel() {
 }
 function closePanel() {
   if (!open.value) return
-  // Revert the live preview if the panel closes without a pick.
-  if (!committed && props.value !== originalValue) emit('preview', originalValue)
+  // Revert any lingering hover-preview back to the last committed font.
+  if (props.value !== baseline) emit('preview', baseline)
   open.value = false
   search.value = ''
   io?.disconnect(); io = null
@@ -80,11 +78,11 @@ function previewFont(family) {
   emit('preview', family)
 }
 
+// Commit the font but keep the menu open — it only closes on click/focus elsewhere.
 function choose(family) {
-  committed = true
+  baseline = family
   emit('change', family)
   loadFont(family)
-  closePanel()
 }
 
 watch(groups, () => { if (open.value) nextTick(observeRows) })

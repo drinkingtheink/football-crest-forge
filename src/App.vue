@@ -353,8 +353,10 @@ const _designFingerprint = computed(() => JSON.stringify({
   palette:    config.palette,
   background: config.background,
   border:     config.border,
-  texts:   config.texts.map(({ id, content, fontFamily, fontWeight, fontSize, color, letterSpacing, arc, arcRx, arcRy }) =>
-             ({ id, content, fontFamily, fontWeight, fontSize, color, letterSpacing, arc, arcRx, arcRy })),
+  // fontFamily is intentionally excluded — hovering the font picker live-previews
+  // fonts, and we don't want the forge burst/pulse firing on every hover.
+  texts:   config.texts.map(({ id, content, fontWeight, fontSize, color, letterSpacing, arc, arcRx, arcRy }) =>
+             ({ id, content, fontWeight, fontSize, color, letterSpacing, arc, arcRx, arcRy })),
   symbols: config.symbols.map(({ instanceId, iconId, color, size }) =>
              ({ instanceId, iconId, color, size })),
 }))
@@ -376,6 +378,7 @@ function onDocumentClick(e) {
   if (!selectedSymbolId.value && !selectedTextId.value) return
   if (e.target.closest('svg')) return
   if (e.target.closest('.symbol-item, .text-item')) return
+  if (e.target.closest('.fp-panel')) return // teleported font-picker panel — keep the text selected
   deselectAll()
 }
 
