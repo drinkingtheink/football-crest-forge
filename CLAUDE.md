@@ -7,20 +7,18 @@ Club crest creator app. Users design crests/badges for any kind of club — foot
 - **Vue 3 + Vite** (no TypeScript)
 - **Plain scoped CSS** — no utility framework. Tailwind was explicitly rejected. Global resets in `src/style.css`, component styles in `<style scoped>`.
 - **`@vueuse/core`** — used for composable utilities
+- **`opentype.js`** — SVG export text→outline (lazy-loaded only on export). Reads WOFF v1; fonts pulled from Fontsource/jsDelivr.
 - No backend yet (Phase 2: Supabase for save/share/gallery)
 
 ## Phase 2 — Export pipeline
 
 ### PNG + SVG export (SHIPPED) — `src/utils/exportBadge.js`
-Both formats share `buildCleanCrestSvg(svgEl, texts)`: clones the live badge `<svg>`, strips `[data-export-hide]` layers (shimmer/depth/guides/size-hint/hit-test, tagged in `BadgeComposer.vue`), drops the drop-shadow filter, and inlines used fonts.
-- **PNG** (`exportCrestPng`): rasterizes that clone via `<img>`→canvas, transparent bg, ~1600×1920.
-- **SVG** (`exportCrestSvg`): serializes the clone (viewBox `0 0 200 240`, nominal 800×960), transparent bg. Text stays as real `<text>`.
-- **Fonts** are the crux: a standalone SVG (rasterized or opened as a file) does NOT inherit page fonts. `embedFont(family, chars)` fetches the family's Google Fonts CSS **subsetted to only the used glyphs** (`&text=`) and inlines the woff2 as base64 `@font-face`, so exports are self-contained and tiny. Verified: a `file://` SVG renders its blackletter/serif text correctly with no app or network context. Handles all app fonts and weights (bold included) since it embeds the exact woff2 the browser uses.
-- Filenames via `crestFilename(texts, ext)` → always `crest-foundry-<slug>.<ext>`.
-- Toolbar buttons "⬇ PNG" / "⬇ SVG" (`App.vue`), guarded by `isExporting`.
-
-### Text → path outlining (opentype.js) — NOT built; optional future enhancement
-The shipped SVG embeds webfonts rather than outlining glyphs. Outlining would matter only for tools that ignore SVG `@font-face` (notably Illustrator; Inkscape/browsers honor it). Deferred because it's fragile in-browser: opentype.js can't read woff2 (what Google serves), and sourcing `.ttf` uniformly for 50+ fonts (many now variable-only, with weak bold-axis support in `getPath`) is unreliable. If pursued: lazy-load opentype.js, bundle a curated `.ttf` set, `font.getPath(text,x,y,size)` for straight text, per-glyph placement along the curve for arc text.
+Both formats start from `buildCleanCrestSvg(svgEl)`: clones the live badge `<svg>`, strips `[data-export-hide]` layers (shimmer/depth/guides/size-hint/hit-test, tagged in `BadgeComposer.vue`), drops the drop-shadow filter. Transparent background, viewBox `0 0 200 240`.
+- **PNG** (`exportCrestPng`): embeds used fonts as base64 `@font-face` (`embedFont` — Google Fonts CSS **subsetted to used glyphs** via `&text=`), then rasterizes the clone via `<img>`→canvas, ~1600×1920.
+- **SVG** (`exportCrestSvg`): converts every `<text>` to **vector outlines** ("Create Outlines") so the file has **zero font dependency** — a print shop needs no fonts, Illustrator/RIP-safe. `outlineTexts` measures per-glyph placement on the live element via the SVG DOM APIs `getStartPositionOfChar` / `getRotationOfChar` (these handle straight *and* curved textPath/arc text uniformly), and replaces each `<text>` with a `<g>` of `<path>` glyph outlines from opentype.js. Fallback: any font that fails to load stays as `<text>` with its font embedded.
+- **Fonts for outlining**: opentype.js (lazy `import()`, only on SVG export) reads **WOFF v1** natively, so `loadFontForOutline` fetches each family+weight as a static WOFF from **Fontsource on jsDelivr** (`@fontsource/<slug>/files/<slug>-latin-<weight>-normal.woff`; slug = lowercased family, spaces→hyphens). Real per-weight files → **correct bold** (no woff2/variable-font problems). All 56 app fonts resolve; weight falls back 700→400 if a weight is missing. `data-text-id` on the badge `<text>` elements matches live↔clone.
+- Verified in-browser: exported SVG has 0 `<text>`, 0 `@font-face`; straight + arc text render correctly as a bare `file://` with no app/network/fonts. Blackletter (UnifrakturMaguntia) and serif outlines match on-screen.
+- Filenames via `crestFilename(texts, ext)` → always `crest-foundry-<slug>.<ext>`. Toolbar "⬇ PNG" / "⬇ SVG" (`App.vue`), guarded by `isExporting`.
 
 ### Text stroke (deferred — build after export pipeline)
 - SVG `<text>` supports `stroke`/`stroke-width` natively; use `paint-order="stroke fill"` so stroke renders behind fill (same pattern already used on symbols)

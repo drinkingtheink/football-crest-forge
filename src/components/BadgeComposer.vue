@@ -509,6 +509,7 @@ const bgElements = computed(() => {
     <text
       v-for="text in config.texts.filter(t => !t.arc)"
       :key="text.id"
+      :data-text-id="text.id"
       :x="text.x"
       :y="text.y"
       :transform="text.rotation ? `rotate(${text.rotation}, ${text.x}, ${text.y})` : null"
@@ -535,6 +536,7 @@ const bgElements = computed(() => {
     <text
       v-for="text in config.texts.filter(t => t.arc)"
       :key="text.id"
+      :data-text-id="text.id"
       :font-family="text.fontFamily"
       :font-size="text.fontSize"
       :font-weight="text.fontWeight"
