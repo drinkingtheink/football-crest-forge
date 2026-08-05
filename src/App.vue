@@ -469,11 +469,11 @@ function randomizeAll() {
   }
 
   const nameFont = randomFonts[Math.floor(Math.random() * randomFonts.length)].family
-  const yearFont = randomFonts[Math.floor(Math.random() * randomFonts.length)].family
+  const monogramFont = randomFonts[Math.floor(Math.random() * randomFonts.length)].family
   loadFont(nameFont)
-  loadFont(yearFont)
+  loadFont(monogramFont)
   updateText('club-name', { y: 55, fontFamily: nameFont })
-  updateText('year', { y: 185, fontFamily: yearFont })
+  updateText('monogram', { y: 185, fontFamily: monogramFont })
   activeClub.value = club
 }
 
