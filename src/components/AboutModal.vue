@@ -13,7 +13,7 @@ const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'lucas
           <button class="about-close" title="Close" @click="$emit('close')">×</button>
 
           <h2 class="about-title">⚒ Crest Foundry</h2>
-          <p class="about-tagline">Design and export your own football club crest.</p>
+          <p class="about-tagline">Design and export a crest for any club — football, scholastic, recreational, intramural, social, role-playing, and more.</p>
           <p class="about-byline">A project by <a href="https://www.drinkingtheink.com/" target="_blank" rel="noopener">Jason M Harrison</a></p>
 
           <div class="about-section">

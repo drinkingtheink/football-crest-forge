@@ -1,6 +1,6 @@
 # Crest Foundry — Claude Code Context
 
-Football badge creator app for football enthusiasts. Users design club crests by combining shield shapes, heraldic symbols, background fills, text, and borders, then export them as PNG or SVG.
+Club crest creator app. Users design crests/badges for any kind of club — football/soccer first, but also scholastic, recreational, intramural, social, role-playing, and more — by combining shield shapes, heraldic symbols, background fills, text, and borders, then export them as PNG or SVG.
 
 ## Stack
 

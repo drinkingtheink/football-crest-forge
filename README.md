@@ -1,6 +1,6 @@
 # Crest Foundry
 
-A browser-based football badge creator for designing custom club crests. Combine shield shapes, heraldic symbols, background patterns, text, and borders — then snapshot your work for later.
+A browser-based club crest creator for designing custom badges for any club — football/soccer, scholastic, recreational, intramural, social, role-playing, and more. Combine shield shapes, heraldic symbols, background patterns, text, and borders — then snapshot your work for later.
 
 ---
 
