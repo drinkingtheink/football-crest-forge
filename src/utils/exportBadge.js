@@ -119,6 +119,32 @@ function flattenPaintOrder(root) {
   })
 }
 
+// Compute the export frame in viewBox user units. Defaults to the badge frame
+// (0 0 200 240), but EXPANDS to include any content dragged outside it (free
+// symbols, arc text, etc.) plus a small margin — so nothing gets clipped or left
+// off the artboard. Measured on the live (laid-out) SVG with the decorative
+// data-export-hide layers hidden so they don't skew the bounds.
+function exportFrame(svgEl) {
+  const MARGIN = 8
+  const hidden = [...svgEl.querySelectorAll('[data-export-hide]')]
+  const prevDisplay = hidden.map(el => el.style.display)
+  hidden.forEach(el => { el.style.display = 'none' })
+  let bb
+  try { bb = svgEl.getBBox() } catch { bb = null } finally {
+    hidden.forEach((el, i) => { el.style.display = prevDisplay[i] })
+  }
+  if (!bb || !bb.width || !bb.height) return { x: 0, y: 0, w: VIEWBOX_W, h: VIEWBOX_H }
+
+  const bx2 = bb.x + bb.width, by2 = bb.y + bb.height
+  const x1 = bb.x < 0 ? bb.x - MARGIN : 0
+  const y1 = bb.y < 0 ? bb.y - MARGIN : 0
+  const x2 = bx2 > VIEWBOX_W ? bx2 + MARGIN : VIEWBOX_W
+  const y2 = by2 > VIEWBOX_H ? by2 + MARGIN : VIEWBOX_H
+  return { x: x1, y: y1, w: x2 - x1, h: y2 - y1 }
+}
+
+const fmt = n => Number(n.toFixed(2))
+
 // ── Clean clone shared by both formats ──────────────────────────────────────
 // Strip decorative / interaction-only layers (data-export-hide) and the
 // presentation drop-shadow. Keeps the `0 0 200 240` viewBox; callers set size.
@@ -231,11 +257,15 @@ async function outlineTexts(liveSvg, clone, texts) {
 
 // Rasterize the live badge <svg> to a transparent PNG and download it.
 export async function exportCrestPng(svgEl, { texts = [], pxWidth = 1600, filename = 'crest.png' } = {}) {
+  const frame = exportFrame(svgEl)
   const clone = buildCleanCrestSvg(svgEl)
   await embedFontsInto(clone, texts)
-  const pxHeight = Math.round(pxWidth * VIEWBOX_H / VIEWBOX_W)
-  clone.setAttribute('width', pxWidth)
-  clone.setAttribute('height', pxHeight)
+  const density = pxWidth / VIEWBOX_W // keep crest detail constant if the frame expands
+  const outW = Math.round(frame.w * density)
+  const outH = Math.round(frame.h * density)
+  clone.setAttribute('viewBox', `${fmt(frame.x)} ${fmt(frame.y)} ${fmt(frame.w)} ${fmt(frame.h)}`)
+  clone.setAttribute('width', outW)
+  clone.setAttribute('height', outH)
 
   const svgStr = new XMLSerializer().serializeToString(clone)
   const url = URL.createObjectURL(new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' }))
@@ -244,9 +274,9 @@ export async function exportCrestPng(svgEl, { texts = [], pxWidth = 1600, filena
       const img = new Image()
       img.onload = () => {
         const canvas = document.createElement('canvas')
-        canvas.width = pxWidth
-        canvas.height = pxHeight
-        canvas.getContext('2d').drawImage(img, 0, 0, pxWidth, pxHeight)
+        canvas.width = outW
+        canvas.height = outH
+        canvas.getContext('2d').drawImage(img, 0, 0, outW, outH)
         canvas.toBlob((pngBlob) => {
           if (!pngBlob) return reject(new Error('PNG encode failed'))
           triggerDownload(pngBlob, filename)
@@ -265,6 +295,7 @@ export async function exportCrestPng(svgEl, { texts = [], pxWidth = 1600, filena
 // to vector outlines (no font dependency). If a font can't be loaded to outline,
 // that text is left as <text> and its font is embedded as a fallback.
 export async function exportCrestSvg(svgEl, { texts = [], pxWidth = 800, filename = 'crest.svg' } = {}) {
+  const frame = exportFrame(svgEl)
   const clone = buildCleanCrestSvg(svgEl)
   flattenPaintOrder(clone)
 
@@ -277,8 +308,10 @@ export async function exportCrestSvg(svgEl, { texts = [], pxWidth = 800, filenam
   }
   if (failed.length) await embedFontsInto(clone, failed)
 
-  clone.setAttribute('width', pxWidth)
-  clone.setAttribute('height', Math.round(pxWidth * VIEWBOX_H / VIEWBOX_W))
+  const density = pxWidth / VIEWBOX_W
+  clone.setAttribute('viewBox', `${fmt(frame.x)} ${fmt(frame.y)} ${fmt(frame.w)} ${fmt(frame.h)}`)
+  clone.setAttribute('width', Math.round(frame.w * density))
+  clone.setAttribute('height', Math.round(frame.h * density))
 
   const svgStr = '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone)
   triggerDownload(new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' }), filename)
