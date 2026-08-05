@@ -815,6 +815,26 @@ function stepBg(dir) {
           </div>
         </div>
 
+        <!-- Border -->
+        <div class="control-group" :class="{ 'group-disabled': config.noShield }">
+          <h3 class="control-label">Border</h3>
+          <div class="bg-color-row" style="margin-bottom: 10px">
+            <span class="color-label">Color</span>
+            <ColorPicker :value="config.border.color" @change="setBorderColor($event)" />
+          </div>
+          <div class="range-row">
+            <label>
+              Thickness
+              <input
+                type="range" min="0" max="12" step="0.5"
+                :value="config.border.width"
+                @input="setBorderWidth($event.target.value)"
+              />
+              <span>{{ config.border.width }}</span>
+            </label>
+          </div>
+        </div>
+
         <!-- Text -->
         <div class="control-group">
           <h3 class="control-label">Text</h3>
@@ -947,26 +967,6 @@ function stepBg(dir) {
               </div>
               </Transition>
             </div>
-          </div>
-        </div>
-
-        <!-- Border -->
-        <div class="control-group" :class="{ 'group-disabled': config.noShield }">
-          <h3 class="control-label">Border</h3>
-          <div class="bg-color-row" style="margin-bottom: 10px">
-            <span class="color-label">Color</span>
-            <ColorPicker :value="config.border.color" @change="setBorderColor($event)" />
-          </div>
-          <div class="range-row">
-            <label>
-              Thickness
-              <input
-                type="range" min="0" max="12" step="0.5"
-                :value="config.border.width"
-                @input="setBorderWidth($event.target.value)"
-              />
-              <span>{{ config.border.width }}</span>
-            </label>
           </div>
         </div>
 
