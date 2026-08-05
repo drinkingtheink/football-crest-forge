@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref, reactive, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import BadgeComposer from './components/BadgeComposer.vue'
+import LogoMark from './components/LogoMark.vue'
 import IconPicker from './components/IconPicker.vue'
 import TextEditor from './components/TextEditor.vue'
 import ToastContainer from './components/ToastContainer.vue'
@@ -627,7 +628,7 @@ function stepBg(dir) {
 
         <div class="logo-row">
           <div class="logo-block">
-            <p class="logo">⚒ Crest Foundry</p>
+            <p class="logo"><LogoMark class="logo-mark-inline" />Crest Foundry</p>
             <a class="logo-byline" href="https://www.drinkingtheink.com/" target="_blank" rel="noopener">A project by Jason M Harrison</a>
           </div>
           <div class="logo-actions">
@@ -1004,6 +1005,9 @@ function stepBg(dir) {
 }
 
 .logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 17px;
   font-weight: 700;
   letter-spacing: 0.5px;
