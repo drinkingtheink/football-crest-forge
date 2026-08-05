@@ -16,7 +16,7 @@ import { shapes, shapesById } from './data/shapes.js'
 import { icons, iconsById } from './data/icons.js'
 import { auroraBg, wavesBg, crisscrossBg } from './utils/patterns.js'
 import { fonts, loadFont } from './utils/fonts.js'
-import { exportCrestPng, crestFilename } from './utils/exportBadge.js'
+import { exportCrestPng, exportCrestSvg, crestFilename } from './utils/exportBadge.js'
 import { createSparkField } from './utils/particles.js'
 import { useToast } from './composables/useToast.js'
 
@@ -467,19 +467,23 @@ const showAbout = ref(false)
 const badgeComposerRef = ref(null)
 const isExporting = ref(false)
 
-async function exportPng() {
+async function exportCrest(format) {
   const svgEl = badgeComposerRef.value?.svgRootEl
   if (!svgEl || isExporting.value) return
   isExporting.value = true
   try {
-    await exportCrestPng(svgEl, { texts: config.texts, filename: crestFilename(config.texts) })
-    addToast('PNG exported', { type: 'tip', duration: 2500 })
+    const opts = { texts: config.texts, filename: crestFilename(config.texts, format) }
+    if (format === 'svg') await exportCrestSvg(svgEl, opts)
+    else await exportCrestPng(svgEl, opts)
+    addToast(`${format.toUpperCase()} exported`, { type: 'tip', duration: 2500 })
   } catch (e) {
     addToast('Export failed — please try again', { type: 'tip', duration: 4000 })
   } finally {
     isExporting.value = false
   }
 }
+const exportPng = () => exportCrest('png')
+const exportSvg = () => exportCrest('svg')
 
 function stepBg(dir) {
   const idx = bgOptions.findIndex(o => o.id === appBg.value)
@@ -554,6 +558,9 @@ function stepBg(dir) {
             </button>
             <button class="export-png-btn" :disabled="isExporting" @click="exportPng" title="Download this crest as a transparent PNG">
               {{ isExporting ? '…' : '⬇ PNG' }}
+            </button>
+            <button class="export-png-btn" :disabled="isExporting" @click="exportSvg" title="Download this crest as a self-contained SVG">
+              {{ isExporting ? '…' : '⬇ SVG' }}
             </button>
             <button class="scene-toggle" @click="showScene = !showScene" title="Toggle scene controls">
               {{ showScene ? '▲ scene' : '▼ scene' }}

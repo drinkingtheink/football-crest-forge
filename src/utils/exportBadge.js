@@ -1,10 +1,11 @@
-// Rasterize the crest SVG to a transparent PNG and trigger a download.
+// Export the crest as a transparent PNG or a self-contained SVG.
 //
-// The badge SVG references Google web fonts by family name only. An SVG rendered
-// through <img>/drawImage runs in an isolated context that does NOT inherit the
-// page's loaded fonts, so text would fall back to a system serif. To render text
-// correctly we fetch each used font's files and inline them as base64 @font-face
-// rules inside the SVG before rasterizing.
+// The badge SVG references Google web fonts by family name only. A standalone
+// SVG (rasterized through <img> for PNG, or opened on its own as a file) does
+// NOT inherit the page's loaded fonts, so text would fall back to a system
+// serif. To keep text faithful we fetch each used font's files and inline them
+// as base64 @font-face rules inside the exported SVG. The same cleaned,
+// font-embedded SVG backs both the PNG (rasterized) and SVG (serialized) paths.
 
 const VIEWBOX_W = 200
 const VIEWBOX_H = 240
@@ -64,6 +65,17 @@ function slugify(str) {
     .replace(/^-+|-+$/g, '')
 }
 
+function triggerDownload(blob, filename) {
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
+}
+
 // Build a download filename from the crest's texts (prefer the club-name row),
 // always prefixed with the app name.
 export function crestFilename(texts, ext = 'png') {
@@ -74,23 +86,21 @@ export function crestFilename(texts, ext = 'png') {
   return `crest-foundry${slug ? `-${slug}` : ''}.${ext}`
 }
 
-// Rasterize the live badge <svg> to a transparent PNG and download it.
-// svgEl: the on-screen BadgeComposer root <svg>
-// texts: config.texts (used to know which font families to embed)
-export async function exportCrestPng(svgEl, { texts = [], pxWidth = 1600, filename = 'crest.png' } = {}) {
+// Produce a cleaned, self-contained clone of the live badge <svg>:
+//   - decorative / interaction-only layers stripped (shimmer, depth overlay,
+//     guides, size hint, hit-test path — tagged data-export-hide),
+//   - presentation drop-shadow removed for crisp edges on transparency,
+//   - used fonts inlined as subsetted base64 @font-face so text is faithful.
+// The returned <svg> keeps its `0 0 200 240` viewBox; callers set width/height.
+async function buildCleanCrestSvg(svgEl, texts = []) {
   const clone = svgEl.cloneNode(true)
   clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
 
-  // Drop decorative / interaction-only layers (shimmer, depth overlay, guides,
-  // size hint, hit-test path) tagged in BadgeComposer.
   clone.querySelectorAll('[data-export-hide]').forEach(el => el.remove())
 
-  // Remove the presentation drop-shadow so edges stay crisp on transparency.
   clone.style.filter = 'none'
   clone.removeAttribute('filter')
 
-  // Embed fonts used by the crest text — one subsetted face per family, limited
-  // to the glyphs that family actually renders.
   const charsByFamily = new Map()
   for (const t of texts || []) {
     if (!t.fontFamily) continue
@@ -106,13 +116,18 @@ export async function exportCrestPng(svgEl, { texts = [], pxWidth = 1600, filena
     clone.insertBefore(style, clone.firstChild)
   }
 
+  return clone
+}
+
+// Rasterize the live badge <svg> to a transparent PNG and download it.
+export async function exportCrestPng(svgEl, { texts = [], pxWidth = 1600, filename = 'crest.png' } = {}) {
+  const clone = await buildCleanCrestSvg(svgEl, texts)
   const pxHeight = Math.round(pxWidth * VIEWBOX_H / VIEWBOX_W)
   clone.setAttribute('width', pxWidth)
   clone.setAttribute('height', pxHeight)
 
   const svgStr = new XMLSerializer().serializeToString(clone)
-  const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' })
-  const url = URL.createObjectURL(blob)
+  const url = URL.createObjectURL(new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' }))
 
   try {
     await new Promise((resolve, reject) => {
@@ -121,18 +136,10 @@ export async function exportCrestPng(svgEl, { texts = [], pxWidth = 1600, filena
         const canvas = document.createElement('canvas')
         canvas.width = pxWidth
         canvas.height = pxHeight
-        const ctx = canvas.getContext('2d')
-        ctx.drawImage(img, 0, 0, pxWidth, pxHeight)
+        canvas.getContext('2d').drawImage(img, 0, 0, pxWidth, pxHeight)
         canvas.toBlob((pngBlob) => {
           if (!pngBlob) return reject(new Error('PNG encode failed'))
-          const pngUrl = URL.createObjectURL(pngBlob)
-          const a = document.createElement('a')
-          a.href = pngUrl
-          a.download = filename
-          document.body.appendChild(a)
-          a.click()
-          a.remove()
-          URL.revokeObjectURL(pngUrl)
+          triggerDownload(pngBlob, filename)
           resolve()
         }, 'image/png')
       }
@@ -142,4 +149,17 @@ export async function exportCrestPng(svgEl, { texts = [], pxWidth = 1600, filena
   } finally {
     URL.revokeObjectURL(url)
   }
+}
+
+// Export the live badge as a self-contained, transparent-background SVG file.
+// Text stays as real <text> (crisp at any scale, still styleable) with the used
+// fonts embedded so the file renders identically anywhere it's opened.
+export async function exportCrestSvg(svgEl, { texts = [], pxWidth = 800, filename = 'crest.svg' } = {}) {
+  const clone = await buildCleanCrestSvg(svgEl, texts)
+  // Nominal intrinsic size for viewers that ignore the viewBox; scales cleanly.
+  clone.setAttribute('width', pxWidth)
+  clone.setAttribute('height', Math.round(pxWidth * VIEWBOX_H / VIEWBOX_W))
+
+  const svgStr = '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone)
+  triggerDownload(new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' }), filename)
 }

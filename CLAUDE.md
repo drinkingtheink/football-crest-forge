@@ -7,18 +7,20 @@ Club crest creator app. Users design crests/badges for any kind of club — foot
 - **Vue 3 + Vite** (no TypeScript)
 - **Plain scoped CSS** — no utility framework. Tailwind was explicitly rejected. Global resets in `src/style.css`, component styles in `<style scoped>`.
 - **`@vueuse/core`** — used for composable utilities
-- **`opentype.js`** — planned for SVG export (text → path outlines)
 - No backend yet (Phase 2: Supabase for save/share/gallery)
 
-## Phase 2 — Export pipeline (not yet built)
+## Phase 2 — Export pipeline
 
-### Text → path outlining (opentype.js)
-- Load `.ttf`/`.otf` font files (must be bundled — Google Fonts CSS doesn't expose raw files at stable URLs)
-- `font.getPath(text, x, y, fontSize)` returns bezier outlines identical to Illustrator's "Create Outlines"
-- Straight text: straightforward, call once per text element
-- Arc text: glyph positions must be computed along the curve manually; opentype.js supports this but it's more involved than straight text
-- Font strategy TBD: curated set of ~5–6 bundled fonts, or fetch `.ttf` on demand at export time
-- Load opentype.js **lazily** (only on export trigger, not on page load)
+### PNG + SVG export (SHIPPED) — `src/utils/exportBadge.js`
+Both formats share `buildCleanCrestSvg(svgEl, texts)`: clones the live badge `<svg>`, strips `[data-export-hide]` layers (shimmer/depth/guides/size-hint/hit-test, tagged in `BadgeComposer.vue`), drops the drop-shadow filter, and inlines used fonts.
+- **PNG** (`exportCrestPng`): rasterizes that clone via `<img>`→canvas, transparent bg, ~1600×1920.
+- **SVG** (`exportCrestSvg`): serializes the clone (viewBox `0 0 200 240`, nominal 800×960), transparent bg. Text stays as real `<text>`.
+- **Fonts** are the crux: a standalone SVG (rasterized or opened as a file) does NOT inherit page fonts. `embedFont(family, chars)` fetches the family's Google Fonts CSS **subsetted to only the used glyphs** (`&text=`) and inlines the woff2 as base64 `@font-face`, so exports are self-contained and tiny. Verified: a `file://` SVG renders its blackletter/serif text correctly with no app or network context. Handles all app fonts and weights (bold included) since it embeds the exact woff2 the browser uses.
+- Filenames via `crestFilename(texts, ext)` → always `crest-foundry-<slug>.<ext>`.
+- Toolbar buttons "⬇ PNG" / "⬇ SVG" (`App.vue`), guarded by `isExporting`.
+
+### Text → path outlining (opentype.js) — NOT built; optional future enhancement
+The shipped SVG embeds webfonts rather than outlining glyphs. Outlining would matter only for tools that ignore SVG `@font-face` (notably Illustrator; Inkscape/browsers honor it). Deferred because it's fragile in-browser: opentype.js can't read woff2 (what Google serves), and sourcing `.ttf` uniformly for 50+ fonts (many now variable-only, with weak bold-axis support in `getPath`) is unreliable. If pursued: lazy-load opentype.js, bundle a curated `.ttf` set, `font.getPath(text,x,y,size)` for straight text, per-glyph placement along the curve for arc text.
 
 ### Text stroke (deferred — build after export pipeline)
 - SVG `<text>` supports `stroke`/`stroke-width` natively; use `paint-order="stroke fill"` so stroke renders behind fill (same pattern already used on symbols)
@@ -45,7 +47,7 @@ src/
     icons.js            # ~270 heraldic SVG icons (single fill; viewBox 0 0 100 100, or per-icon `viewBox: [w, h]`)
   utils/
     arcPath.js          # Pure fn: generates SVG arc path string for textPath
-    exportBadge.js      # (planned) PNG + SVG export, opentype.js outlining
+    exportBadge.js      # PNG + SVG export (shared clean-SVG builder + font embedding)
     fonts.js            # Font registry + lazy Google Fonts loader (promise-based; EB Garamond pre-loaded in index.html)
   App.vue               # Layout shell + wires composable to components
   style.css             # Global reset only
