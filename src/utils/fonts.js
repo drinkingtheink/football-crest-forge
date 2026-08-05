@@ -132,6 +132,10 @@ export const fontsByGroup = Object.fromEntries(
   fontGroups.map(g => [g, fonts.filter(f => f.group === g)])
 )
 
+// Fonts eligible for random crest generation. Handwritten styles are excluded —
+// too informal for a crest, so they're last-choice / manual-pick only.
+export const randomFonts = fonts.filter(f => f.group !== 'Handwritten')
+
 // These are pre-loaded via <link> in index.html; mark them to skip the dynamic inject
 const loaded = new Set(['EB Garamond', 'Cormorant Garamond', 'Yeseva One'])
 

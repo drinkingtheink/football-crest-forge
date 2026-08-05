@@ -1,9 +1,7 @@
 <script setup>
-import { ref, watch, nextTick } from 'vue'
-import { fontGroups, fontsByGroup, loadFont } from '../utils/fonts.js'
+import { watch, nextTick } from 'vue'
 import ColorPicker from './ColorPicker.vue'
-
-const loadingFont = ref(false)
+import FontPicker from './FontPicker.vue'
 
 const props = defineProps({
   texts: { type: Array, required: true },
@@ -34,12 +32,8 @@ const ARC_OPTS = [
   { value: 'bottom', label: 'Arc bottom' },
 ]
 
-async function onFontChange(textId, event) {
-  const family = event.target.value
+function onFontPick(textId, family) {
   emit('update-text', textId, { fontFamily: family })
-  loadingFont.value = true
-  await loadFont(family)
-  loadingFont.value = false
 }
 </script>
 
@@ -91,25 +85,7 @@ async function onFontChange(textId, event) {
 
           <div class="field">
             <span>Font</span>
-            <select
-              :value="text.fontFamily"
-              class="t-select"
-              @change="onFontChange(text.id, $event)"
-            >
-              <optgroup v-for="group in fontGroups" :key="group" :label="group">
-                <option
-                  v-for="font in fontsByGroup[group]"
-                  :key="font.family"
-                  :value="font.family"
-                >{{ font.family }}</option>
-              </optgroup>
-            </select>
-            <span
-              v-if="text.fontFamily"
-              class="font-preview"
-              :class="{ 'font-loading': loadingFont }"
-              :style="{ fontFamily: text.fontFamily }"
-            >{{ loadingFont ? 'loading…' : 'AaBbCc 123' }}</span>
+            <FontPicker :value="text.fontFamily" @change="onFontPick(text.id, $event)" />
           </div>
 
           <div class="field-row">
