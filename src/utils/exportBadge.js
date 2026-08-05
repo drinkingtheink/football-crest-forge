@@ -64,12 +64,14 @@ function slugify(str) {
     .replace(/^-+|-+$/g, '')
 }
 
-// Build a download filename from the crest's texts (prefer the club-name row).
-export function crestFilename(texts) {
+// Build a download filename from the crest's texts (prefer the club-name row),
+// always prefixed with the app name.
+export function crestFilename(texts, ext = 'png') {
   const name = texts?.find(t => t.id === 'club-name')?.content
     || texts?.[0]?.content
-    || 'crest'
-  return `${slugify(name) || 'crest'}.png`
+    || ''
+  const slug = slugify(name)
+  return `crest-foundry${slug ? `-${slug}` : ''}.${ext}`
 }
 
 // Rasterize the live badge <svg> to a transparent PNG and download it.
