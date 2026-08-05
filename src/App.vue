@@ -172,12 +172,18 @@ const reduceMotion = typeof window !== 'undefined'
 const tilt = reactive({ rx: 0, ry: 0 })
 const isDraggingEl = ref(false)
 
+// Searing-hot cursor glow — follows the pointer over the stage, but not over the
+// crest itself (where the tilt takes over).
+const hotCursor = reactive({ x: 0, y: 0 })
+const overCrest = ref(false)
+
 // Tilt is a hover-only affordance — flatten and suspend it while dragging so
 // it doesn't fight precise alignment.
 function onElDragStart() { isDraggingEl.value = true; tilt.rx = 0; tilt.ry = 0 }
 function onElDragEnd() { isDraggingEl.value = false }
 
 function onBadgeMove(e) {
+  overCrest.value = true // over the crest → suppress the hot-cursor glow
   if (reduceMotion || isDraggingEl.value || !badgeTiltRef.value) return
   const r = badgeTiltRef.value.getBoundingClientRect()
   const px = (e.clientX - r.left) / r.width
@@ -188,6 +194,7 @@ function onBadgeMove(e) {
 }
 function onBadgeLeave() {
   tilt.rx = 0; tilt.ry = 0
+  overCrest.value = false
 }
 
 function onKeyDown(e) {
@@ -278,6 +285,7 @@ function onStageMove(e) {
   const cr = c.getBoundingClientRect()
   const x = e.clientX - cr.left
   const y = e.clientY - cr.top
+  hotCursor.x = x; hotCursor.y = y // track the hot-cursor glow position
   const now = performance.now()
   let speed = 0
   if (_lastSparkPos) {
@@ -512,6 +520,12 @@ function stepBg(dir) {
       <!-- Preview -->
       <section class="preview-pane" @wheel.prevent="forwardScroll" @mousemove="onStageMove" @mouseenter="isBadgeActive = true" @mouseleave="isBadgeActive = false">
         <canvas ref="particleCanvas" class="particle-canvas" />
+        <!-- Searing-hot cursor glow — shown over the stage, off when over the crest -->
+        <div
+          v-show="isBadgeActive && !overCrest && !reduceMotion"
+          class="hot-cursor"
+          :style="{ left: hotCursor.x + 'px', top: hotCursor.y + 'px' }"
+        />
         <!-- Warm forge glow at the base of the stage (behind the badge, above the background) -->
         <div class="forge-glow" />
 
@@ -1150,6 +1164,29 @@ function stepBg(dir) {
   z-index: 5;
   width: 100%;
   height: 100%;
+}
+
+/* Searing-hot cursor glow that trails the pointer over the stage */
+.hot-cursor {
+  position: absolute;
+  z-index: 4;
+  width: 54px;
+  height: 54px;
+  margin: -27px 0 0 -27px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle,
+    rgba(255, 172, 62, 0.55) 0%,
+    rgba(255, 120, 26, 0.30) 34%,
+    rgba(255, 90, 10, 0) 70%);
+  mix-blend-mode: screen;
+  filter: blur(3px);
+  animation: hot-cursor-pulse 1.6s ease-in-out infinite;
+  will-change: left, top;
+}
+@keyframes hot-cursor-pulse {
+  0%, 100% { opacity: 0.82; transform: scale(0.94); }
+  50%      { opacity: 1;    transform: scale(1.06); }
 }
 
 /* Warm coal-glow at the base of the crest stage — subtle, breathing */
