@@ -60,7 +60,7 @@ const {
 
 const clipboard = ref(null)
 
-const bgTypes = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'chevron', 'sash', 'striped-v', 'striped-h', 'striped-diagonal', 'checkered', 'saltire', 'sunburst']
+const bgTypes = ['solid', 'gradient', 'radial', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'chevron', 'sash', 'striped-v', 'striped-h', 'striped-diagonal', 'checkered', 'saltire', 'sunburst']
 const stripeTypes = new Set(['striped-v', 'striped-h', 'striped-diagonal', 'checkered'])
 const imageBgTypes = new Set(['grass', 'stadium', 'fabric', 'brick', 'pitch'])
 

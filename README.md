@@ -31,7 +31,7 @@ A browser-based club crest creator for designing custom badges for any club — 
 ## Features
 
 - **Shield shapes** — multiple traditional badge silhouettes
-- **Background patterns** — solid, halved, quartered, diagonal, chevron, sash, and striped variants
+- **Background patterns** — solid, gradient (linear & radial), halved, quartered, diagonal, chevron, sash, and striped variants
 - **Heraldic symbols** — 400+ SVG icons across groups: Crowns, Beasts, Birds, Maritime, Weapons, Buildings, Heraldic, Celestial, Shapes, Flora, Industrial, Mythical, Fantasy, Emblems, Nature, Insects, and Sport
 - **Text layers** — straight or arc text with font, size, weight, letter-spacing, and color controls; drag to reposition, scroll to resize
 - **Border** — adjustable color and thickness

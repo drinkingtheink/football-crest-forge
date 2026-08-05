@@ -303,9 +303,21 @@ const bgElements = computed(() => {
       })
       return { rects: [{ x: 0, y: 0, w: W, h: H, fill: c0 }], polys }
     }
+    case 'gradient':
+      return { rects: [{ x: 0, y: 0, w: W, h: H, fill: `url(#bg-grad-${props.uid})` }], polys: [] }
+    case 'radial':
+      return { rects: [{ x: 0, y: 0, w: W, h: H, fill: `url(#bg-radial-${props.uid})` }], polys: [] }
     default:
       return { rects: [{ x: 0, y: 0, w: W, h: H, fill: c0 }], polys: [] }
   }
+})
+
+// Gradient stops spread evenly across the current palette, so the gradient
+// backgrounds recolour with the club palette like every other fill.
+const gradientStops = computed(() => {
+  const cols = props.config.palette.length ? props.config.palette : ['#000000']
+  if (cols.length === 1) return [{ offset: '0%', color: cols[0] }, { offset: '100%', color: cols[0] }]
+  return cols.map((c, i) => ({ offset: `${Math.round((i / (cols.length - 1)) * 100)}%`, color: c }))
 })
 </script>
 
@@ -347,6 +359,14 @@ const bgElements = computed(() => {
         :d="arcPathD(text)"
         fill="none"
       />
+      <!-- Palette background gradients (linear diagonal + radial) -->
+      <linearGradient v-if="config.background.type === 'gradient'" :id="`bg-grad-${uid}`" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop v-for="(s, i) in gradientStops" :key="i" :offset="s.offset" :stop-color="s.color" />
+      </linearGradient>
+      <radialGradient v-if="config.background.type === 'radial'" :id="`bg-radial-${uid}`" cx="50%" cy="42%" r="72%">
+        <stop v-for="(s, i) in gradientStops" :key="i" :offset="s.offset" :stop-color="s.color" />
+      </radialGradient>
+
       <!-- Shimmer gradient: narrow white band, feathered edges -->
       <linearGradient :id="`shimmer-grad-${uid}`" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%"   stop-color="white" stop-opacity="0" />
