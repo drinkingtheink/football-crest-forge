@@ -33,8 +33,8 @@
   position: relative;
   display: inline-flex;
   flex: none;
-  width: 30px;
-  height: 34px;
+  width: 38px;
+  height: 43px;
   line-height: 0;
 }
 

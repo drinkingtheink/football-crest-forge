@@ -632,8 +632,11 @@ function stepBg(dir) {
 
         <div class="logo-row">
           <div class="logo-block">
-            <p class="logo"><LogoMark class="logo-mark-inline" />Crest Foundry</p>
-            <a class="logo-byline" href="https://www.drinkingtheink.com/" target="_blank" rel="noopener">A project by Jason M Harrison</a>
+            <LogoMark class="logo-mark-inline" />
+            <div class="logo-text">
+              <p class="logo"><span class="logo-title">Crest Foundry<i class="logo-ember e1" /><i class="logo-ember e2" /><i class="logo-ember e3" /><i class="logo-ember e4" /><i class="logo-ember e5" /></span></p>
+              <a class="logo-byline" href="https://www.drinkingtheink.com/" target="_blank" rel="noopener">A project by Jason M Harrison</a>
+            </div>
           </div>
           <div class="logo-actions">
             <button class="about-btn" title="About &amp; credits" @click="showAbout = true">ⓘ</button>
@@ -1012,8 +1015,13 @@ function stepBg(dir) {
 
 .logo-block {
   display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.logo-text {
+  display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 1px;
 }
 .logo-byline {
   font-size: 10px;
@@ -1023,6 +1031,38 @@ function stepBg(dir) {
   transition: color 0.15s;
 }
 .logo-byline:hover { color: #e8c84a; }
+
+/* Embers drifting up off the "Crest Foundry" logotype */
+.logo-title {
+  position: relative;
+  display: inline-block;
+}
+.logo-ember {
+  position: absolute;
+  bottom: 3px;
+  width: 2.5px;
+  height: 2.5px;
+  border-radius: 50%;
+  background: #ffd98a;
+  box-shadow: 0 0 5px 1px rgba(255, 140, 40, 0.85);
+  opacity: 0;
+  pointer-events: none;
+  animation: logo-ember-rise 3.4s ease-out infinite;
+}
+.logo-ember.e1 { left: 12%; --dx: -3px; animation-duration: 3.6s; animation-delay: -0.3s; }
+.logo-ember.e2 { left: 33%; --dx: 4px;  animation-duration: 4.4s; animation-delay: -1.7s; }
+.logo-ember.e3 { left: 52%; --dx: -2px; animation-duration: 3.9s; animation-delay: -2.9s; }
+.logo-ember.e4 { left: 71%; --dx: 5px;  animation-duration: 4.7s; animation-delay: -1.0s; }
+.logo-ember.e5 { left: 89%; --dx: -4px; animation-duration: 4.1s; animation-delay: -3.3s; }
+@keyframes logo-ember-rise {
+  0%   { transform: translate(0, 0) scale(1);            opacity: 0; }
+  8%   { opacity: 0.95; }
+  55%  { opacity: 0.5; }
+  100% { transform: translate(var(--dx), -22px) scale(0.35); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .logo-ember { display: none; }
+}
 
 .mode-switch {
   display: flex;
@@ -1056,12 +1096,11 @@ function stepBg(dir) {
 }
 
 .logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  font-family: 'Yeseva One', Georgia, serif;
+  font-size: 23px;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  line-height: 1.05;
   color: #e8c84a;
   margin: 0;
 }
