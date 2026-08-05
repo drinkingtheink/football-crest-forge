@@ -23,10 +23,12 @@ const { toasts, dismiss } = useToast()
 </template>
 
 <style scoped>
+/* Centered over the crest edit pane (viewport minus the right controls pane),
+   so the offset tracks the responsive sidebar width. */
 .toast-stack {
   position: fixed;
   top: 24px;
-  left: 50%;
+  left: calc(50% - 150px);
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
@@ -34,6 +36,14 @@ const { toasts, dismiss } = useToast()
   gap: 8px;
   z-index: 9999;
   pointer-events: none;
+}
+
+@media (min-width: 1440px) {
+  .toast-stack { left: calc(50% - 180px); }
+}
+
+@media (min-width: 1920px) {
+  .toast-stack { left: calc(50% - 210px); }
 }
 
 .toast {
