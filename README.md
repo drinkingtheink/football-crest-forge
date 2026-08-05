@@ -32,7 +32,7 @@ A browser-based club crest creator for designing custom badges for any club — 
 
 - **Shield shapes** — multiple traditional badge silhouettes
 - **Background patterns** — solid, halved, quartered, diagonal, chevron, sash, and striped variants
-- **Heraldic symbols** — 260+ SVG icons across groups: Crowns, Beasts, Birds, Maritime, Weapons, Buildings, Heraldic, Celestial, Shapes, Flora, Industrial, Mythical, Emblems, Nature, Insects, and Sport
+- **Heraldic symbols** — 400+ SVG icons across groups: Crowns, Beasts, Birds, Maritime, Weapons, Buildings, Heraldic, Celestial, Shapes, Flora, Industrial, Mythical, Fantasy, Emblems, Nature, Insects, and Sport
 - **Text layers** — straight or arc text with font, size, weight, letter-spacing, and color controls; drag to reposition, scroll to resize
 - **Border** — adjustable color and thickness
 - **Club color palette** — load real club colors or build a custom palette of up to 6 colors
@@ -42,6 +42,27 @@ A browser-based club crest creator for designing custom badges for any club — 
 - **Scroll to resize** — scroll over any symbol or text element to resize it in place
 - **Randomizer** — Space bar or ⚄ button generates a random badge from real club color data
 - **Snapshots** — save named design snapshots (config + thumbnail) to localStorage; load or delete from the in-app library; Cmd+S shortcut
+- **Export** — download your crest as a transparent **PNG** or a self-contained **SVG** (see below)
+
+---
+
+## Export
+
+Two one-click downloads from the badge toolbar; both have a fully transparent background outside the shield.
+
+- **⬇ PNG** — high-resolution raster (~1600×1920). Fonts are embedded during rasterization, so text is always faithful.
+- **⬇ SVG** — a self-contained vector file with **all text converted to outlines** ("Create Outlines"). No fonts are required to open or print it anywhere — glyphs are real `<path>` geometry, so it drops cleanly into Illustrator, Inkscape, or a print RIP.
+
+Both files are named `crest-foundry-<club-name>.<ext>`.
+
+**How it works & gotchas learned**
+
+- **Fonts in exports:** a standalone SVG (rasterized via `<img>` for PNG, or opened as a file) does **not** inherit the page's web fonts. PNG embeds each used font as a subsetted base64 `@font-face`; SVG outlines the glyphs instead (via [opentype.js](https://github.com/opentypejs/opentype.js), lazy-loaded only on export).
+- **Glyph outlining** reads **WOFF v1** font files from [Fontsource](https://fontsource.org/) (jsDelivr) — real per-weight files, so **bold** stays bold. (Google serves WOFF2, which opentype.js can't read; the `wawoff2` decompressor **hangs in-browser under Vite**, so we avoid it entirely.) Glyph *placement* — including text on an arc — comes from the browser's own `getStartPositionOfChar` / `getRotationOfChar`.
+- **`paint-order` & Illustrator:** symbols paint their stroke *behind* the fill (`paint-order="stroke fill"`) so only a thin outer outline shows. Illustrator ignores `paint-order` and paints the stroke centered on top, reading ~2× thicker. The SVG export **flattens `paint-order`** into explicit draw order (stroke-only path behind, fill-only path on top) so strokes match the editor in every viewer.
+- **Illustrator clip warning:** opening the SVG may show *"Clipping will be lost on roundtrip to Tiny"* — this is a **benign** SVG-Tiny-profile caution about the shield `<clipPath>`. The art imports fully, with clipping applied as a normal Illustrator clip mask.
+
+> _Text stroke and a print-grade vector PDF (bleed/margins) are possible future additions._
 
 ---
 
@@ -49,6 +70,7 @@ A browser-based club crest creator for designing custom badges for any club — 
 
 - **Vue 3** + **Vite** (no TypeScript)
 - **Plain scoped CSS** — no utility framework
+- **opentype.js** — SVG-export text→outline (lazy-loaded only on export)
 - No backend (Phase 2: Supabase for save/share/gallery)
 
 ---
