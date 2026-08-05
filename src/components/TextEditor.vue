@@ -85,7 +85,11 @@ function onFontPick(textId, family) {
 
           <div class="field">
             <span>Font</span>
-            <FontPicker :value="text.fontFamily" @change="onFontPick(text.id, $event)" />
+            <FontPicker
+              :value="text.fontFamily"
+              @preview="onFontPick(text.id, $event)"
+              @change="onFontPick(text.id, $event)"
+            />
           </div>
 
           <div class="field-row">

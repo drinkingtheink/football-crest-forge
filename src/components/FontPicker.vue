@@ -3,10 +3,12 @@ import { ref, computed, nextTick, watch, onBeforeUnmount } from 'vue'
 import { fontGroups, fontsByGroup, loadFont } from '../utils/fonts.js'
 
 const props = defineProps({ value: { type: String, default: '' } })
-const emit = defineEmits(['change'])
+const emit = defineEmits(['change', 'preview'])
 
 const open = ref(false)
 const search = ref('')
+let originalValue = ''   // font when the panel opened, for revert-on-cancel
+let committed = false
 const triggerRef = ref(null)
 const panelRef = ref(null)
 const listRef = ref(null)
@@ -50,6 +52,8 @@ function observeRows() {
 
 async function openPanel() {
   open.value = true
+  originalValue = props.value
+  committed = false
   if (props.value) loadFont(props.value)
   await nextTick()
   position()
@@ -59,6 +63,8 @@ async function openPanel() {
 }
 function closePanel() {
   if (!open.value) return
+  // Revert the live preview if the panel closes without a pick.
+  if (!committed && props.value !== originalValue) emit('preview', originalValue)
   open.value = false
   search.value = ''
   io?.disconnect(); io = null
@@ -68,7 +74,14 @@ function closePanel() {
 function reposition() { if (open.value) position() }
 function toggle() { open.value ? closePanel() : openPanel() }
 
+// Live-preview the hovered font on the actual text block.
+function previewFont(family) {
+  loadFont(family)
+  emit('preview', family)
+}
+
 function choose(family) {
+  committed = true
   emit('change', family)
   loadFont(family)
   closePanel()
@@ -118,6 +131,8 @@ onBeforeUnmount(() => {
               :class="{ active: f.family === value }"
               :data-family="f.family"
               :style="{ fontFamily: f.family }"
+              @mouseenter="previewFont(f.family)"
+              @focus="previewFont(f.family)"
               @click="choose(f.family)"
             >{{ f.family }}</button>
           </template>
