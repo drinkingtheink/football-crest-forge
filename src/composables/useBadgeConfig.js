@@ -46,6 +46,7 @@ const config = reactive({
     sunburstRays: 12,
     // Editable color stops for the gradient/radial background fills.
     gradient: _randomClub.colors.slice(0, 2).map(c => c.hex),
+    gradientAngle: 45, // degrees, for the linear gradient direction
   },
   // Always start with a random symbol on app boot.
   symbols: (() => {
@@ -157,6 +158,9 @@ export function useBadgeConfig() {
     const g = config.background.gradient
     if (g.length > 2) g.splice(index, 1)
   }
+  function setGradientAngle(deg) {
+    config.background.gradientAngle = ((Number(deg) % 360) + 360) % 360
+  }
 
   // ── Border ────────────────────────────────────────────────────────────────
   function setBorderColor(color) { config.border.color = color }
@@ -241,7 +245,7 @@ export function useBadgeConfig() {
     config.shapeId = 'traditional-english'
     config.noShield = false
     config.palette.splice(0, config.palette.length, '#1a3a6b', '#c8102e', '#ffffff')
-    Object.assign(config.background, { type: 'solid', stripeCount: 4, sashWidth: 174, sunburstRays: 12, gradient: ['#1a3a6b', '#c8102e'] })
+    Object.assign(config.background, { type: 'solid', stripeCount: 4, sashWidth: 174, sunburstRays: 12, gradient: ['#1a3a6b', '#c8102e'], gradientAngle: 45 })
     config.symbols.splice(0, config.symbols.length)
     config.texts.splice(0, config.texts.length,
       { ...DEFAULT_TEXT(), id: 'club-name', content: 'FC CREST FOUNDRY', fontSize: 13, fontWeight: 'bold', letterSpacing: 2, x: 100, y: 55 },
@@ -261,6 +265,7 @@ export function useBadgeConfig() {
     if (!Array.isArray(config.background.gradient) || config.background.gradient.length < 2) {
       config.background.gradient = config.palette.slice(0, 2)
     }
+    if (config.background.gradientAngle == null) config.background.gradientAngle = 45
     config.symbols.splice(0, config.symbols.length, ...saved.symbols)
     config.texts.splice(0, config.texts.length, ...saved.texts)
     Object.assign(config.border, saved.border)
@@ -293,6 +298,7 @@ export function useBadgeConfig() {
     setGradientStop,
     addGradientStop,
     removeGradientStop,
+    setGradientAngle,
     setBorderColor,
     setBorderWidth,
     addSymbol,

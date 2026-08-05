@@ -42,6 +42,7 @@ const {
   setGradientStop,
   addGradientStop,
   removeGradientStop,
+  setGradientAngle,
   setBorderColor,
   setBorderWidth,
   addSymbol,
@@ -768,6 +769,16 @@ function stepBg(dir) {
                 title="Add stop"
                 @click="addGradientStop"
               >+</button>
+            </div>
+            <div v-if="config.background.type === 'gradient'" class="range-row" style="margin-top: 8px;">
+              <label>
+                Angle <em>{{ config.background.gradientAngle }}°</em>
+                <input
+                  type="range" min="0" max="360" step="15"
+                  :value="config.background.gradientAngle"
+                  @input="setGradientAngle($event.target.value)"
+                />
+              </label>
             </div>
             <p class="palette-hint">2–5 stops · click to change · hover to remove</p>
           </div>

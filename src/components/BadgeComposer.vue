@@ -322,6 +322,16 @@ const gradientStops = computed(() => {
   if (cols.length === 1) return [{ offset: '0%', color: cols[0] }, { offset: '100%', color: cols[0] }]
   return cols.map((c, i) => ({ offset: `${Math.round((i / (cols.length - 1)) * 100)}%`, color: c }))
 })
+
+// Linear-gradient endpoints for the current angle, in badge user space so the
+// axis spans the whole shield at any angle.
+const gradLine = computed(() => {
+  const rad = (props.config.background.gradientAngle ?? 45) * Math.PI / 180
+  const cx = VIEWBOX_W / 2, cy = VIEWBOX_H / 2
+  const c = Math.cos(rad), s = Math.sin(rad)
+  const half = (Math.abs(VIEWBOX_W * c) + Math.abs(VIEWBOX_H * s)) / 2
+  return { x1: cx - c * half, y1: cy - s * half, x2: cx + c * half, y2: cy + s * half }
+})
 </script>
 
 <template>
@@ -363,7 +373,7 @@ const gradientStops = computed(() => {
         fill="none"
       />
       <!-- Palette background gradients (linear diagonal + radial) -->
-      <linearGradient v-if="config.background.type === 'gradient'" :id="`bg-grad-${uid}`" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient v-if="config.background.type === 'gradient'" :id="`bg-grad-${uid}`" gradientUnits="userSpaceOnUse" :x1="gradLine.x1" :y1="gradLine.y1" :x2="gradLine.x2" :y2="gradLine.y2">
         <stop v-for="(s, i) in gradientStops" :key="i" :offset="s.offset" :stop-color="s.color" />
       </linearGradient>
       <radialGradient v-if="config.background.type === 'radial'" :id="`bg-radial-${uid}`" cx="50%" cy="42%" r="72%">
