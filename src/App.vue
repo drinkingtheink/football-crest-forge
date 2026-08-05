@@ -39,6 +39,9 @@ const {
   setStripeCount,
   setSashWidth,
   setSunburstRays,
+  setGradientStop,
+  addGradientStop,
+  removeGradientStop,
   setBorderColor,
   setBorderWidth,
   addSymbol,
@@ -732,6 +735,43 @@ function stepBg(dir) {
               @click="setBackgroundType(t)"
             >{{ t }}</button>
           </div>
+
+          <!-- Gradient stops editor (gradient / radial types) -->
+          <div v-if="config.background.type === 'gradient' || config.background.type === 'radial'" class="gradient-editor">
+            <span class="color-label">Gradient stops</span>
+            <div class="palette-editor" style="margin-top: 8px;">
+              <div
+                v-for="(color, i) in config.background.gradient"
+                :key="i"
+                class="palette-slot"
+                :style="{ background: color }"
+                :title="color"
+                @click="openColorInput"
+              >
+                <input
+                  type="color"
+                  :value="color"
+                  class="palette-input-overlay"
+                  @input="setGradientStop(i, $event.target.value)"
+                  @click.stop
+                />
+                <button
+                  v-if="config.background.gradient.length > 2"
+                  class="palette-remove"
+                  title="Remove stop"
+                  @click.stop="removeGradientStop(i)"
+                >×</button>
+              </div>
+              <button
+                v-if="config.background.gradient.length < 5"
+                class="palette-add"
+                title="Add stop"
+                @click="addGradientStop"
+              >+</button>
+            </div>
+            <p class="palette-hint">2–5 stops · click to change · hover to remove</p>
+          </div>
+
           <div v-if="stripeTypes.has(config.background.type)" class="stripe-count-row">
             <span class="color-label">{{ config.background.type === 'checkered' ? 'Columns' : 'Stripes' }}</span>
             <div class="stripe-stepper">

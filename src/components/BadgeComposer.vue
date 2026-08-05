@@ -312,10 +312,13 @@ const bgElements = computed(() => {
   }
 })
 
-// Gradient stops spread evenly across the current palette, so the gradient
-// backgrounds recolour with the club palette like every other fill.
+// Gradient background stops — an editable list (config.background.gradient),
+// spread evenly across the fill. Falls back to the palette if unset.
 const gradientStops = computed(() => {
-  const cols = props.config.palette.length ? props.config.palette : ['#000000']
+  const g = props.config.background.gradient
+  const cols = (Array.isArray(g) && g.length >= 2)
+    ? g
+    : (props.config.palette.length ? props.config.palette : ['#000000'])
   if (cols.length === 1) return [{ offset: '0%', color: cols[0] }, { offset: '100%', color: cols[0] }]
   return cols.map((c, i) => ({ offset: `${Math.round((i / (cols.length - 1)) * 100)}%`, color: c }))
 })

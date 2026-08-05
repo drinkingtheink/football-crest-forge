@@ -44,6 +44,8 @@ const config = reactive({
     stripeCount: 4,
     sashWidth: 174,
     sunburstRays: 12,
+    // Editable color stops for the gradient/radial background fills.
+    gradient: _randomClub.colors.slice(0, 2).map(c => c.hex),
   },
   // Always start with a random symbol on app boot.
   symbols: (() => {
@@ -125,6 +127,10 @@ export function useBadgeConfig() {
     }
     const borderInPalette = newPalette.some(c => c.toLowerCase() === config.border.color.toLowerCase())
     if (!borderInPalette) config.border.color = remapColor(config.border.color, oldPalette, newPalette)
+    // Recolour gradient stops to the nearest new palette colour, like everything else.
+    if (Array.isArray(config.background.gradient)) {
+      config.background.gradient = config.background.gradient.map(c => remapColor(c, oldPalette, newPalette))
+    }
     config.palette.splice(0, config.palette.length, ...newPalette)
   }
 
@@ -137,6 +143,20 @@ export function useBadgeConfig() {
   function setStripeCount(n) { config.background.stripeCount = Math.min(16, Math.max(2, n)) }
   function setSashWidth(n) { config.background.sashWidth = Math.min(280, Math.max(68, n)) }
   function setSunburstRays(n) { config.background.sunburstRays = Math.min(48, Math.max(6, Math.round(n / 2) * 2)) }
+
+  // Gradient stops — 2 to 5 colours, evenly spread across the fill.
+  const GRADIENT_MAX = 5
+  function setGradientStop(index, color) {
+    if (config.background.gradient[index] != null) config.background.gradient[index] = color
+  }
+  function addGradientStop() {
+    const g = config.background.gradient
+    if (g.length < GRADIENT_MAX) g.push(g[g.length - 1] || '#ffffff')
+  }
+  function removeGradientStop(index) {
+    const g = config.background.gradient
+    if (g.length > 2) g.splice(index, 1)
+  }
 
   // ── Border ────────────────────────────────────────────────────────────────
   function setBorderColor(color) { config.border.color = color }
@@ -221,7 +241,7 @@ export function useBadgeConfig() {
     config.shapeId = 'traditional-english'
     config.noShield = false
     config.palette.splice(0, config.palette.length, '#1a3a6b', '#c8102e', '#ffffff')
-    Object.assign(config.background, { type: 'solid', stripeCount: 4, sashWidth: 174, sunburstRays: 12 })
+    Object.assign(config.background, { type: 'solid', stripeCount: 4, sashWidth: 174, sunburstRays: 12, gradient: ['#1a3a6b', '#c8102e'] })
     config.symbols.splice(0, config.symbols.length)
     config.texts.splice(0, config.texts.length,
       { ...DEFAULT_TEXT(), id: 'club-name', content: 'FC CREST FOUNDRY', fontSize: 13, fontWeight: 'bold', letterSpacing: 2, x: 100, y: 55 },
@@ -237,6 +257,10 @@ export function useBadgeConfig() {
     config.noShield = saved.noShield ?? false
     config.palette.splice(0, config.palette.length, ...saved.palette)
     Object.assign(config.background, saved.background)
+    // Older snapshots have no gradient — seed one so the editor still works.
+    if (!Array.isArray(config.background.gradient) || config.background.gradient.length < 2) {
+      config.background.gradient = config.palette.slice(0, 2)
+    }
     config.symbols.splice(0, config.symbols.length, ...saved.symbols)
     config.texts.splice(0, config.texts.length, ...saved.texts)
     Object.assign(config.border, saved.border)
@@ -266,6 +290,9 @@ export function useBadgeConfig() {
     setStripeCount,
     setSashWidth,
     setSunburstRays,
+    setGradientStop,
+    addGradientStop,
+    removeGradientStop,
     setBorderColor,
     setBorderWidth,
     addSymbol,
