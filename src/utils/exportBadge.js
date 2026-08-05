@@ -99,6 +99,26 @@ async function embedFontsInto(clone, texts) {
   }
 }
 
+// Symbols render with `paint-order="stroke fill"` so the stroke sits behind the
+// fill (only its outer half shows — a thin outline). Illustrator and some other
+// SVG consumers ignore paint-order and paint the stroke centered on top of the
+// fill, which reads ~2× thicker. Reproduce paint-order with explicit draw order:
+// a stroke-only copy first (behind), then a fill-only copy on top.
+function flattenPaintOrder(root) {
+  root.querySelectorAll('[paint-order]').forEach(el => {
+    const stroke = el.style.stroke || el.getAttribute('stroke')
+    if (!stroke || stroke === 'none') { el.removeAttribute('paint-order'); return }
+    const behind = el.cloneNode(true)   // stroke only
+    const front = el.cloneNode(true)    // fill only
+    behind.removeAttribute('paint-order')
+    front.removeAttribute('paint-order')
+    behind.style.fill = 'none'
+    front.style.stroke = 'none'
+    front.removeAttribute('stroke-width')
+    el.replaceWith(behind, front)
+  })
+}
+
 // ── Clean clone shared by both formats ──────────────────────────────────────
 // Strip decorative / interaction-only layers (data-export-hide) and the
 // presentation drop-shadow. Keeps the `0 0 200 240` viewBox; callers set size.
@@ -246,6 +266,7 @@ export async function exportCrestPng(svgEl, { texts = [], pxWidth = 1600, filena
 // that text is left as <text> and its font is embedded as a fallback.
 export async function exportCrestSvg(svgEl, { texts = [], pxWidth = 800, filename = 'crest.svg' } = {}) {
   const clone = buildCleanCrestSvg(svgEl)
+  flattenPaintOrder(clone)
 
   let failed = []
   try {
