@@ -6,6 +6,8 @@ export const fontGroups = [
   'Script',
   'Military',
   'Modern',
+  'Display',
+  'Handwritten',
 ]
 
 export const fonts = [
@@ -72,14 +74,66 @@ export const fonts = [
   { family: 'Michroma',     group: 'Modern' },
   { family: 'Montserrat',   group: 'Modern' },
   { family: 'Raleway',      group: 'Modern' },
+
+  // ── Expanded batch ──
+  // Blackletter
+  { family: 'Fondamento',      group: 'Blackletter' },
+  { family: 'MedievalSharp',   group: 'Blackletter' },
+  { family: 'Metamorphous',    group: 'Blackletter' },
+  { family: 'New Rocker',      group: 'Blackletter' },
+  { family: 'Eagle Lake',      group: 'Blackletter' },
+  // Gothic / condensed
+  { family: 'Staatliches',     group: 'Gothic' },
+  { family: 'Khand',           group: 'Gothic' },
+  { family: 'Archivo Black',   group: 'Gothic' },
+  { family: 'Saira Condensed', group: 'Gothic' },
+  { family: 'League Gothic',   group: 'Gothic' },
+  // Slab Serif
+  { family: 'Rokkitt',         group: 'Slab Serif' },
+  { family: 'Bevan',           group: 'Slab Serif' },
+  { family: 'Ultra',           group: 'Slab Serif' },
+  { family: 'Aleo',            group: 'Slab Serif' },
+  // Classic Serif
+  { family: 'Spectral',        group: 'Classic Serif' },
+  { family: 'Vollkorn',        group: 'Classic Serif' },
+  { family: 'Marcellus',       group: 'Classic Serif' },
+  { family: 'Prata',           group: 'Classic Serif' },
+  { family: 'Domine',          group: 'Classic Serif' },
+  // Script / Retro
+  { family: 'Great Vibes',     group: 'Script' },
+  { family: 'Kaushan Script',  group: 'Script' },
+  { family: 'Yellowtail',      group: 'Script' },
+  { family: 'Sacramento',      group: 'Script' },
+  // Military / Stencil
+  { family: 'Stardos Stencil', group: 'Military' },
+  { family: 'Wallpoet',        group: 'Military' },
+  { family: 'Sarpanch',        group: 'Military' },
+  // Modern Geometric
+  { family: 'Poppins',         group: 'Modern' },
+  { family: 'Jost',            group: 'Modern' },
+  { family: 'Space Grotesk',   group: 'Modern' },
+  { family: 'Chakra Petch',    group: 'Modern' },
+  // Display / Athletic
+  { family: 'Bungee',          group: 'Display' },
+  { family: 'Bungee Inline',   group: 'Display' },
+  { family: 'Racing Sans One', group: 'Display' },
+  { family: 'Bowlby One SC',   group: 'Display' },
+  { family: 'Faster One',      group: 'Display' },
+  { family: 'Monoton',         group: 'Display' },
+  // Handwritten
+  { family: 'Caveat',              group: 'Handwritten' },
+  { family: 'Shadows Into Light',  group: 'Handwritten' },
+  { family: 'Patrick Hand',        group: 'Handwritten' },
+  { family: 'Gochi Hand',          group: 'Handwritten' },
+  { family: 'Neucha',              group: 'Handwritten' },
 ]
 
 export const fontsByGroup = Object.fromEntries(
   fontGroups.map(g => [g, fonts.filter(f => f.group === g)])
 )
 
-// EB Garamond is pre-loaded via <link> in index.html; mark it to skip the dynamic inject
-const loaded = new Set(['EB Garamond'])
+// These are pre-loaded via <link> in index.html; mark them to skip the dynamic inject
+const loaded = new Set(['EB Garamond', 'Cormorant Garamond', 'Yeseva One'])
 
 export function loadFont(family) {
   if (loaded.has(family)) return Promise.resolve()
