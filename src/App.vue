@@ -16,6 +16,7 @@ import { shapes, shapesById } from './data/shapes.js'
 import { icons, iconsById } from './data/icons.js'
 import { auroraBg, wavesBg, crisscrossBg } from './utils/patterns.js'
 import { fonts, loadFont } from './utils/fonts.js'
+import { exportCrestPng, crestFilename } from './utils/exportBadge.js'
 import { createSparkField } from './utils/particles.js'
 import { useToast } from './composables/useToast.js'
 
@@ -463,6 +464,23 @@ function randomizeAll() {
 const showScene = ref(true)
 const showAbout = ref(false)
 
+const badgeComposerRef = ref(null)
+const isExporting = ref(false)
+
+async function exportPng() {
+  const svgEl = badgeComposerRef.value?.svgRootEl
+  if (!svgEl || isExporting.value) return
+  isExporting.value = true
+  try {
+    await exportCrestPng(svgEl, { texts: config.texts, filename: crestFilename(config.texts) })
+    addToast('PNG exported', { type: 'tip', duration: 2500 })
+  } catch (e) {
+    addToast('Export failed — please try again', { type: 'tip', duration: 4000 })
+  } finally {
+    isExporting.value = false
+  }
+}
+
 function stepBg(dir) {
   const idx = bgOptions.findIndex(o => o.id === appBg.value)
   appBg.value = bgOptions[(idx + dir + bgOptions.length) % bgOptions.length].id
@@ -506,6 +524,7 @@ function stepBg(dir) {
         >
         <div ref="badgeWrap" :class="['badge-wrap', { pulsing: isPulsing }]">
           <BadgeComposer
+            ref="badgeComposerRef"
             :config="config"
             :selected-symbol-id="selectedSymbolId"
             :size="380"
@@ -532,6 +551,9 @@ function stepBg(dir) {
             </button>
             <button class="swap-colors-btn" @click="randomizeColors" title="Recast the palette">
               ⇄ Recast
+            </button>
+            <button class="export-png-btn" :disabled="isExporting" @click="exportPng" title="Download this crest as a transparent PNG">
+              {{ isExporting ? '…' : '⬇ PNG' }}
             </button>
             <button class="scene-toggle" @click="showScene = !showScene" title="Toggle scene controls">
               {{ showScene ? '▲ scene' : '▼ scene' }}
@@ -1137,6 +1159,7 @@ function stepBg(dir) {
 }
 .start-over-btn,
 .swap-colors-btn,
+.export-png-btn,
 .scene-toggle {
   display: inline-flex;
   align-items: center;
@@ -1155,10 +1178,18 @@ function stepBg(dir) {
 }
 .start-over-btn:hover,
 .swap-colors-btn:hover,
+.export-png-btn:hover,
 .scene-toggle:hover {
   color: #111;
   background: rgba(232, 200, 74, 0.9);
   border-color: #e8c84a;
+}
+.export-png-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+  color: #cdb24a;
+  background: rgba(0, 0, 0, 0.5);
+  border-color: rgba(232, 200, 74, 0.4);
 }
 
 .scene-controls {

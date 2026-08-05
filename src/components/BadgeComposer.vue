@@ -70,7 +70,10 @@ function symbolTransform(sym) {
 
 // ── Unified drag (text or symbol) ──────────────────────────────────────────
 const drag = ref(null)
+const svgRootEl = ref(null)
 const shapePathEl = ref(null)
+
+defineExpose({ svgRootEl })
 const outsidePromptedId = ref(null)
 
 // ── Alignment guides (show-only, badge centre) ─────────────────────────────
@@ -308,6 +311,7 @@ const bgElements = computed(() => {
 
 <template>
   <svg
+    ref="svgRootEl"
     :width="size"
     :viewBox="`0 0 ${VIEWBOX_W} ${VIEWBOX_H}`"
     xmlns="http://www.w3.org/2000/svg"
@@ -318,7 +322,7 @@ const bgElements = computed(() => {
     @click="emit('deselect')"
   >
     <!-- Hidden path used for isPointInFill hit-testing (must be in main SVG tree, not defs) -->
-    <path v-if="shape" ref="shapePathEl" :d="shape.path" style="visibility:hidden;pointer-events:none;" />
+    <path v-if="shape" ref="shapePathEl" :d="shape.path" style="visibility:hidden;pointer-events:none;" data-export-hide />
 
     <defs>
       <clipPath :id="clipId">
@@ -439,7 +443,7 @@ const bgElements = computed(() => {
 
     <!-- Shimmer (decorative sheen sweep) — clipped to the shield, or to the
          symbol silhouettes in No Shield mode -->
-    <g :clip-path="`url(#${config.noShield ? elementsClipId : clipId})`" style="pointer-events:none">
+    <g :clip-path="`url(#${config.noShield ? elementsClipId : clipId})`" style="pointer-events:none" data-export-hide>
       <g>
         <animateTransform
           attributeName="transform"
@@ -459,7 +463,7 @@ const bgElements = computed(() => {
     </g>
 
     <!-- 3D depth overlay (presentation only — excluded from export) -->
-    <g v-if="!config.noShield" :clip-path="`url(#${clipId})`" style="pointer-events:none">
+    <g v-if="!config.noShield" :clip-path="`url(#${clipId})`" style="pointer-events:none" data-export-hide>
       <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-radial-${uid})`" />
       <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-left-${uid})`"   />
       <rect x="0" y="0" width="200" height="240" :fill="`url(#depth-right-${uid})`"  />
@@ -555,13 +559,13 @@ const bgElements = computed(() => {
     </text>
 
     <!-- Size hint bubble (shown while scroll-resizing) -->
-    <g v-if="sizeHint" :transform="`translate(${sizeHint.x}, ${sizeHint.y})`" style="pointer-events:none">
+    <g v-if="sizeHint" :transform="`translate(${sizeHint.x}, ${sizeHint.y})`" style="pointer-events:none" data-export-hide>
       <rect x="-14" y="-9" width="28" height="13" rx="3" fill="#000000" fill-opacity="0.65" />
       <text x="0" y="0" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-size="7" font-family="system-ui,sans-serif" font-weight="600">{{ sizeHint.size }}px</text>
     </g>
 
     <!-- Alignment guides (shown while dragging near badge centre) -->
-    <g style="pointer-events:none">
+    <g style="pointer-events:none" data-export-hide>
       <line v-if="guides.x" :x1="BADGE_CX" y1="-8" :x2="BADGE_CX" :y2="VIEWBOX_H + 8" class="align-guide" />
       <line v-if="guides.y" x1="-8" :y1="BADGE_CY" :x2="VIEWBOX_W + 8" :y2="BADGE_CY" class="align-guide" />
     </g>
