@@ -573,6 +573,8 @@ function randomizeAll() {
   updateText('club-name', { y: 55, fontFamily: nameFont, ...textStroke })
   updateText('monogram', { y: 185, fontFamily: monogramFont, ...textStroke })
   activeClub.value = club
+  // A freshly forged crest shows what it *is* — nothing selected, no glow.
+  deselectAll()
 }
 
 const showScene = ref(true)
