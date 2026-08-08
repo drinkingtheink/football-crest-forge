@@ -19,6 +19,13 @@ const filtered = computed(() => {
     return matchGroup && matchSearch
   })
 })
+
+// A rectangle primitive lives in the gallery like any symbol. Shown in the
+// default view and when its keywords match the search.
+const showRectTile = computed(() => {
+  const q = search.value.toLowerCase().trim()
+  return activeGroup.value === 'All' && (!q || 'rectangle bar band box banner shape'.includes(q))
+})
 </script>
 
 <template>
@@ -43,6 +50,16 @@ const filtered = computed(() => {
     <!-- Scroll wrapper separate from flex grid so tooltips aren't clipped -->
     <div class="icon-grid-scroll">
       <div class="icon-grid">
+        <button
+          v-if="showRectTile"
+          class="icon-btn"
+          data-label="Rectangle"
+          @click="$emit('add-icon', 'shape:rect')"
+        >
+          <svg viewBox="0 0 100 100" width="34" height="34">
+            <rect x="14" y="30" width="72" height="40" fill="currentColor" />
+          </svg>
+        </button>
         <button
           v-for="ic in filtered"
           :key="ic.id"

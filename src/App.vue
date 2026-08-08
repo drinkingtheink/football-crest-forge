@@ -298,6 +298,7 @@ const DIST_ICONS = {
 function distIcon(axis) { return `<svg viewBox="0 0 16 16" width="15" height="15">${DIST_ICONS[axis]}</svg>` }
 
 function onPickIcon(iconId) {
+  if (iconId === 'shape:rect') { addRect(); return } // gallery rectangle tile
   const sel = selectedSymbolId.value && config.symbols.find(s => s.instanceId === selectedSymbolId.value)
   if (sel && sel.kind !== 'rect') {
     updateSymbol(selectedSymbolId.value, { iconId }) // swap the selected icon
@@ -1155,7 +1156,6 @@ function stepBg(dir) {
         <div class="control-group">
           <h3 class="control-label">Add Symbol</h3>
           <IconPicker :placed-counts="placedIconCounts" @add-icon="onPickIcon" />
-          <button class="random-colors-btn" style="margin-top: 8px;" @click="addRect" title="Add a rectangle you can size">▭ Add Rectangle</button>
         </div>
 
         <!-- Placed Symbols -->
