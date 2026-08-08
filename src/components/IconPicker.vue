@@ -24,7 +24,8 @@ const filtered = computed(() => {
 // default view and when its keywords match the search.
 const showRectTile = computed(() => {
   const q = search.value.toLowerCase().trim()
-  return activeGroup.value === 'All' && (!q || 'rectangle bar band box banner shape'.includes(q))
+  const inGroup = activeGroup.value === 'All' || activeGroup.value === 'Shapes'
+  return inGroup && (!q || 'rectangle bar band box banner shape'.includes(q))
 })
 </script>
 
