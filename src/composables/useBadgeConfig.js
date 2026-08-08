@@ -9,6 +9,20 @@ function _contrastColor(fill, palette) {
   return alt ?? (fill.toLowerCase() === '#000000' ? '#ffffff' : '#000000')
 }
 
+function _lum(hex) {
+  const h = hex.replace('#', '')
+  return 0.299 * parseInt(h.slice(0, 2), 16) + 0.587 * parseInt(h.slice(2, 4), 16) + 0.114 * parseInt(h.slice(4, 6), 16)
+}
+
+// Guarantee a light neutral is always on hand: append white as the last colour
+// when the palette has no near-white and there's room (6-colour cap). Text
+// defaults to white and strokes/borders/backgrounds all pull from these swatches.
+function withNeutral(hexes) {
+  const arr = hexes.slice(0, 6)
+  if (arr.length < 6 && !arr.some(c => _lum(c) > 225)) arr.push('#ffffff')
+  return arr
+}
+
 const _BG_TYPES = ['solid', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'chevron', 'sash', 'striped-v', 'striped-h', 'striped-diagonal']
 const _randomBgType = _BG_TYPES[Math.floor(Math.random() * _BG_TYPES.length)]
 
@@ -40,7 +54,7 @@ const DEFAULT_TEXT = () => ({
 const config = reactive({
   shapeId: 'traditional-english',
   noShield: false,
-  palette: _randomClub.colors.map(c => c.hex),
+  palette: withNeutral(_randomClub.colors.map(c => c.hex)),
   background: {
     type: _randomBgType,
     stripeCount: 4,
@@ -132,7 +146,7 @@ export function useBadgeConfig() {
   }
   function setPalette(hexArray) {
     const oldPalette = [...config.palette]
-    const newPalette = hexArray.slice(0, 6)
+    const newPalette = withNeutral(hexArray)
     const thirdColor = newPalette[2]
     for (const text of config.texts)   text.color = '#ffffff'
     for (const sym of config.symbols) {
