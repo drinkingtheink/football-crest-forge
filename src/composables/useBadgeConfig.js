@@ -1,4 +1,4 @@
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { clubs } from '../data/clubs.js'
 import { icons } from '../data/icons.js'
 
@@ -82,8 +82,30 @@ const config = reactive({
   border: _defaultBorder,
 })
 
-const selectedSymbolId = ref(null)
-const selectedTextId = ref(null)
+// Unified selection: an ordered list of { type: 'symbol'|'text', id }. The
+// single-id refs below are read-only shims that resolve only when exactly one
+// element of that type is selected, so all the existing single-select consumers
+// (expanded editors, keyboard, symbol controls) behave exactly as before.
+const selection = ref([])
+const selectedSymbolId = computed(() =>
+  selection.value.length === 1 && selection.value[0].type === 'symbol' ? selection.value[0].id : null)
+const selectedTextId = computed(() =>
+  selection.value.length === 1 && selection.value[0].type === 'text' ? selection.value[0].id : null)
+
+function isSelected(type, id) {
+  return selection.value.some(s => s.type === type && s.id === id)
+}
+function setSelection(type, id) { selection.value = [{ type, id }] }
+function toggleSelection(type, id) {
+  const i = selection.value.findIndex(s => s.type === type && s.id === id)
+  if (i === -1) selection.value = [...selection.value, { type, id }]
+  else selection.value = selection.value.filter((_, idx) => idx !== i)
+}
+function clearSelection() { selection.value = [] }
+function removeFromSelection(type, id) {
+  selection.value = selection.value.filter(s => !(s.type === type && s.id === id))
+}
+
 let nextId = 1
 
 function colorDist(a, b) {
@@ -176,13 +198,13 @@ export function useBadgeConfig() {
     const ring = icon?.supportsRing ? { ringThickness: icon.defaultRingThickness ?? 44 } : {}
     const strokeColor = _contrastColor(color, config.palette)
     config.symbols.push({ instanceId, iconId, color, x: 100, y: 105, size: 72, rotation: 0, flipH: false, strokeColor, strokeWidth: 0, clipped: true, ...ring })
-    selectedSymbolId.value = instanceId
+    setSelection('symbol', instanceId)
   }
 
   function removeSymbol(instanceId) {
     const idx = config.symbols.findIndex(s => s.instanceId === instanceId)
     if (idx !== -1) config.symbols.splice(idx, 1)
-    if (selectedSymbolId.value === instanceId) selectedSymbolId.value = null
+    removeFromSelection('symbol', instanceId)
   }
 
   function updateSymbol(instanceId, updates) {
@@ -195,19 +217,19 @@ export function useBadgeConfig() {
     if (sym) { sym.x = x; sym.y = y }
   }
 
-  function selectSymbol(instanceId) { selectedSymbolId.value = instanceId; selectedTextId.value = null }
+  function selectSymbol(instanceId) { setSelection('symbol', instanceId) }
 
   // ── Text ──────────────────────────────────────────────────────────────────
   function addText() {
     const id = `text-${nextId++}`
     config.texts.push({ ...DEFAULT_TEXT(), id, content: 'New Text' })
-    selectedTextId.value = id
+    setSelection('text', id)
   }
 
   function removeText(id) {
     const idx = config.texts.findIndex(t => t.id === id)
     if (idx !== -1) config.texts.splice(idx, 1)
-    if (selectedTextId.value === id) selectedTextId.value = null
+    removeFromSelection('text', id)
   }
 
   function updateText(id, updates) {
@@ -220,13 +242,12 @@ export function useBadgeConfig() {
     if (text) { text.x = x; text.y = y }
   }
 
-  function selectText(id) { selectedTextId.value = id; selectedSymbolId.value = null }
+  function selectText(id) { setSelection('text', id) }
 
   function pasteSymbol(source) {
     const instanceId = `sym-${nextId++}`
     config.symbols.push({ ...source, instanceId, x: source.x + 8, y: source.y + 8 })
-    selectedSymbolId.value = instanceId
-    selectedTextId.value = null
+    setSelection('symbol', instanceId)
   }
 
   function pasteText(source) {
@@ -237,11 +258,10 @@ export function useBadgeConfig() {
       pasted.y = (source.y ?? 120) + 8
     }
     config.texts.push(pasted)
-    selectedTextId.value = id
-    selectedSymbolId.value = null
+    setSelection('text', id)
   }
 
-  function deselectAll() { selectedSymbolId.value = null; selectedTextId.value = null }
+  function deselectAll() { clearSelection() }
 
   function resetConfig() {
     config.shapeId = 'traditional-english'
@@ -254,8 +274,7 @@ export function useBadgeConfig() {
       { ...DEFAULT_TEXT(), id: 'monogram', content: 'FC', fontSize: 22, fontWeight: 'bold', letterSpacing: 3, x: 100, y: 185 },
     )
     Object.assign(config.border, { color: '#ffffff', width: 0 })
-    selectedSymbolId.value = null
-    selectedTextId.value = null
+    clearSelection()
   }
 
   function loadConfig(saved) {
@@ -271,8 +290,7 @@ export function useBadgeConfig() {
     config.symbols.splice(0, config.symbols.length, ...saved.symbols)
     config.texts.splice(0, config.texts.length, ...saved.texts)
     Object.assign(config.border, saved.border)
-    selectedSymbolId.value = null
-    selectedTextId.value = null
+    clearSelection()
     // Advance nextId past any numeric IDs in the loaded config to avoid collisions
     const ids = [...saved.symbols.map(s => s.instanceId), ...saved.texts.map(t => t.id)]
     for (const id of ids) {
@@ -286,6 +304,9 @@ export function useBadgeConfig() {
     initialClub: _randomClub,
     selectedSymbolId,
     selectedTextId,
+    selection,
+    isSelected,
+    toggleSelection,
     setPaletteColor,
     addPaletteColor,
     removePaletteColor,
