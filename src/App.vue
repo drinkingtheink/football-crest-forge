@@ -472,8 +472,20 @@ function randomizeAll() {
   const monogramFont = randomFonts[Math.floor(Math.random() * randomFonts.length)].family
   loadFont(nameFont)
   loadFont(monogramFont)
-  updateText('club-name', { y: 55, fontFamily: nameFont })
-  updateText('monogram', { y: 185, fontFamily: monogramFont })
+
+  // Intermittently outline the (white) crest text with a bold contrasting edge,
+  // like a screen-printed kit. Otherwise clear any stroke left by a prior forge.
+  let textStroke = { strokeWidth: 0 }
+  if (Math.random() < 0.4) {
+    const lum = hex => {
+      const h = hex.replace('#', '')
+      return 0.299 * parseInt(h.slice(0, 2), 16) + 0.587 * parseInt(h.slice(2, 4), 16) + 0.114 * parseInt(h.slice(4, 6), 16)
+    }
+    const strokeColor = [...config.palette].sort((a, b) => lum(a) - lum(b))[0] || '#000000'
+    textStroke = { strokeColor, strokeWidth: Math.round((1.25 + Math.random() * 1.75) / 0.25) * 0.25 }
+  }
+  updateText('club-name', { y: 55, fontFamily: nameFont, ...textStroke })
+  updateText('monogram', { y: 185, fontFamily: monogramFont, ...textStroke })
   activeClub.value = club
 }
 
