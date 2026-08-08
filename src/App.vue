@@ -340,18 +340,49 @@ function onBadgeLeave() {
   overCrest.value = false
 }
 
-// After a sustained hover over the crest, ring its edge with orbiting sparks.
-const EDGE_SPARK_DELAY = 2000 // ms of continuous hover (2s for testing)
-const showEdgeSparks = ref(false)
-let edgeSparkTimer = null
-watch(overCrest, (over) => {
-  clearTimeout(edgeSparkTimer)
-  if (over && !reduceMotion) {
-    edgeSparkTimer = setTimeout(() => { showEdgeSparks.value = true }, EDGE_SPARK_DELAY)
-  } else {
-    showEdgeSparks.value = false
+// ── Welding sparks ──────────────────────────────────────────────────────────
+// After a sustained IDLE hover over the crest, spray a dense sputter of sparks
+// from behind the shield seam, following its outline — like welding, not
+// fireworks. Idle = nothing selected/being edited and not mid-drag.
+const EDGE_SPARK_DELAY = 2000 // ms of continuous idle hover (2s for testing)
+const weldCanvas = ref(null)
+let weldField = null
+const welding = ref(false)
+let weldDelayTimer = null
+let weldRaf = null
+
+function crestIdle() { return selection.value.length === 0 && !isDraggingEl.value }
+
+function weldTick() {
+  const comp = badgeComposerRef.value
+  const canvas = weldCanvas.value
+  if (!welding.value || !comp?.outlineScreenPoints || !canvas || !weldField) { weldRaf = null; return }
+  const r = canvas.getBoundingClientRect()
+  for (const p of comp.outlineScreenPoints(6)) {
+    weldField.weld(p.x - r.left, p.y - r.top, p.nx, p.ny, 2)
   }
-})
+  weldRaf = requestAnimationFrame(weldTick)
+}
+function startWelding() {
+  if (welding.value) return
+  welding.value = true
+  if (!weldRaf) weldRaf = requestAnimationFrame(weldTick)
+}
+function stopWelding() { welding.value = false } // weldTick self-cancels next frame
+
+function evalWeld() {
+  if (overCrest.value && crestIdle() && !reduceMotion) {
+    if (welding.value) return
+    clearTimeout(weldDelayTimer)
+    weldDelayTimer = setTimeout(() => { if (overCrest.value && crestIdle()) startWelding() }, EDGE_SPARK_DELAY)
+  } else {
+    clearTimeout(weldDelayTimer)
+    stopWelding()
+  }
+}
+watch(overCrest, evalWeld)
+watch(selection, evalWeld, { deep: true })
+watch(isDraggingEl, evalWeld)
 
 function onKeyDown(e) {
   if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return
@@ -477,10 +508,11 @@ function forwardScroll(e) {
 }
 
 function sizeCanvas() {
-  const c = particleCanvas.value
-  if (!c) return
-  c.width  = c.offsetWidth
-  c.height = c.offsetHeight
+  for (const c of [particleCanvas.value, weldCanvas.value]) {
+    if (!c) continue
+    c.width  = c.offsetWidth
+    c.height = c.offsetHeight
+  }
 }
 
 function triggerEffects() {
@@ -551,6 +583,7 @@ onMounted(() => {
       sparkField = createSparkField(particleCanvas.value)
       if (!reduceMotion) spitEmber()
     }
+    if (weldCanvas.value) weldField = createSparkField(weldCanvas.value)
   })
 })
 
@@ -559,7 +592,10 @@ onUnmounted(() => {
   window.removeEventListener('resize', sizeCanvas)
   document.removeEventListener('click', onDocumentClick)
   clearTimeout(emberTimer)
+  clearTimeout(weldDelayTimer)
+  cancelAnimationFrame(weldRaf)
   sparkField?.stop()
+  weldField?.stop()
 })
 
 function onSymbolOutsideBounds(instanceId) {
@@ -678,6 +714,8 @@ function stepBg(dir) {
     <main class="app-body">
       <!-- Preview -->
       <section class="preview-pane" @wheel.prevent="forwardScroll" @mousemove="onStageMove" @mouseenter="isBadgeActive = true" @mouseleave="isBadgeActive = false">
+        <!-- Welding sparks canvas — sits BEHIND the crest -->
+        <canvas ref="weldCanvas" class="weld-canvas" />
         <canvas ref="particleCanvas" class="particle-canvas" />
         <!-- Searing-hot cursor glow — shown over the stage, off when over the crest -->
         <div
@@ -738,7 +776,6 @@ function stepBg(dir) {
             :config="config"
             :selected-symbol-id="selectedSymbolId"
             :selection="selection"
-            :edge-sparks="showEdgeSparks"
             :size="380"
             uid="main"
             @update-text="updateText"
@@ -1367,6 +1404,16 @@ function stepBg(dir) {
   height: 100%;
 }
 
+/* Welding sparks sit behind the crest (below .badge-float-wrap's z-index) */
+.weld-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+}
+
 /* Searing-hot cursor glow that trails the pointer over the stage */
 .hot-cursor {
   position: absolute;
@@ -1493,6 +1540,7 @@ function stepBg(dir) {
 
 .badge-float-wrap {
   position: relative;
+  z-index: 3;
   perspective: 1100px;
   animation: badge-float 3.4s ease-in-out infinite alternate;
 }

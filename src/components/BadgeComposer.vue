@@ -12,20 +12,9 @@ const props = defineProps({
   config: { type: Object, required: true },
   selectedSymbolId: { type: String, default: null },
   selection: { type: Array, default: () => [] },
-  edgeSparks: { type: Boolean, default: false },
   size: { type: Number, default: 380 },
   uid: { type: String, default: 'b0' },
 })
-
-// Sparks orbiting the crest outline on long hover. Fixed varied radii/colours
-// so each fleck reads as its own hot ember.
-const edgePathId = computed(() => `edge-path-${props.uid}`)
-const EDGE_SPARKS = [
-  { r: 1.8, fill: '#ffe6a6' }, { r: 1.2, fill: '#ff9130' }, { r: 2.0, fill: '#ffd47a' },
-  { r: 1.4, fill: '#ffb347' }, { r: 1.7, fill: '#ffe6a6' }, { r: 1.2, fill: '#ff7a2e' },
-  { r: 1.9, fill: '#ffd47a' }, { r: 1.4, fill: '#ffb347' },
-]
-const EDGE_SPARK_DUR = 3.6
 
 const selectedSyms  = computed(() => new Set(props.selection.filter(s => s.type === 'symbol').map(s => s.id)))
 const selectedTexts = computed(() => new Set(props.selection.filter(s => s.type === 'text').map(s => s.id)))
@@ -89,7 +78,38 @@ const drag = ref(null)
 const svgRootEl = ref(null)
 const shapePathEl = ref(null)
 
-defineExpose({ svgRootEl })
+// Sample `n` random points along the shield outline, returned in screen (client)
+// coordinates with an outward unit normal — used to spray welding sparks from the
+// seam. Empty in No-Shield mode (no edge). The normal direction is preserved to
+// screen space since the badge CTM is uniform scale + translate.
+function outlineScreenPoints(n) {
+  const pathEl = shapePathEl.value
+  const svg = svgRootEl.value
+  if (!pathEl || !svg || props.config.noShield) return []
+  const ctm = svg.getScreenCTM()
+  if (!ctm) return []
+  const total = pathEl.getTotalLength()
+  const toScreen = (x, y) => {
+    const p = svg.createSVGPoint(); p.x = x; p.y = y
+    return p.matrixTransform(ctm)
+  }
+  const out = []
+  for (let i = 0; i < n; i++) {
+    const L = Math.random() * total
+    const a = pathEl.getPointAtLength(L)
+    const b = pathEl.getPointAtLength((L + 1.5) % total)
+    let tx = b.x - a.x, ty = b.y - a.y
+    const tl = Math.hypot(tx, ty) || 1
+    tx /= tl; ty /= tl
+    let nx = -ty, ny = tx                       // perpendicular
+    if ((a.x - 100) * nx + (a.y - 120) * ny < 0) { nx = -nx; ny = -ny } // point outward
+    const s = toScreen(a.x, a.y)
+    out.push({ x: s.x, y: s.y, nx, ny })
+  }
+  return out
+}
+
+defineExpose({ svgRootEl, outlineScreenPoints })
 const outsidePromptedId = ref(null)
 
 // ── Alignment guides (show-only, badge centre) ─────────────────────────────
@@ -424,8 +444,6 @@ const gradLine = computed(() => {
         :d="arcPathD(text)"
         fill="none"
       />
-      <!-- Motion path for the long-hover edge sparks -->
-      <path v-if="shape" :id="edgePathId" :d="shape.path" fill="none" />
       <!-- Palette background gradients (linear diagonal + radial) -->
       <linearGradient v-if="config.background.type === 'gradient'" :id="`bg-grad-${uid}`" gradientUnits="userSpaceOnUse" :x1="gradLine.x1" :y1="gradLine.y1" :x2="gradLine.x2" :y2="gradLine.y2">
         <stop v-for="(s, i) in gradientStops" :key="i" :offset="s.offset" :stop-color="s.color" />
@@ -655,20 +673,6 @@ const gradLine = computed(() => {
       >{{ text.content }}</textPath>
     </text>
 
-    <!-- Edge sparks — orbit the crest outline after a sustained hover -->
-    <g v-if="edgeSparks && shape && !config.noShield" class="edge-sparks" data-export-hide style="pointer-events:none">
-      <circle v-for="(sp, i) in EDGE_SPARKS" :key="i" :r="sp.r" :fill="sp.fill">
-        <animateMotion
-          :dur="`${EDGE_SPARK_DUR}s`"
-          repeatCount="indefinite"
-          rotate="auto"
-          :begin="`${-i * EDGE_SPARK_DUR / EDGE_SPARKS.length}s`"
-        >
-          <mpath :href="`#${edgePathId}`" />
-        </animateMotion>
-      </circle>
-    </g>
-
     <!-- Size hint bubble (shown while scroll-resizing) -->
     <g v-if="sizeHint" :transform="`translate(${sizeHint.x}, ${sizeHint.y})`" style="pointer-events:none" data-export-hide>
       <rect x="-14" y="-9" width="28" height="13" rx="3" fill="#000000" fill-opacity="0.65" />
@@ -692,15 +696,6 @@ const gradLine = computed(() => {
 </template>
 
 <style>
-.edge-sparks {
-  filter: drop-shadow(0 0 1.5px #ffb347) drop-shadow(0 0 3px rgba(255, 120, 30, 0.7));
-  animation: edge-sparks-in 0.45s ease both;
-}
-@keyframes edge-sparks-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
 .align-guide {
   stroke: #00e5ff;
   stroke-width: 0.75;

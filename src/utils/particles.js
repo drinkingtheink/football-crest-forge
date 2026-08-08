@@ -170,6 +170,26 @@ export function createSparkField(canvas) {
       if (trail.length > 100) trail.splice(0, trail.length - 100)
       ensureRunning()
     },
+    // Welding spray: a burst of hot streaks jetting out from a seam point (x,y)
+    // along the outward normal (nx,ny), with a wide fan, quick decay and gravity.
+    weld(x, y, nx = 0, ny = 1, n = 2) {
+      const base = Math.atan2(ny, nx)
+      for (let i = 0; i < n; i++) {
+        const angle = base + (Math.random() - 0.5) * 1.7 // ~±49° fan around the normal
+        const v = 2.5 + Math.random() * 5.5
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * v,
+          vy: Math.sin(angle) * v,
+          size: 0.5 + Math.random() * 0.9,
+          color: pick(),
+          life: 1,
+          decay: 0.06 + Math.random() * 0.06, // short-lived — sputtering, not lingering
+          grav: 0.16 + Math.random() * 0.12,
+        })
+      }
+      ensureRunning()
+    },
     // A single ember that floats up from (x,y), wobbling and fading — from the coals.
     float(x, y) {
       const v = 0.4 + Math.random() * 0.5
