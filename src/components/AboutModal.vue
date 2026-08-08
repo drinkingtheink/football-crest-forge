@@ -26,6 +26,14 @@ const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'lucas
               Created by {{ iconAuthors.join(', ') }}.
             </p>
             <p class="about-text" style="margin-top: 8px;">
+              Additional symbols from
+              <a href="https://fontawesome.com" target="_blank" rel="noopener">Font&nbsp;Awesome&nbsp;Free</a>
+              (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC&nbsp;BY&nbsp;4.0</a>)
+              and
+              <a href="https://pictogrammers.com/library/mdi/" target="_blank" rel="noopener">Material&nbsp;Design&nbsp;Icons</a>
+              (<a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">Apache&nbsp;2.0</a>).
+            </p>
+            <p class="about-text" style="margin-top: 8px;">
               Background photography from
               <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a>.
             </p>
