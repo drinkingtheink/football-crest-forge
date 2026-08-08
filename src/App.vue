@@ -67,6 +67,9 @@ const clipboard = ref(null)
 const bgTypes = ['solid', 'gradient', 'radial', 'halved-v', 'halved-h', 'quartered', 'diagonal', 'chevron', 'sash', 'striped-v', 'striped-h', 'striped-diagonal', 'checkered', 'saltire', 'sunburst']
 const stripeTypes = new Set(['striped-v', 'striped-h', 'striped-diagonal', 'checkered'])
 const imageBgTypes = new Set(['grass', 'stadium', 'fabric', 'brick', 'pitch'])
+// Patterns that respond to the Dark/Medium/Light tone selector.
+const patternTonedTypes = new Set(['waves', 'crisscross', 'pinstripe', 'diamonds'])
+const patternTones = ['dark', 'medium', 'light']
 
 // Auto-scroll sidebar to selected symbol row
 const symRefs = {}
@@ -96,6 +99,7 @@ const bgOptions = [
 ]
 
 const appBg = ref(bgOptions[Math.floor(Math.random() * bgOptions.length)].id)
+const patternTone = ref('dark')
 const overlay = reactive({ color: config.palette[0] ?? '#000000', opacity: 0.7 })
 
 const activeClub = ref(initialClub)
@@ -143,10 +147,10 @@ function openColorInput(e) {
 watch(() => config.palette[0], c => { if (c) overlay.color = c })
 
 const auroraThumb    = computed(() => auroraBg(config.palette))
-const wavesThumb     = computed(() => wavesBg(config.palette))
-const crisscrossThumb = computed(() => crisscrossBg(config.palette))
-const pinstripeThumb = computed(() => pinstripeBg(config.palette))
-const diamondsThumb  = computed(() => diamondsBg(config.palette))
+const wavesThumb     = computed(() => wavesBg(config.palette, patternTone.value))
+const crisscrossThumb = computed(() => crisscrossBg(config.palette, patternTone.value))
+const pinstripeThumb = computed(() => pinstripeBg(config.palette, patternTone.value))
+const diamondsThumb  = computed(() => diamondsBg(config.palette, patternTone.value))
 
 const _ARROW_DELTA = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }
 
@@ -453,6 +457,7 @@ function randomizeAll() {
   setBorderColor(third || '#ffffff')
   setBorderWidth(third ? Math.floor(Math.random() * 5) + 4 : 0)
   appBg.value = bgOptions[Math.floor(Math.random() * bgOptions.length)].id
+  patternTone.value = patternTones[Math.floor(Math.random() * patternTones.length)]
 
   ;[...config.symbols].forEach(s => removeSymbol(s.instanceId))
   if (Math.random() < 2/3) {
@@ -525,7 +530,7 @@ function stepBg(dir) {
 
 <template>
   <div class="app">
-    <AppBackground :type="appBg" />
+    <AppBackground :type="appBg" :tone="patternTone" />
     <div
       v-if="imageBgTypes.has(appBg)"
       class="app-overlay"
@@ -625,32 +630,46 @@ function stepBg(dir) {
               </button>
             </div>
 
-            <div class="overlay-controls hud-pill" :style="{ visibility: imageBgTypes.has(appBg) ? 'visible' : 'hidden' }">
-              <input
-                type="color"
-                :value="overlay.color"
-                class="overlay-color"
-                title="Overlay color"
-                @input="overlay.color = $event.target.value"
-              />
-              <div class="overlay-swatches">
-                <button
-                  v-for="(color, i) in config.palette"
-                  :key="i"
-                  class="overlay-swatch"
-                  :class="{ active: overlay.color.toLowerCase() === color.toLowerCase() }"
-                  :style="{ background: color }"
-                  :title="`Set overlay to club color ${color}`"
-                  @click="overlay.color = color"
+            <div class="overlay-controls hud-pill" :style="{ visibility: (imageBgTypes.has(appBg) || patternTonedTypes.has(appBg)) ? 'visible' : 'hidden' }">
+              <template v-if="imageBgTypes.has(appBg)">
+                <input
+                  type="color"
+                  :value="overlay.color"
+                  class="overlay-color"
+                  title="Overlay color"
+                  @input="overlay.color = $event.target.value"
                 />
-              </div>
-              <input
-                type="range" min="0" max="1" step="0.05"
-                :value="overlay.opacity"
-                class="overlay-opacity"
-                @input="overlay.opacity = Number($event.target.value)"
-              />
-              <span class="overlay-label">overlay</span>
+                <div class="overlay-swatches">
+                  <button
+                    v-for="(color, i) in config.palette"
+                    :key="i"
+                    class="overlay-swatch"
+                    :class="{ active: overlay.color.toLowerCase() === color.toLowerCase() }"
+                    :style="{ background: color }"
+                    :title="`Set overlay to club color ${color}`"
+                    @click="overlay.color = color"
+                  />
+                </div>
+                <input
+                  type="range" min="0" max="1" step="0.05"
+                  :value="overlay.opacity"
+                  class="overlay-opacity"
+                  @input="overlay.opacity = Number($event.target.value)"
+                />
+                <span class="overlay-label">overlay</span>
+              </template>
+              <template v-else-if="patternTonedTypes.has(appBg)">
+                <div class="tone-btns">
+                  <button
+                    v-for="t in patternTones"
+                    :key="t"
+                    class="tone-btn"
+                    :class="{ active: patternTone === t }"
+                    @click="patternTone = t"
+                  >{{ t }}</button>
+                </div>
+                <span class="overlay-label">tone</span>
+              </template>
             </div>
           </div>
           </Transition>
@@ -1463,6 +1482,31 @@ function stepBg(dir) {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   flex-shrink: 0;
+}
+
+.tone-btns {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+}
+.tone-btn {
+  flex: 1;
+  padding: 4px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #999;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.tone-btn:hover { border-color: rgba(232, 200, 74, 0.5); color: #ccc; }
+.tone-btn.active {
+  border-color: #e8c84a;
+  color: #e8c84a;
+  background: rgba(232, 200, 74, 0.08);
 }
 
 .controls-pane {

@@ -6,6 +6,7 @@ import { wavesBg, crisscrossBg, pinstripeBg, diamondsBg } from '../utils/pattern
 
 const props = defineProps({
   type: { type: String, default: 'none' },
+  tone: { type: String, default: 'dark' },
 })
 
 const { config } = useBadgeConfig()
@@ -50,10 +51,10 @@ function auroraRibbonsFor(palette) {
 }
 
 function styleFor(type) {
-  if (type === 'waves')      return wavesBg(config.palette)
-  if (type === 'crisscross') return crisscrossBg(config.palette)
-  if (type === 'pinstripe')  return pinstripeBg(config.palette)
-  if (type === 'diamonds')   return diamondsBg(config.palette)
+  if (type === 'waves')      return wavesBg(config.palette, props.tone)
+  if (type === 'crisscross') return crisscrossBg(config.palette, props.tone)
+  if (type === 'pinstripe')  return pinstripeBg(config.palette, props.tone)
+  if (type === 'diamonds')   return diamondsBg(config.palette, props.tone)
   if (imageMap[type])        return { backgroundImage: `url(${imageMap[type]})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: imagePos[type] || 'center' }
   return {}
 }
