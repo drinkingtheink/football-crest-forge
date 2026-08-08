@@ -25,6 +25,10 @@ const iconAuthors = ['carl-olsen', 'caro-asercion', 'delapouite', 'lorc', 'lucas
               <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener">CC&nbsp;BY&nbsp;3.0</a>.
               Created by {{ iconAuthors.join(', ') }}.
             </p>
+            <p class="about-text" style="margin-top: 8px;">
+              Background photography from
+              <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a>.
+            </p>
           </div>
         </div>
       </div>
