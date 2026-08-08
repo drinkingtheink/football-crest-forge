@@ -20,6 +20,29 @@ const selectedSyms  = computed(() => new Set(props.selection.filter(s => s.type 
 const selectedTexts = computed(() => new Set(props.selection.filter(s => s.type === 'text').map(s => s.id)))
 const SELECT_GLOW = 'drop-shadow(0 0 2.5px #00e5ff) drop-shadow(0 0 7px rgba(0,229,255,0.75))'
 
+// The single selected rectangle (if exactly one rect is selected) — gets resize handles.
+const resizeRect = computed(() => {
+  if (props.selection.length !== 1 || props.selection[0].type !== 'symbol') return null
+  const sym = props.config.symbols.find(s => s.instanceId === props.selection[0].id)
+  return sym && sym.kind === 'rect' ? sym : null
+})
+
+const HANDLE_DIRS = [[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]]
+// Handle world positions: local corner/edge (hx*w/2, hy*h/2) rotated about centre.
+function rectHandles(sym) {
+  const r = (sym.rotation || 0) * Math.PI / 180
+  const cos = Math.cos(r), sin = Math.sin(r), hw = sym.w / 2, hh = sym.h / 2
+  return HANDLE_DIRS.map(([hx, hy]) => {
+    const lx = hx * hw, ly = hy * hh
+    return { hx, hy, x: sym.x + lx * cos - ly * sin, y: sym.y + lx * sin + ly * cos }
+  })
+}
+function handleCursor(h) {
+  if (h.hx === 0) return 'ns-resize'
+  if (h.hy === 0) return 'ew-resize'
+  return h.hx * h.hy > 0 ? 'nwse-resize' : 'nesw-resize'
+}
+
 const emit = defineEmits(['update-text-position', 'update-symbol-position', 'update-text', 'update-symbol', 'select-symbol', 'select-text', 'deselect', 'symbol-outside-bounds', 'ember', 'drag-start', 'drag-end'])
 
 function arcPathId(textId) { return `arcpath-${props.uid}-${textId}` }
@@ -176,8 +199,38 @@ function beginDrag(e, type, id) {
 function startTextDrag(e, textId)   { beginDrag(e, 'text', textId) }
 function startSymbolDrag(e, instanceId) { beginDrag(e, 'symbol', instanceId) }
 
+// Resize a rectangle by dragging a handle. The opposite edge/corner (anchor)
+// holds fixed; new w/h and centre are derived along the rect's own (rotated) axes.
+function startRectResize(e, hx, hy) {
+  const sym = resizeRect.value
+  if (!sym) return
+  e.stopPropagation()
+  const r = (sym.rotation || 0) * Math.PI / 180
+  const u = { x: Math.cos(r), y: Math.sin(r) }   // local x axis
+  const v = { x: -Math.sin(r), y: Math.cos(r) }  // local y axis
+  const alx = -hx * sym.w / 2, aly = -hy * sym.h / 2
+  const anchor = { x: sym.x + alx * u.x + aly * v.x, y: sym.y + alx * u.y + aly * v.y }
+  drag.value = { mode: 'resize', id: sym.instanceId, hx, hy, u, v, anchor, oldW: sym.w, oldH: sym.h }
+  emit('drag-start')
+  e.preventDefault()
+}
+
 function onMove(e) {
   if (!drag.value) return
+
+  if (drag.value.mode === 'resize') {
+    const pt = toSVGPoint(e.currentTarget, e.clientX, e.clientY)
+    const { hx, hy, u, v, anchor, oldW, oldH } = drag.value
+    const ax = pt.x - anchor.x, ay = pt.y - anchor.y
+    const newW = hx ? Math.max(6, Math.min(300, (ax * u.x + ay * u.y) * hx)) : oldW
+    const newH = hy ? Math.max(6, Math.min(340, (ax * v.x + ay * v.y) * hy)) : oldH
+    const cx = anchor.x + (hx * newW / 2) * u.x + (hy * newH / 2) * v.x
+    const cy = anchor.y + (hx * newW / 2) * u.y + (hy * newH / 2) * v.y
+    emit('update-symbol', drag.value.id, { w: Math.round(newW), h: Math.round(newH), x: cx, y: cy })
+    emit('ember', e.clientX, e.clientY)
+    return
+  }
+
   emit('ember', e.clientX, e.clientY) // shed a hot-metal ember trail while dragging
   const pt = toSVGPoint(e.currentTarget, e.clientX, e.clientY)
   const dx = pt.x - drag.value.sx
@@ -712,6 +765,18 @@ const gradLine = computed(() => {
       >{{ text.content }}</textPath>
     </text>
 
+    <!-- Resize handles for a single selected rectangle -->
+    <g v-if="resizeRect" data-export-hide>
+      <rect
+        v-for="(h, i) in rectHandles(resizeRect)"
+        :key="i"
+        :x="h.x - 3.2" :y="h.y - 3.2" width="6.4" height="6.4" rx="1"
+        class="resize-handle"
+        :style="{ cursor: handleCursor(h) }"
+        @mousedown="startRectResize($event, h.hx, h.hy)"
+      />
+    </g>
+
     <!-- Size hint bubble (shown while scroll-resizing) -->
     <g v-if="sizeHint" :transform="`translate(${sizeHint.x}, ${sizeHint.y})`" style="pointer-events:none" data-export-hide>
       <rect x="-14" y="-9" width="28" height="13" rx="3" fill="#000000" fill-opacity="0.65" />
@@ -735,6 +800,14 @@ const gradLine = computed(() => {
 </template>
 
 <style>
+.resize-handle {
+  fill: #ffffff;
+  stroke: #ff7a2e;
+  stroke-width: 1.2;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+}
+.resize-handle:hover { fill: #ffd9b3; }
+
 .align-guide {
   stroke: #00e5ff;
   stroke-width: 0.75;
