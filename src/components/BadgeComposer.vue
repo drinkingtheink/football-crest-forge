@@ -101,29 +101,56 @@ function toSVGPoint(svgEl, clientX, clientY) {
   return pt.matrixTransform(svgEl.getScreenCTM().inverse())
 }
 
-function startTextDrag(e, textId) {
+function inSelection(type, id) { return props.selection.some(s => s.type === type && s.id === id) }
+
+// A movable target with its start position: symbols carry x/y (centre), straight
+// text x/y, arc text arcX/arcY.
+function targetFor(type, id) {
+  if (type === 'symbol') {
+    const sym = props.config.symbols.find(s => s.instanceId === id)
+    return sym ? { type: 'symbol', id, ox: sym.x, oy: sym.y } : null
+  }
+  const t = props.config.texts.find(x => x.id === id)
+  if (!t) return null
+  return t.arc
+    ? { type: 'text', id, isArc: true, ox: t.arcX ?? 100, oy: t.arcY ?? 120 }
+    : { type: 'text', id, isArc: false, ox: t.x ?? 100, oy: t.y ?? 120 }
+}
+
+// Shared mousedown handler for symbols and text. Decides whether this drag moves
+// a single element or the whole multi-selection, and defers a "collapse to just
+// this one" until mouseup if the group was clicked (not dragged).
+function beginDrag(e, type, id) {
   const svgEl = e.currentTarget.closest('svg')
   const pt = toSVGPoint(svgEl, e.clientX, e.clientY)
-  const text = props.config.texts.find(t => t.id === textId)
-  if (text.arc) {
-    drag.value = { type: 'text', id: textId, sx: pt.x, sy: pt.y, ox: text.arcX ?? 100, oy: text.arcY ?? 120, isArc: true }
+  const additive = e.shiftKey || e.metaKey
+  const selectEvt = type === 'symbol' ? 'select-symbol' : 'select-text'
+
+  let targets, collapse = null
+  if (additive) {
+    emit(selectEvt, id, true)                 // toggle membership; drag this one
+    targets = [targetFor(type, id)].filter(Boolean)
+  } else if (inSelection(type, id) && props.selection.length > 1) {
+    targets = props.selection.map(s => targetFor(s.type, s.id)).filter(Boolean)
+    collapse = { type, id }                   // collapse to this one if not dragged
   } else {
-    drag.value = { type: 'text', id: textId, sx: pt.x, sy: pt.y, ox: text.x, oy: text.y, isArc: false }
+    emit(selectEvt, id, false)                // replace → single
+    targets = [targetFor(type, id)].filter(Boolean)
+  }
+
+  const primary = targetFor(type, id)
+  if (type === 'symbol') outsidePromptedId.value = null
+  drag.value = {
+    type, id, instanceId: type === 'symbol' ? id : undefined,
+    sx: pt.x, sy: pt.y, px: primary.ox, py: primary.oy,
+    targets, collapse, moved: false,
   }
   emit('drag-start')
   e.preventDefault()
 }
 
-function startSymbolDrag(e, instanceId) {
-  const svgEl = e.currentTarget.closest('svg')
-  const pt = toSVGPoint(svgEl, e.clientX, e.clientY)
-  const sym = props.config.symbols.find(s => s.instanceId === instanceId)
-  drag.value = { type: 'symbol', instanceId, sx: pt.x, sy: pt.y, ox: sym.x, oy: sym.y }
-  outsidePromptedId.value = null
-  emit('select-symbol', instanceId, e.shiftKey || e.metaKey)
-  emit('drag-start')
-  e.preventDefault()
-}
+function startTextDrag(e, textId)   { beginDrag(e, 'text', textId) }
+function startSymbolDrag(e, instanceId) { beginDrag(e, 'symbol', instanceId) }
 
 function onMove(e) {
   if (!drag.value) return
@@ -131,29 +158,38 @@ function onMove(e) {
   const pt = toSVGPoint(e.currentTarget, e.clientX, e.clientY)
   const dx = pt.x - drag.value.sx
   const dy = pt.y - drag.value.sy
-  updateGuides(drag.value.ox + dx, drag.value.oy + dy)
-  if (drag.value.type === 'text') {
-    if (drag.value.isArc) {
-      emit('update-text', drag.value.id, { arcX: drag.value.ox + dx, arcY: drag.value.oy + dy })
-    } else {
-      emit('update-text-position', drag.value.id, drag.value.ox + dx, drag.value.oy + dy)
-    }
-  } else {
-    const newX = drag.value.ox + dx
-    const newY = drag.value.oy + dy
-    emit('update-symbol-position', drag.value.instanceId, newX, newY)
-    const sym = props.config.symbols.find(s => s.instanceId === drag.value.instanceId)
-    if (!props.config.noShield && sym?.clipped !== false && shapePathEl.value && outsidePromptedId.value !== drag.value.instanceId) {
+  if (dx || dy) drag.value.moved = true
+  updateGuides(drag.value.px + dx, drag.value.py + dy)
+
+  for (const tg of drag.value.targets) {
+    const nx = tg.ox + dx, ny = tg.oy + dy
+    if (tg.type === 'symbol') emit('update-symbol-position', tg.id, nx, ny)
+    else if (tg.isArc)       emit('update-text', tg.id, { arcX: nx, arcY: ny })
+    else                     emit('update-text-position', tg.id, nx, ny)
+  }
+
+  // Out-of-bounds prompt only for a lone symbol drag (noisy for groups).
+  if (drag.value.type === 'symbol' && drag.value.targets.length === 1) {
+    const id = drag.value.id
+    const newX = drag.value.px + dx, newY = drag.value.py + dy
+    const sym = props.config.symbols.find(s => s.instanceId === id)
+    if (!props.config.noShield && sym?.clipped !== false && shapePathEl.value && outsidePromptedId.value !== id) {
       if (!shapePathEl.value.isPointInFill(new DOMPoint(newX, newY))) {
-        outsidePromptedId.value = drag.value.instanceId
-        emit('symbol-outside-bounds', drag.value.instanceId)
+        outsidePromptedId.value = id
+        emit('symbol-outside-bounds', id)
       }
     }
   }
 }
 
 function stopDrag() {
-  if (drag.value) emit('drag-end')
+  if (drag.value) {
+    if (!drag.value.moved && drag.value.collapse) {
+      const c = drag.value.collapse
+      emit(c.type === 'symbol' ? 'select-symbol' : 'select-text', c.id, false)
+    }
+    emit('drag-end')
+  }
   drag.value = null
   guides.value = { x: false, y: false }
 }
@@ -568,7 +604,7 @@ const gradLine = computed(() => {
         transition: 'fill 0.35s ease, stroke 0.35s ease, filter 0.15s ease',
       }"
       @mousedown="startTextDrag($event, text.id)"
-      @click.stop="$emit('select-text', text.id, $event.shiftKey || $event.metaKey)"
+      @click.stop
       @mouseenter="onTextEnter($event, text.id)"
       @mouseleave="onTextLeave"
       @wheel.stop.prevent="onTextWheel($event, text.id)"
@@ -595,7 +631,7 @@ const gradLine = computed(() => {
         transition: 'fill 0.35s ease, stroke 0.35s ease, filter 0.15s ease',
       }"
       @mousedown="startTextDrag($event, text.id)"
-      @click.stop="$emit('select-text', text.id, $event.shiftKey || $event.metaKey)"
+      @click.stop
       @mouseenter="onTextEnter($event, text.id)"
       @mouseleave="onTextLeave"
       @wheel.stop.prevent="onTextWheel($event, text.id)"

@@ -161,6 +161,19 @@ const _ARROW_DELTA = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], 
 function onSelectSymbol(id, additive) { additive ? toggleSelection('symbol', id) : selectSymbol(id) }
 function onSelectText(id, additive) { additive ? toggleSelection('text', id) : selectText(id) }
 
+// Move one selected item by (dx, dy) — used by arrow-key nudge for the whole set.
+function nudgeSelected(item, dx, dy) {
+  if (item.type === 'symbol') {
+    const sym = config.symbols.find(s => s.instanceId === item.id)
+    if (sym) updateSymbolPosition(item.id, sym.x + dx, sym.y + dy)
+  } else {
+    const text = config.texts.find(t => t.id === item.id)
+    if (!text) return
+    if (text.arc) updateText(item.id, { arcX: (text.arcX ?? 100) + dx, arcY: (text.arcY ?? 120) + dy })
+    else updateTextPosition(item.id, (text.x ?? 100) + dx, (text.y ?? 120) + dy)
+  }
+}
+
 function onPickIcon(iconId) {
   if (selectedSymbolId.value) {
     updateSymbol(selectedSymbolId.value, { iconId })
@@ -244,27 +257,15 @@ function onKeyDown(e) {
     e.preventDefault()
     const step = e.shiftKey ? 10 : 1
     const [dx, dy] = _ARROW_DELTA[e.key].map(v => v * step)
-    if (selectedSymbolId.value) {
-      const sym = config.symbols.find(s => s.instanceId === selectedSymbolId.value)
-      if (sym) updateSymbolPosition(selectedSymbolId.value, sym.x + dx, sym.y + dy)
-    } else if (selectedTextId.value) {
-      const text = config.texts.find(t => t.id === selectedTextId.value)
-      if (text) {
-        if (text.arc) {
-          updateText(selectedTextId.value, { arcX: (text.arcX ?? 100) + dx, arcY: (text.arcY ?? 120) + dy })
-        } else {
-          updateTextPosition(selectedTextId.value, (text.x ?? 100) + dx, (text.y ?? 120) + dy)
-        }
-      }
-    }
+    selection.value.forEach(item => nudgeSelected(item, dx, dy))
     return
   }
 
   if (e.key === 'Escape') { deselectAll(); return }
   if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); randomizeAll(); return }
   if (e.key !== 'Delete' && e.key !== 'Backspace') return
-  if (selectedSymbolId.value) removeSymbol(selectedSymbolId.value)
-  else if (selectedTextId.value) removeText(selectedTextId.value)
+  // copy the list first — removeSymbol/removeText mutate the selection
+  ;[...selection.value].forEach(item => item.type === 'symbol' ? removeSymbol(item.id) : removeText(item.id))
 }
 
 const controlsPane    = ref(null)
