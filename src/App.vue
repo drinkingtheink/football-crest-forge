@@ -111,7 +111,7 @@ const overlay = reactive({ color: config.palette[0] ?? '#000000', opacity: 0.7 }
 
 const activeClub = ref(initialClub)
 // True while showing an unedited curated crest from the library (drives the badge).
-const LIBRARY_CHANCE = 0.2
+const LIBRARY_CHANCE = 0.08
 const isCurated = ref(false)
 let curatedLoadPending = false // ignore the library-load's own config mutation
 // Any edit to the crest drops the "curated" badge. The load itself batches into
