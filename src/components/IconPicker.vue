@@ -11,6 +11,16 @@ const emit = defineEmits(['add-icon'])
 const search = ref('')
 const activeGroup = ref('All')
 
+// Tooltip teleported to <body> and fixed to the viewport, so it isn't clipped
+// by the scrollable icon grid (overflow-y) — which cut off the top row's labels.
+const tip = ref(null) // { label, x, y, below }
+function showTip(e, label) {
+  const r = e.currentTarget.getBoundingClientRect()
+  const below = r.top < 60
+  tip.value = { label, x: r.left + r.width / 2, y: below ? r.bottom + 6 : r.top - 6, below }
+}
+function hideTip() { tip.value = null }
+
 const filtered = computed(() => {
   const q = search.value.toLowerCase().trim()
   return icons.filter(ic => {
@@ -54,8 +64,9 @@ const showRectTile = computed(() => {
         <button
           v-if="showRectTile"
           class="icon-btn"
-          data-label="Rectangle"
           @click="$emit('add-icon', 'shape:rect')"
+          @mouseenter="showTip($event, 'Rectangle')"
+          @mouseleave="hideTip"
         >
           <svg viewBox="0 0 100 100" width="34" height="34">
             <rect x="14" y="30" width="72" height="40" fill="currentColor" />
@@ -66,8 +77,9 @@ const showRectTile = computed(() => {
           :key="ic.id"
           class="icon-btn"
           :class="{ placed: placedCounts[ic.id] > 0 }"
-          :data-label="ic.label"
           @click="$emit('add-icon', ic.id)"
+          @mouseenter="showTip($event, ic.label)"
+          @mouseleave="hideTip"
         >
           <svg
             :viewBox="ic.viewBox ? `0 0 ${ic.viewBox[0]} ${ic.viewBox[1]}` : '0 0 100 100'"
@@ -83,6 +95,14 @@ const showRectTile = computed(() => {
         </button>
       </div>
     </div>
+
+    <Teleport to="body">
+      <div
+        v-if="tip"
+        class="icon-tip"
+        :style="{ left: tip.x + 'px', top: tip.y + 'px', transform: tip.below ? 'translate(-50%, 0)' : 'translate(-50%, -100%)' }"
+      >{{ tip.label }}</div>
+    </Teleport>
   </div>
 </template>
 
@@ -181,6 +201,20 @@ const showRectTile = computed(() => {
   background: rgba(232, 200, 74, 0.08);
   color: #cdb96a;
 }
+.icon-tip {
+  position: fixed;
+  z-index: 1000;
+  background: #0f0f13;
+  border: 1px solid #3a3a48;
+  border-radius: 4px;
+  color: #e8e8ec;
+  font-size: 11px;
+  font-family: system-ui, sans-serif;
+  padding: 3px 8px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 .placed-badge {
   position: absolute;
   top: -5px;
@@ -201,27 +235,4 @@ const showRectTile = computed(() => {
   z-index: 11;
 }
 
-/* CSS tooltip */
-.icon-btn::after {
-  content: attr(data-label);
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: #0f0f13;
-  border: 1px solid #3a3a48;
-  border-radius: 4px;
-  color: #e8e8ec;
-  font-size: 11px;
-  font-family: system-ui, sans-serif;
-  padding: 3px 8px;
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.12s;
-  z-index: 10;
-}
-.icon-btn:hover::after {
-  opacity: 1;
-}
 </style>
