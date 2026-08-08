@@ -473,7 +473,7 @@ function fitArcToShape(textId) {
 }
 
 function onDocumentClick(e) {
-  if (!selectedSymbolId.value && !selectedTextId.value) return
+  if (!selection.value.length) return
   if (e.target.closest('svg')) return
   if (e.target.closest('.symbol-item, .text-item')) return
   if (e.target.closest('.fp-panel')) return // teleported font-picker panel — keep the text selected
