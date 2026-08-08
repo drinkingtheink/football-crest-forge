@@ -193,9 +193,12 @@ function isAlignable(s) {
 }
 const alignableCount = computed(() => selection.value.filter(isAlignable).length)
 
-function alignSelection(edge) {
+// Measure each selected (non-arc) element as a box with its anchor (ax/ay), its
+// measured centre (cx/cy) and edges. Symbols use their size box; straight text a
+// live getBBox. Shared by align + distribute.
+function selectionBoxes() {
   const svg = badgeComposerRef.value?.svgRootEl
-  if (!svg) return
+  if (!svg) return []
   const boxes = []
   for (const s of selection.value) {
     if (s.type === 'symbol') {
@@ -212,6 +215,16 @@ function alignSelection(edge) {
       boxes.push({ type: 'text', id: s.id, ax: t.x, ay: t.y, cx: bb.x + bb.width / 2, cy: bb.y + bb.height / 2, hw: bb.width / 2, hh: bb.height / 2, left: bb.x, right: bb.x + bb.width, top: bb.y, bottom: bb.y + bb.height })
     }
   }
+  return boxes
+}
+
+function moveBox(b, nx, ny) {
+  if (b.type === 'symbol') updateSymbolPosition(b.id, nx, ny)
+  else updateTextPosition(b.id, nx, ny)
+}
+
+function alignSelection(edge) {
+  const boxes = selectionBoxes()
   if (boxes.length < 2) return
 
   const gLeft = Math.min(...boxes.map(b => b.left))
@@ -228,8 +241,32 @@ function alignSelection(edge) {
     else if (edge === 'top')     ny = b.ay + (gTop + b.hh - b.cy)
     else if (edge === 'bottom')  ny = b.ay + (gBottom - b.hh - b.cy)
     else if (edge === 'vcenter') ny = b.ay + (gCY - b.cy)
-    if (b.type === 'symbol') updateSymbolPosition(b.id, nx, ny)
-    else updateTextPosition(b.id, nx, ny)
+    moveBox(b, nx, ny)
+  }
+}
+
+// Distribute even GAPS between elements along an axis (accounts for differing
+// sizes). Endpoints hold; the middle elements are respaced so the empty space
+// between adjacent edges is equal.
+function distributeSelection(axis) {
+  const boxes = selectionBoxes()
+  if (boxes.length < 3) return
+  const horiz = axis === 'h'
+
+  boxes.sort((a, b) => (horiz ? a.left - b.left : a.top - b.top))
+  const start = horiz ? boxes[0].left : boxes[0].top
+  const end   = horiz ? boxes[boxes.length - 1].right : boxes[boxes.length - 1].bottom
+  const sizeOf = b => (horiz ? b.right - b.left : b.bottom - b.top)
+  const totalSize = boxes.reduce((s, b) => s + sizeOf(b), 0)
+  const gap = (end - start - totalSize) / (boxes.length - 1)
+
+  let cursor = start
+  for (const b of boxes) {
+    const size = sizeOf(b)
+    const newCentre = cursor + size / 2
+    if (horiz) moveBox(b, b.ax + (newCentre - b.cx), b.ay)
+    else       moveBox(b, b.ax, b.ay + (newCentre - b.cy))
+    cursor += size + gap
   }
 }
 
@@ -242,6 +279,16 @@ const ALIGN_ICONS = {
   vcenter: '<line x1="2" y1="8" x2="14" y2="8" stroke="#e8c84a" stroke-width="1.4"/><rect x="4.4" y="3.5" width="2.2" height="9" rx="1" fill="currentColor"/><rect x="9.4" y="5.25" width="2.2" height="5.5" rx="1" fill="currentColor"/>',
 }
 function alignIcon(edge) { return `<svg viewBox="0 0 16 16" width="15" height="15">${ALIGN_ICONS[edge]}</svg>` }
+
+const distributeOps = [
+  { axis: 'h', title: 'Distribute horizontal spacing' },
+  { axis: 'v', title: 'Distribute vertical spacing' },
+]
+const DIST_ICONS = {
+  h: '<rect x="1.5" y="3" width="2" height="10" rx="1" fill="currentColor"/><rect x="7" y="3" width="2" height="10" rx="1" fill="currentColor"/><rect x="12.5" y="3" width="2" height="10" rx="1" fill="currentColor"/>',
+  v: '<rect x="3" y="1.5" width="10" height="2" rx="1" fill="currentColor"/><rect x="3" y="7" width="10" height="2" rx="1" fill="currentColor"/><rect x="3" y="12.5" width="10" height="2" rx="1" fill="currentColor"/>',
+}
+function distIcon(axis) { return `<svg viewBox="0 0 16 16" width="15" height="15">${DIST_ICONS[axis]}</svg>` }
 
 function onPickIcon(iconId) {
   if (selectedSymbolId.value) {
@@ -640,6 +687,17 @@ function stepBg(dir) {
               @click="alignSelection(op.edge)"
               v-html="alignIcon(op.edge)"
             />
+            <template v-if="alignableCount >= 3">
+              <span class="align-sep" />
+              <button
+                v-for="op in distributeOps"
+                :key="op.axis"
+                class="align-btn"
+                :title="op.title"
+                @click="distributeSelection(op.axis)"
+                v-html="distIcon(op.axis)"
+              />
+            </template>
           </div>
         </Transition>
 
@@ -1372,6 +1430,12 @@ function stepBg(dir) {
 }
 .align-btn:hover { background: rgba(232, 200, 74, 0.14); color: #fff; }
 .align-btn :deep(svg) { display: block; }
+.align-sep {
+  width: 1px;
+  align-self: stretch;
+  margin: 2px 2px;
+  background: rgba(255, 255, 255, 0.12);
+}
 
 .align-fade-enter-active,
 .align-fade-leave-active { transition: opacity 0.18s ease, transform 0.18s ease; }
