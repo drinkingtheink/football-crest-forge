@@ -83,7 +83,7 @@ watch(selectedSymbolId, async (id) => {
 
 const bgOptions = [
   { id: 'grass',       label: 'Grass',      thumb: '/backgrounds/grass.jpg', isImgOption: true },
-  { id: 'stadium',     label: 'Stadium',    thumb: '/backgrounds/stadium.png', isImgOption: true },
+  { id: 'stadium',     label: 'Stadium',    thumb: '/backgrounds/stadium.jpg', isImgOption: true },
   { id: 'fabric',      label: 'Fabric',     thumb: '/backgrounds/fabric.png', isImgOption: true },
   { id: 'brick',       label: 'Brick',      thumb: '/backgrounds/brick.jpg', isImgOption: true },
   { id: 'pitch',       label: 'Pitch',      thumb: '/backgrounds/pitch.png', isImgOption: true },

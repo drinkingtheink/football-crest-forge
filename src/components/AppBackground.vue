@@ -14,7 +14,7 @@ const imageMap = {
   grass:   '/backgrounds/grass.jpg',
   fabric:  '/backgrounds/fabric.png',
   brick:   '/backgrounds/brick.jpg',
-  stadium: '/backgrounds/stadium.png',
+  stadium: '/backgrounds/stadium.jpg',
   pitch:   '/backgrounds/pitch.png',
 }
 
