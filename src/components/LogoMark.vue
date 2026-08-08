@@ -1,7 +1,8 @@
 <script setup>
-// The Crest Foundry mark: a molten-gold shield that breathes a warm glow and
-// kicks the odd spark, like a piece cooling on the anvil. All motion is CSS and
-// disabled under prefers-reduced-motion.
+// The Crest Foundry mark: a molten-gold crest forged on an anvil. A hammer
+// swings a 3-strike loop, each impact shuddering the crest, flaring the spark
+// burst and spitting embers, then the mark rests aglow before repeating.
+// Pure CSS — no JS, no SMIL — and fully stilled under prefers-reduced-motion.
 </script>
 
 <template>
@@ -14,22 +15,45 @@
           <stop offset="100%" stop-color="#c2911f" />
         </linearGradient>
       </defs>
-      <g fill="url(#logo-gold)">
-        <path d="M352.37,303.11h-166.11v14.26h-63.29c1.97,3.8,3.56,7.34,5.56,10.64,12.89,21.26,31.54,34.92,55.43,41.5,1.88.52,2.49,1.24,2.45,3.2-.14,6.12-.06,12.24-.05,18.36,0,.84.07,1.67.12,2.7h41.71c-2.16,4.41-4,8.54-6.15,12.49-8.3,15.27-19.71,28.02-32.37,39.77-2.26,2.1-4.47,3.12-7.57,2.95-4.49-.25-9-.06-13.54-.06v13.06h201.77v-13.06c-5.86,0-11.57.04-17.28-.04-1.04-.02-2.28-.27-3.07-.88-15.24-11.68-28.3-25.32-37.36-42.43-1.99-3.75-3.62-7.69-5.6-11.93h45.41c0-1.04,0-1.9,0-2.75,0-5.25.08-10.5-.05-15.74-.04-1.74.57-2.5,2.15-3.08,8.7-3.21,16.75-7.7,24.31-13.02,5.37-3.79,10.49-7.92,15.92-12.06-12.53-11.21-26.3-19.07-42.39-22.94v-20.93Z" />
-        <path d="M399.14,214.08c17.01-24.47,33.56-48.27,50.1-72.07-.15-.2-.3-.41-.45-.61-25.48,13.61-50.97,27.21-77.14,41.19,7.63-33.96,15.07-67.01,22.5-100.07-.21-.1-.43-.19-.64-.29-26.69,42.45-53.39,84.9-80.59,128.16-3.03-11.96-5.78-22.8-8.53-33.65-.25.02-.5.03-.76.05-10.52,31.01-21.03,62.02-31.81,93.78,22.75-10.66,44.66-20.92,67.19-31.47v31.57c45.01-18.06,89.47-35.91,133.94-53.75l-.16-.77c-24.28-.69-48.56-1.37-73.65-2.08Z" />
-        <path d="M527.89,85.99c-20.02-15.5-40.63-30.79-60.57-45.57-13.7-10.16-27.86-20.66-41.65-31.11-15.08-11.42-29.21-11.6-44.46-.55-29.6,21.43-67.66,33.21-107.22,33.21-.16,0-.33,0-.49,0-39.81-.1-78.54-12.12-109.04-33.86-15.35-10.93-29.41-10.81-44.25.37-6.2,4.67-12.43,9.47-18.46,14.12-19.41,14.95-39.48,30.42-60.3,42.81C-2.34,91.47-2.6,122.28,1.86,139.56c6.92,128.72,35.8,230.45,90.84,320.03,39.74,64.68,87.23,115.57,145.19,155.6,9.06,6.26,20.12,12.21,33.31,12.21,9.35,0,19.78-2.99,31.31-10.99,60.51-41.93,110.59-94.89,148.84-157.41,57.92-94.65,88.11-206.06,92.29-340.59.35-11.44-6.28-25.07-15.77-32.42ZM423.22,441.78c-35.84,58.57-82.78,108.2-139.49,147.51-10.25,7.11-15.31,6.87-27.08-1.25-54.11-37.37-98.54-85.03-135.83-145.72-25.42-41.37-44.93-85.65-59.03-134.44,43.85-24.7,87.48-49.28,131.32-73.98,9.34,12.5,18.62,24.92,28,37.47,12.79-7.2,25.3-14.25,37.76-21.26-.14-.58-.17-.85-.27-1.1-7.07-17.51-14.14-35.03-21.26-52.52-.38-.94-1.14-1.84-1.94-2.5-15.15-12.48-30.34-24.89-45.47-37.39-1.45-1.2-2.48-1.22-4-.25-2.27,1.46-4.7,2.66-7.05,3.98-5.07,2.87-10.14,5.75-15.37,8.72,5.86,14.52,11.63,28.85,17.51,43.42-42.08,23.7-83.88,47.25-125.8,70.87-10.98-44.89-17.72-93.59-20.51-147.28l-.1-1.95-.56-1.88c-1.5-5.05-6.05-20.42,24.25-38.45,22.53-13.41,43.39-29.48,63.56-45.03,5.96-4.59,12.11-9.33,18.17-13.9,1.14-.86,1.92-1.34,2.41-1.61.55.27,1.47.79,2.83,1.76,37.5,26.72,83.2,40.09,128.68,40.08,45.17,0,90.12-13.19,126.58-39.58,1.21-.88,2.05-1.37,2.57-1.63.52.29,1.37.82,2.62,1.76,13.92,10.54,28.15,21.09,41.91,31.3,19.79,14.68,40.26,29.87,60.02,45.15,1.12.94,2.79,4.01,2.99,5.5-4.02,128.57-32.63,234.61-87.45,324.2Z" />
+
+      <g class="shake" fill="url(#logo-gold)">
+        <path id="anvil" d="M369.72,396.61h-53.8c2.35,5.03,4.28,9.69,6.64,14.13,10.74,20.27,26.21,36.43,44.27,50.28.94.72,2.41,1.02,3.63,1.04,6.76.1,13.53.05,20.47.05v15.48h-239.06v-15.47c5.37,0,10.72-.22,16.04.07,3.67.2,6.29-1.01,8.97-3.49,15-13.92,28.52-29.02,38.35-47.12,2.55-4.68,4.72-9.57,7.28-14.8h-49.42c-.05-1.21-.14-2.2-.14-3.2-.01-7.25-.12-14.51.05-21.76.05-2.33-.67-3.18-2.9-3.79-28.3-7.79-50.4-23.98-65.67-49.17-2.36-3.9-4.24-8.09-6.58-12.6h74.99v-16.9h196.8v24.8c19.06,4.59,35.38,13.9,50.23,27.18-6.44,4.9-12.5,9.8-18.87,14.28-8.95,6.31-18.49,11.63-28.8,15.43-1.86.69-2.59,1.59-2.54,3.65.15,6.21.05,12.43.05,18.65,0,1.01,0,2.02,0,3.26Z" />
+        <path id="hammer" d="M181.04,212.46c-5.87-14.57-11.65-28.89-17.51-43.42,5.23-2.97,10.3-5.85,15.37-8.72,2.35-1.33,4.78-2.53,7.05-3.98,1.52-.97,2.54-.95,4,.25,15.12,12.5,30.32,24.92,45.47,37.39.8.66,1.55,1.56,1.94,2.5,7.12,17.49,14.19,35.01,21.26,52.52.1.24.13.52.27,1.1-12.45,7.01-24.97,14.06-37.76,21.26-9.37-12.55-18.66-24.97-28-37.47-45.67,25.73-91.11,51.33-136.81,77.08-4.03-7.15-7.99-14.16-12.09-21.43,45.63-25.7,91.06-51.29,136.83-77.08Z" />
+        <path id="sparks" d="M449.24,142.01c-16.54,23.8-33.09,47.6-50.1,72.07,25.09.71,49.37,1.4,73.65,2.08.05.26.11.51.16.77-44.47,17.84-88.93,35.69-133.94,53.75v-31.57c-22.53,10.55-44.44,20.81-67.19,31.47,10.77-31.76,21.29-62.77,31.81-93.78.25-.02.5-.03.76-.05,2.75,10.85,5.5,21.69,8.53,33.65,27.2-43.26,53.89-85.71,80.59-128.16l.64.29c-7.43,33.06-14.86,66.11-22.5,100.07,26.17-13.98,51.66-27.58,77.14-41.19.15.2.3.41.45.61Z" />
+
+        <g id="shrapnel">
+          <circle class="bit" cx="252" cy="278" r="5"   style="--dx: 96px;  --dy: -84px;" />
+          <circle class="bit" cx="252" cy="278" r="4"   style="--dx: 142px; --dy: -26px;" />
+          <circle class="bit" cx="252" cy="278" r="4.5" style="--dx: 44px;  --dy: -128px;" />
+          <circle class="bit" cx="252" cy="278" r="4"   style="--dx: -82px; --dy: -72px;" />
+          <circle class="bit" cx="252" cy="278" r="3.5" style="--dx: -128px;--dy: -14px;" />
+          <circle class="bit" cx="252" cy="278" r="4"   style="--dx: 112px; --dy: 46px;" />
+          <circle class="bit" cx="252" cy="278" r="3.5" style="--dx: -62px; --dy: 56px;" />
+          <circle class="bit" cx="252" cy="278" r="3"   style="--dx: 8px;   --dy: -164px;" />
+          <circle class="bit" cx="252" cy="278" r="3.5" style="--dx: 172px; --dy: -96px;" />
+          <circle class="bit" cx="252" cy="278" r="2.5" style="--dx: -34px; --dy: -142px;" />
+        </g>
+
+        <path id="border" d="M271.21,627.4c-13.19,0-24.25-5.95-33.31-12.21-57.96-40.03-105.46-90.92-145.19-155.6C37.66,370.01,8.78,268.28,1.86,139.56c-4.47-17.28-4.2-48.09,39.57-74.15,20.83-12.4,40.89-27.86,60.3-42.81,6.03-4.64,12.26-9.45,18.46-14.12,14.85-11.18,28.91-11.3,44.25-.37,30.51,21.74,69.23,33.76,109.04,33.86.16,0,.33,0,.49,0,39.56,0,77.62-11.79,107.22-33.21,15.25-11.04,29.38-10.87,44.46.55,13.79,10.44,27.95,20.94,41.64,31.1,19.94,14.79,40.55,30.08,60.58,45.58,9.49,7.35,16.12,20.98,15.77,32.42-4.18,134.53-34.37,245.94-92.29,340.59-38.25,62.51-88.33,115.47-148.84,157.41-11.54,7.99-21.96,10.99-31.31,10.99ZM142.47,33.22c-.49.27-1.27.76-2.41,1.61-6.06,4.56-12.22,9.31-18.18,13.9-20.17,15.54-41.04,31.62-63.56,45.02-30.3,18.03-25.75,33.4-24.25,38.45l.56,1.88.1,1.95c6.45,123.84,33.8,221.16,86.1,306.27,37.29,60.69,81.72,108.35,135.83,145.72,11.76,8.12,16.82,8.35,27.08,1.25,56.72-39.31,103.65-88.94,139.49-147.51,54.82-89.59,83.43-195.64,87.45-324.2-.2-1.48-1.86-4.56-2.99-5.5-19.76-15.29-40.23-30.48-60.03-45.16-13.76-10.2-27.98-20.75-41.9-31.29-1.25-.95-2.1-1.48-2.62-1.77-.52.27-1.36.75-2.57,1.63-36.46,26.39-81.41,39.58-126.58,39.58-45.48,0-91.18-13.37-128.68-40.08-1.36-.97-2.28-1.49-2.83-1.76Z" />
       </g>
     </svg>
-    <i class="spark s1"></i>
-    <i class="spark s2"></i>
-    <i class="spark s3"></i>
-    <i class="spark s4"></i>
-    <i class="spark s5"></i>
   </span>
 </template>
 
 <style scoped>
+/* Timeline (percentages of --loop): 3 strikes, then the crest rests aglow,
+   then embers dim before the loop restarts. Impacts land at 7.8 / 20.3 / 32.8%. */
 .logo-mark {
+  --loop: 8s;
+  --lift: -22deg;        /* windup angle (negative = raised) */
+  --strike: 5deg;        /* contact angle (positive = onto the anvil) */
+  --shake: 1.6px;        /* crest shudder on impact */
+  --recoil: 4px;         /* anvil settle on impact */
+  --spark-pop: 1.45;     /* how far the spark burst flares */
+  --spark-rest: 1;       /* opacity of the burst while the crest holds static */
+  --spark-gone: .5;      /* how far the burst collapses as it dies out */
+  --particle-fade: .9;   /* opacity of the flying spark bits */
+
   position: relative;
   display: inline-flex;
   flex: none;
@@ -38,9 +62,11 @@
   line-height: 0;
 }
 
+/* Molten-gold glow, breathing on its own gentle cycle */
 .logo-svg {
   width: 100%;
   height: 100%;
+  overflow: visible;             /* let stray embers clear the mark */
   filter: drop-shadow(0 0 2px rgba(255, 140, 40, 0.4));
   animation: logo-glow 3.4s ease-in-out infinite;
 }
@@ -53,37 +79,114 @@
   animation-play-state: paused;
 }
 
-/* Intermittent sparks kicked off the top of the mark */
-.spark {
-  position: absolute;
-  top: 6px;
-  left: 50%;
-  width: 2.5px;
-  height: 2.5px;
-  border-radius: 50%;
-  background: #ffe6a6;
-  box-shadow: 0 0 4px 1px rgba(255, 150, 40, 0.9);
-  opacity: 0;
-  pointer-events: none;
-  animation: spark-fly 3s ease-out infinite;
+/* 1. whole-crest shudder on each impact */
+.shake { animation: crest-shake var(--loop) infinite linear; }
+@keyframes crest-shake {
+  0%, 7.8%    { transform: translate(0, 0); }
+  8.1%        { transform: translate(var(--shake), calc(var(--shake) * .35)); }
+  8.5%        { transform: translate(calc(var(--shake) * -.7), calc(var(--shake) * -.5)); }
+  8.9%        { transform: translate(calc(var(--shake) * .35), 0); }
+  9.4%, 20.3% { transform: translate(0, 0); }
+  20.6%       { transform: translate(var(--shake), calc(var(--shake) * .35)); }
+  21%         { transform: translate(calc(var(--shake) * -.7), calc(var(--shake) * -.5)); }
+  21.4%       { transform: translate(calc(var(--shake) * .35), 0); }
+  21.9%, 32.8%{ transform: translate(0, 0); }
+  33.1%       { transform: translate(var(--shake), calc(var(--shake) * .35)); }
+  33.5%       { transform: translate(calc(var(--shake) * -.7), calc(var(--shake) * -.5)); }
+  33.9%       { transform: translate(calc(var(--shake) * .35), 0); }
+  34.4%, 100% { transform: translate(0, 0); }
 }
-/* Each spark: different drift, timing and phase so pops feel random & occasional */
-.s1 { --dx: -9px;  animation-duration: 2.8s; animation-delay: 0s;    margin-left: -6px; }
-.s2 { --dx: 7px;   animation-duration: 3.6s; animation-delay: -1.1s; margin-left: 3px; }
-.s3 { --dx: -3px;  animation-duration: 3.1s; animation-delay: -2.2s; margin-left: -1px; }
-.s4 { --dx: 11px;  animation-duration: 4.2s; animation-delay: -0.6s; margin-left: 5px; }
-.s5 { --dx: 2px;   animation-duration: 3.9s; animation-delay: -2.8s; margin-left: -4px; }
 
+/* 2. the hammer — pivots at the butt of the handle, lower left */
+#hammer {
+  transform-box: view-box;
+  transform-origin: 50px 300px;
+  animation: swing var(--loop) infinite;
+}
+@keyframes swing {
+  0%     { transform: rotate(0deg);          animation-timing-function: cubic-bezier(.3,.7,.4,1); }
+  5%     { transform: rotate(var(--lift));    animation-timing-function: cubic-bezier(.75,0,.9,.35); }
+  7.8%   { transform: rotate(var(--strike));  animation-timing-function: linear; }
+  9%     { transform: rotate(var(--strike));  animation-timing-function: cubic-bezier(.2,.9,.4,1); }
+  12.5%  { transform: rotate(0deg);          animation-timing-function: cubic-bezier(.3,.7,.4,1); }
+  17.5%  { transform: rotate(var(--lift));    animation-timing-function: cubic-bezier(.75,0,.9,.35); }
+  20.3%  { transform: rotate(var(--strike));  animation-timing-function: linear; }
+  21.5%  { transform: rotate(var(--strike));  animation-timing-function: cubic-bezier(.2,.9,.4,1); }
+  25%    { transform: rotate(0deg);          animation-timing-function: cubic-bezier(.3,.7,.4,1); }
+  30%    { transform: rotate(var(--lift));    animation-timing-function: cubic-bezier(.75,0,.9,.35); }
+  32.8%  { transform: rotate(var(--strike));  animation-timing-function: linear; }
+  34%    { transform: rotate(var(--strike));  animation-timing-function: cubic-bezier(.2,.9,.4,1); }
+  37.5%,
+  100%   { transform: rotate(0deg); }
+}
+
+/* 3. the anvil takes the hit */
+#anvil {
+  transform-box: view-box;
+  transform-origin: 271px 400px;
+  animation: anvil-recoil var(--loop) infinite;
+}
+@keyframes anvil-recoil {
+  0%, 7.8%    { transform: translateY(0) scaleY(1);              animation-timing-function: cubic-bezier(.3,0,.6,1); }
+  8.2%        { transform: translateY(var(--recoil)) scaleY(.988); animation-timing-function: cubic-bezier(.2,.9,.4,1); }
+  10.2%, 20.3%{ transform: translateY(0) scaleY(1);              animation-timing-function: cubic-bezier(.3,0,.6,1); }
+  20.7%       { transform: translateY(var(--recoil)) scaleY(.988); animation-timing-function: cubic-bezier(.2,.9,.4,1); }
+  22.7%, 32.8%{ transform: translateY(0) scaleY(1);              animation-timing-function: cubic-bezier(.3,0,.6,1); }
+  33.2%       { transform: translateY(var(--recoil)) scaleY(.988); animation-timing-function: cubic-bezier(.2,.9,.4,1); }
+  35.2%, 100% { transform: translateY(0) scaleY(1); }
+}
+
+/* 4. the built-in spark burst flares just after each impact */
+#sparks {
+  transform-box: view-box;
+  transform-origin: 268px 272px;
+  animation: spark-flare var(--loop) infinite;
+}
+@keyframes spark-flare {
+  0%, 8.4%   { transform: scale(var(--spark-gone)); opacity: 0; animation-timing-function: cubic-bezier(.2,.8,.4,1); }
+  8.6%       { transform: scale(var(--spark-pop));  opacity: 1; }
+  9.1%       { transform: scale(var(--spark-pop));  opacity: 1; animation-timing-function: cubic-bezier(.25,.8,.4,1); }
+  12.5%,
+  20.9%      { transform: scale(1);                 opacity: var(--spark-rest); animation-timing-function: cubic-bezier(.2,.8,.4,1); }
+  21.1%      { transform: scale(var(--spark-pop));  opacity: 1; }
+  21.6%      { transform: scale(var(--spark-pop));  opacity: 1; animation-timing-function: cubic-bezier(.25,.8,.4,1); }
+  25%,
+  33.4%      { transform: scale(1);                 opacity: var(--spark-rest); animation-timing-function: cubic-bezier(.2,.8,.4,1); }
+  33.6%      { transform: scale(var(--spark-pop));  opacity: 1; }
+  34.1%      { transform: scale(var(--spark-pop));  opacity: 1; animation-timing-function: cubic-bezier(.25,.8,.4,1); }
+  37.5%,
+  86%        { transform: scale(1);                 opacity: var(--spark-rest); animation-timing-function: cubic-bezier(.45,0,.75,.5); }
+  93%,
+  100%       { transform: scale(var(--spark-gone)); opacity: 0; }
+}
+
+/* 5. spark shrapnel — the spitting embers; each bit carries its own vector */
+#shrapnel { filter: drop-shadow(0 0 2px rgba(255, 150, 40, 0.85)); }
+.bit {
+  fill: #ffe6a6;
+  opacity: 0;
+  animation: spark-fly var(--loop) infinite;
+}
 @keyframes spark-fly {
-  0%   { transform: translate(0, 0) scale(1);        opacity: 0; }
-  4%   { opacity: 1; }
-  9%   { opacity: 1; }
-  38%  { transform: translate(var(--dx), -16px) scale(0.35); opacity: 0; }
-  100% { transform: translate(var(--dx), -16px) scale(0.35); opacity: 0; }
+  0%, 8.5%    { transform: translate(0, 0) scale(.35); opacity: 0; }
+  8.7%        { transform: translate(calc(var(--dx) * .18), calc(var(--dy) * .18)) scale(1);
+                opacity: var(--particle-fade); animation-timing-function: cubic-bezier(.15,.7,.35,1); }
+  12.3%       { transform: translate(var(--dx), var(--dy)) scale(.15); opacity: 0; }
+  12.9%, 21%  { transform: translate(0, 0) scale(.35); opacity: 0; }
+  21.2%       { transform: translate(calc(var(--dx) * .18), calc(var(--dy) * .18)) scale(1);
+                opacity: var(--particle-fade); animation-timing-function: cubic-bezier(.15,.7,.35,1); }
+  24.8%       { transform: translate(var(--dx), var(--dy)) scale(.15); opacity: 0; }
+  25.4%, 33.5%{ transform: translate(0, 0) scale(.35); opacity: 0; }
+  33.7%       { transform: translate(calc(var(--dx) * .18), calc(var(--dy) * .18)) scale(1);
+                opacity: var(--particle-fade); animation-timing-function: cubic-bezier(.15,.7,.35,1); }
+  37.3%       { transform: translate(var(--dx), var(--dy)) scale(.15); opacity: 0; }
+  37.9%, 100% { transform: translate(0, 0) scale(.35); opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .logo-svg { animation: none; filter: drop-shadow(0 0 2px rgba(255, 150, 40, 0.4)); }
-  .spark { display: none; }
+  .shake, #hammer, #anvil, #sparks, .bit { animation: none; }
+  .bit { opacity: 0; }
+  #sparks { opacity: var(--spark-rest); }
 }
 </style>
