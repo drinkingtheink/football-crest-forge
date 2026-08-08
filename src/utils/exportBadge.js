@@ -154,6 +154,9 @@ function buildCleanCrestSvg(svgEl) {
   clone.querySelectorAll('[data-export-hide]').forEach(el => el.remove())
   clone.style.filter = 'none'
   clone.removeAttribute('filter')
+  // Drop decorative element-level filters (hover / selection glow) so an active
+  // selection or hover never bakes a gold halo into the exported artwork.
+  clone.querySelectorAll('*').forEach(el => { if (el.style && el.style.filter) el.style.filter = 'none' })
   return clone
 }
 

@@ -28,6 +28,9 @@ const {
   initialClub,
   selectedSymbolId,
   selectedTextId,
+  selection,
+  isSelected,
+  toggleSelection,
   setPaletteColor,
   addPaletteColor,
   removePaletteColor,
@@ -153,6 +156,10 @@ const pinstripeThumb = computed(() => pinstripeBg(config.palette, patternTone.va
 const diamondsThumb  = computed(() => diamondsBg(config.palette, patternTone.value))
 
 const _ARROW_DELTA = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }
+
+// Shift/⌘-click toggles membership; a plain click replaces the selection.
+function onSelectSymbol(id, additive) { additive ? toggleSelection('symbol', id) : selectSymbol(id) }
+function onSelectText(id, additive) { additive ? toggleSelection('text', id) : selectText(id) }
 
 function onPickIcon(iconId) {
   if (selectedSymbolId.value) {
@@ -574,14 +581,15 @@ function stepBg(dir) {
             ref="badgeComposerRef"
             :config="config"
             :selected-symbol-id="selectedSymbolId"
+            :selection="selection"
             :size="380"
             uid="main"
             @update-text="updateText"
             @update-text-position="updateTextPosition"
             @update-symbol-position="updateSymbolPosition"
             @update-symbol="updateSymbol"
-            @select-symbol="selectSymbol"
-            @select-text="selectText"
+            @select-symbol="onSelectSymbol"
+            @select-text="onSelectText"
             @deselect="deselectAll"
             @symbol-outside-bounds="onSymbolOutsideBounds"
             @ember="onDragEmber"
@@ -890,11 +898,12 @@ function stepBg(dir) {
           <TextEditor
             :texts="config.texts"
             :selected-text-id="selectedTextId"
+            :selected-text-ids="selection.filter(s => s.type === 'text').map(s => s.id)"
             :shape-fit="currentShapeFit"
             @add-text="addText"
             @remove-text="removeText"
             @update-text="updateText"
-            @select-text="selectText"
+            @select-text="onSelectText"
             @fit-arc="fitArcToShape"
           />
         </div>
@@ -914,8 +923,8 @@ function stepBg(dir) {
               :key="sym.instanceId"
               :ref="el => setSymRef(el, sym.instanceId)"
               class="symbol-item"
-              :class="{ selected: selectedSymbolId === sym.instanceId }"
-              @click="selectSymbol(sym.instanceId)"
+              :class="{ selected: isSelected('symbol', sym.instanceId) }"
+              @click="onSelectSymbol(sym.instanceId, $event.shiftKey || $event.metaKey)"
             >
               <div class="sym-row">
                 <svg :viewBox="symPreviewVB(sym.iconId)" width="28" height="28" class="sym-preview">

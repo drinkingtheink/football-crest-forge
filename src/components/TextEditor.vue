@@ -6,6 +6,7 @@ import FontPicker from './FontPicker.vue'
 const props = defineProps({
   texts: { type: Array, required: true },
   selectedTextId: { type: String, default: null },
+  selectedTextIds: { type: Array, default: () => [] },
   shapeFit: { type: Object, default: null },
 })
 
@@ -47,8 +48,8 @@ function onFontPick(textId, family) {
         :key="text.id"
         :ref="el => setRowRef(el, text.id)"
         class="text-item"
-        :class="{ selected: selectedTextId === text.id }"
-        @click="$emit('select-text', text.id)"
+        :class="{ selected: selectedTextIds.includes(text.id) }"
+        @click="$emit('select-text', text.id, $event.shiftKey || $event.metaKey)"
       >
         <!-- Row summary -->
         <div class="text-row">

@@ -11,9 +11,14 @@ let resizeHintShown = false
 const props = defineProps({
   config: { type: Object, required: true },
   selectedSymbolId: { type: String, default: null },
+  selection: { type: Array, default: () => [] },
   size: { type: Number, default: 380 },
   uid: { type: String, default: 'b0' },
 })
+
+const selectedSyms  = computed(() => new Set(props.selection.filter(s => s.type === 'symbol').map(s => s.id)))
+const selectedTexts = computed(() => new Set(props.selection.filter(s => s.type === 'text').map(s => s.id)))
+const SELECT_GLOW = 'drop-shadow(0 0 2.5px #e8c84a) drop-shadow(0 0 7px rgba(232,200,74,0.7))'
 
 const emit = defineEmits(['update-text-position', 'update-symbol-position', 'update-text', 'update-symbol', 'select-symbol', 'select-text', 'deselect', 'symbol-outside-bounds', 'ember', 'drag-start', 'drag-end'])
 
@@ -115,7 +120,7 @@ function startSymbolDrag(e, instanceId) {
   const sym = props.config.symbols.find(s => s.instanceId === instanceId)
   drag.value = { type: 'symbol', instanceId, sx: pt.x, sy: pt.y, ox: sym.x, oy: sym.y }
   outsidePromptedId.value = null
-  emit('select-symbol', instanceId)
+  emit('select-symbol', instanceId, e.shiftKey || e.metaKey)
   emit('drag-start')
   e.preventDefault()
 }
@@ -434,7 +439,7 @@ const gradLine = computed(() => {
       :clip-path="config.noShield ? null : `url(#${clipId})`"
       :style="{
         cursor: drag?.instanceId === sym.instanceId ? 'grabbing' : 'grab',
-        filter: hoveredSymbolId === sym.instanceId ? 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' : 'none',
+        filter: selectedSyms.has(sym.instanceId) ? SELECT_GLOW : (hoveredSymbolId === sym.instanceId ? 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' : 'none'),
         transition: 'filter 0.15s ease',
       }"
       @click.stop
@@ -510,7 +515,7 @@ const gradLine = computed(() => {
       :key="sym.instanceId"
       :style="{
         cursor: drag?.instanceId === sym.instanceId ? 'grabbing' : 'grab',
-        filter: hoveredSymbolId === sym.instanceId ? 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' : 'none',
+        filter: selectedSyms.has(sym.instanceId) ? SELECT_GLOW : (hoveredSymbolId === sym.instanceId ? 'drop-shadow(0 0 6px rgba(255,255,255,0.4))' : 'none'),
         transition: 'filter 0.15s ease',
       }"
       @click.stop
@@ -559,11 +564,11 @@ const gradLine = computed(() => {
         fill: text.color,
         stroke: text.strokeWidth > 0 ? text.strokeColor : 'none',
         cursor: drag?.id === text.id ? 'grabbing' : 'grab',
-        filter: hoveredTextId === text.id ? 'drop-shadow(0 0 5px rgba(255,255,255,0.35))' : 'none',
+        filter: selectedTexts.has(text.id) ? SELECT_GLOW : (hoveredTextId === text.id ? 'drop-shadow(0 0 5px rgba(255,255,255,0.35))' : 'none'),
         transition: 'fill 0.35s ease, stroke 0.35s ease, filter 0.15s ease',
       }"
       @mousedown="startTextDrag($event, text.id)"
-      @click.stop="$emit('select-text', text.id)"
+      @click.stop="$emit('select-text', text.id, $event.shiftKey || $event.metaKey)"
       @mouseenter="onTextEnter($event, text.id)"
       @mouseleave="onTextLeave"
       @wheel.stop.prevent="onTextWheel($event, text.id)"
@@ -586,11 +591,11 @@ const gradLine = computed(() => {
         fill: text.color,
         stroke: text.strokeWidth > 0 ? text.strokeColor : 'none',
         cursor: drag?.id === text.id ? 'grabbing' : 'grab',
-        filter: hoveredTextId === text.id ? 'drop-shadow(0 0 5px rgba(255,255,255,0.35))' : 'none',
+        filter: selectedTexts.has(text.id) ? SELECT_GLOW : (hoveredTextId === text.id ? 'drop-shadow(0 0 5px rgba(255,255,255,0.35))' : 'none'),
         transition: 'fill 0.35s ease, stroke 0.35s ease, filter 0.15s ease',
       }"
       @mousedown="startTextDrag($event, text.id)"
-      @click.stop="$emit('select-text', text.id)"
+      @click.stop="$emit('select-text', text.id, $event.shiftKey || $event.metaKey)"
       @mouseenter="onTextEnter($event, text.id)"
       @mouseleave="onTextLeave"
       @wheel.stop.prevent="onTextWheel($event, text.id)"
