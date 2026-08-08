@@ -15,7 +15,7 @@ import { saveSnapshot } from './utils/snapshots.js'
 import { clubs } from './data/clubs.js'
 import { shapes, shapesById } from './data/shapes.js'
 import { icons, iconsById } from './data/icons.js'
-import { auroraBg, wavesBg, crisscrossBg } from './utils/patterns.js'
+import { auroraBg, wavesBg, crisscrossBg, pinstripeBg, diamondsBg } from './utils/patterns.js'
 import { randomFonts, loadFont } from './utils/fonts.js'
 import { exportCrestPng, exportCrestSvg, crestFilename } from './utils/exportBadge.js'
 import { createSparkField } from './utils/particles.js'
@@ -91,6 +91,8 @@ const bgOptions = [
   { id: 'aurora',      label: 'Aurora' },
   { id: 'waves',       label: 'Waves' },
   { id: 'crisscross',  label: 'Criss-Cross' },
+  { id: 'pinstripe',   label: 'Pinstripe' },
+  { id: 'diamonds',    label: 'Diamonds' },
 ]
 
 const appBg = ref(bgOptions[Math.floor(Math.random() * bgOptions.length)].id)
@@ -143,6 +145,8 @@ watch(() => config.palette[0], c => { if (c) overlay.color = c })
 const auroraThumb    = computed(() => auroraBg(config.palette))
 const wavesThumb     = computed(() => wavesBg(config.palette))
 const crisscrossThumb = computed(() => crisscrossBg(config.palette))
+const pinstripeThumb = computed(() => pinstripeBg(config.palette))
+const diamondsThumb  = computed(() => diamondsBg(config.palette))
 
 const _ARROW_DELTA = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }
 
@@ -612,7 +616,7 @@ function stepBg(dir) {
                 class="bg-opt"
                 :class="{ active: appBg === opt.id }"
                 :title="opt.label"
-                :style="opt.id === 'aurora' ? auroraThumb : opt.id === 'waves' ? wavesThumb : opt.id === 'crisscross' ? crisscrossThumb : {}"
+                :style="opt.id === 'aurora' ? auroraThumb : opt.id === 'waves' ? wavesThumb : opt.id === 'crisscross' ? crisscrossThumb : opt.id === 'pinstripe' ? pinstripeThumb : opt.id === 'diamonds' ? diamondsThumb : {}"
                 @click="appBg = opt.id"
               >
                 <img v-if="opt.thumb" :src="opt.thumb" class="bg-opt-thumb" />

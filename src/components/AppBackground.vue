@@ -2,7 +2,7 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useBadgeConfig } from '../composables/useBadgeConfig.js'
 import { startBokeh } from '../utils/bokeh.js'
-import { wavesBg, crisscrossBg } from '../utils/patterns.js'
+import { wavesBg, crisscrossBg, pinstripeBg, diamondsBg } from '../utils/patterns.js'
 
 const props = defineProps({
   type: { type: String, default: 'none' },
@@ -52,6 +52,8 @@ function auroraRibbonsFor(palette) {
 function styleFor(type) {
   if (type === 'waves')      return wavesBg(config.palette)
   if (type === 'crisscross') return crisscrossBg(config.palette)
+  if (type === 'pinstripe')  return pinstripeBg(config.palette)
+  if (type === 'diamonds')   return diamondsBg(config.palette)
   if (imageMap[type])        return { backgroundImage: `url(${imageMap[type]})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: imagePos[type] || 'center' }
   return {}
 }
