@@ -174,6 +174,75 @@ function nudgeSelected(item, dx, dy) {
   }
 }
 
+// ── Align selected elements to their combined bounding box ────────────────────
+// Symbols align by their size box; straight text by its measured getBBox; arc
+// text is excluded (its position is a circle centre, not a linear anchor).
+const alignOps = [
+  { edge: 'left',    title: 'Align left edges' },
+  { edge: 'hcenter', title: 'Align horizontal centers' },
+  { edge: 'right',   title: 'Align right edges' },
+  { edge: 'top',     title: 'Align top edges' },
+  { edge: 'vcenter', title: 'Align vertical centers' },
+  { edge: 'bottom',  title: 'Align bottom edges' },
+]
+
+function isAlignable(s) {
+  if (s.type === 'symbol') return true
+  const t = config.texts.find(x => x.id === s.id)
+  return !!t && !t.arc
+}
+const alignableCount = computed(() => selection.value.filter(isAlignable).length)
+
+function alignSelection(edge) {
+  const svg = badgeComposerRef.value?.svgRootEl
+  if (!svg) return
+  const boxes = []
+  for (const s of selection.value) {
+    if (s.type === 'symbol') {
+      const sym = config.symbols.find(x => x.instanceId === s.id)
+      if (!sym) continue
+      const hw = sym.size / 2, hh = sym.size / 2
+      boxes.push({ type: 'symbol', id: s.id, ax: sym.x, ay: sym.y, cx: sym.x, cy: sym.y, hw, hh, left: sym.x - hw, right: sym.x + hw, top: sym.y - hh, bottom: sym.y + hh })
+    } else {
+      const t = config.texts.find(x => x.id === s.id)
+      if (!t || t.arc) continue
+      const el = svg.querySelector(`[data-text-id="${CSS.escape(s.id)}"]`)
+      if (!el) continue
+      const bb = el.getBBox()
+      boxes.push({ type: 'text', id: s.id, ax: t.x, ay: t.y, cx: bb.x + bb.width / 2, cy: bb.y + bb.height / 2, hw: bb.width / 2, hh: bb.height / 2, left: bb.x, right: bb.x + bb.width, top: bb.y, bottom: bb.y + bb.height })
+    }
+  }
+  if (boxes.length < 2) return
+
+  const gLeft = Math.min(...boxes.map(b => b.left))
+  const gRight = Math.max(...boxes.map(b => b.right))
+  const gTop = Math.min(...boxes.map(b => b.top))
+  const gBottom = Math.max(...boxes.map(b => b.bottom))
+  const gCX = (gLeft + gRight) / 2, gCY = (gTop + gBottom) / 2
+
+  for (const b of boxes) {
+    let nx = b.ax, ny = b.ay
+    if (edge === 'left')         nx = b.ax + (gLeft + b.hw - b.cx)
+    else if (edge === 'right')   nx = b.ax + (gRight - b.hw - b.cx)
+    else if (edge === 'hcenter') nx = b.ax + (gCX - b.cx)
+    else if (edge === 'top')     ny = b.ay + (gTop + b.hh - b.cy)
+    else if (edge === 'bottom')  ny = b.ay + (gBottom - b.hh - b.cy)
+    else if (edge === 'vcenter') ny = b.ay + (gCY - b.cy)
+    if (b.type === 'symbol') updateSymbolPosition(b.id, nx, ny)
+    else updateTextPosition(b.id, nx, ny)
+  }
+}
+
+const ALIGN_ICONS = {
+  left:    '<line x1="2.5" y1="2" x2="2.5" y2="14" stroke="#e8c84a" stroke-width="1.4"/><rect x="2.5" y="4.4" width="9" height="2.2" rx="1" fill="currentColor"/><rect x="2.5" y="9.4" width="5.5" height="2.2" rx="1" fill="currentColor"/>',
+  right:   '<line x1="13.5" y1="2" x2="13.5" y2="14" stroke="#e8c84a" stroke-width="1.4"/><rect x="4.5" y="4.4" width="9" height="2.2" rx="1" fill="currentColor"/><rect x="8" y="9.4" width="5.5" height="2.2" rx="1" fill="currentColor"/>',
+  hcenter: '<line x1="8" y1="2" x2="8" y2="14" stroke="#e8c84a" stroke-width="1.4"/><rect x="3.5" y="4.4" width="9" height="2.2" rx="1" fill="currentColor"/><rect x="5.25" y="9.4" width="5.5" height="2.2" rx="1" fill="currentColor"/>',
+  top:     '<line x1="2" y1="2.5" x2="14" y2="2.5" stroke="#e8c84a" stroke-width="1.4"/><rect x="4.4" y="2.5" width="2.2" height="9" rx="1" fill="currentColor"/><rect x="9.4" y="2.5" width="2.2" height="5.5" rx="1" fill="currentColor"/>',
+  bottom:  '<line x1="2" y1="13.5" x2="14" y2="13.5" stroke="#e8c84a" stroke-width="1.4"/><rect x="4.4" y="4.5" width="2.2" height="9" rx="1" fill="currentColor"/><rect x="9.4" y="8" width="2.2" height="5.5" rx="1" fill="currentColor"/>',
+  vcenter: '<line x1="2" y1="8" x2="14" y2="8" stroke="#e8c84a" stroke-width="1.4"/><rect x="4.4" y="3.5" width="2.2" height="9" rx="1" fill="currentColor"/><rect x="9.4" y="5.25" width="2.2" height="5.5" rx="1" fill="currentColor"/>',
+}
+function alignIcon(edge) { return `<svg viewBox="0 0 16 16" width="15" height="15">${ALIGN_ICONS[edge]}</svg>` }
+
 function onPickIcon(iconId) {
   if (selectedSymbolId.value) {
     updateSymbol(selectedSymbolId.value, { iconId })
@@ -557,6 +626,20 @@ function stepBg(dir) {
         />
         <!-- Warm forge glow at the base of the stage (behind the badge, above the background) -->
         <div class="forge-glow" />
+
+        <!-- Align toolbar — appears when 2+ alignable elements are selected -->
+        <Transition name="align-fade">
+          <div v-if="alignableCount >= 2" class="align-bar">
+            <button
+              v-for="op in alignOps"
+              :key="op.edge"
+              class="align-btn"
+              :title="op.title"
+              @click="alignSelection(op.edge)"
+              v-html="alignIcon(op.edge)"
+            />
+          </div>
+        </Transition>
 
         <button
           class="bg-arrow bg-arrow-left"
@@ -1253,6 +1336,45 @@ function stepBg(dir) {
   0%, 100% { opacity: 0.6; }
   50%      { opacity: 1; }
 }
+
+/* Align toolbar */
+.align-bar {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  gap: 3px;
+  padding: 4px;
+  border-radius: 9px;
+  background: rgba(12, 12, 20, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+.align-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #cfcfd6;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.align-btn:hover { background: rgba(232, 200, 74, 0.14); color: #fff; }
+.align-btn :deep(svg) { display: block; }
+
+.align-fade-enter-active,
+.align-fade-leave-active { transition: opacity 0.18s ease, transform 0.18s ease; }
+.align-fade-enter-from,
+.align-fade-leave-to { opacity: 0; transform: translate(-50%, -6px); }
 
 .bg-arrow {
   position: absolute;
