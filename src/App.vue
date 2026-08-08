@@ -342,7 +342,8 @@ function onElDragEnd() { isDraggingEl.value = false }
 
 function onBadgeMove(e) {
   overCrest.value = true // over the crest → suppress the hot-cursor glow
-  if (reduceMotion || isDraggingEl.value || !badgeTiltRef.value) return
+  // Hold the crest flat while editing — tilt fights precise placement/resizing.
+  if (reduceMotion || isDraggingEl.value || selection.value.length || !badgeTiltRef.value) return
   const r = badgeTiltRef.value.getBoundingClientRect()
   const px = (e.clientX - r.left) / r.width
   const py = (e.clientY - r.top) / r.height
@@ -354,6 +355,10 @@ function onBadgeLeave() {
   tilt.rx = 0; tilt.ry = 0
   overCrest.value = false
 }
+
+// Flatten the crest the moment anything is selected (incl. via a sidebar click,
+// where the badge isn't being hovered), so it isn't left tilted mid-edit.
+watch(() => selection.value.length, (n) => { if (n) { tilt.rx = 0; tilt.ry = 0 } })
 
 // ── Welding sparks ──────────────────────────────────────────────────────────
 // After a sustained IDLE hover over the crest, spray a dense sputter of sparks
