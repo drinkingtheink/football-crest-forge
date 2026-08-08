@@ -228,10 +228,19 @@ const textTooltip = ref(null) // { x, y } screen coords
 function onSymbolWheel(e, instanceId) {
   const sym = props.config.symbols.find(s => s.instanceId === instanceId)
   if (!sym) return
-  const delta = e.deltaY > 0 ? -3 : 3
-  const newSize = Math.min(240, Math.max(16, sym.size + delta))
-  emit('update-symbol', instanceId, { size: newSize })
-  sizeHint.value = { x: sym.x, y: sym.y - newSize / 2 - 8, size: newSize }
+  if (sym.kind === 'rect') {
+    // Scale both dimensions by the same factor so the rectangle keeps its ratio.
+    const factor = e.deltaY > 0 ? 0.94 : 1.06
+    const w = Math.min(200, Math.max(6, Math.round(sym.w * factor)))
+    const h = Math.min(240, Math.max(6, Math.round(sym.h * factor)))
+    emit('update-symbol', instanceId, { w, h })
+    sizeHint.value = { x: sym.x, y: sym.y - h / 2 - 8, size: `${w}×${h}` }
+  } else {
+    const delta = e.deltaY > 0 ? -3 : 3
+    const newSize = Math.min(240, Math.max(16, sym.size + delta))
+    emit('update-symbol', instanceId, { size: newSize })
+    sizeHint.value = { x: sym.x, y: sym.y - newSize / 2 - 8, size: newSize }
+  }
   clearTimeout(sizeHintTimer)
   sizeHintTimer = setTimeout(() => { sizeHint.value = null }, 900)
 }
@@ -421,6 +430,11 @@ const gradLine = computed(() => {
       <!-- Symbol silhouettes — used to clip the shimmer over elements in No Shield mode -->
       <clipPath :id="elementsClipId">
         <template v-for="sym in config.symbols" :key="sym.instanceId">
+          <rect
+            v-if="sym.kind === 'rect'"
+            :x="sym.x - sym.w / 2" :y="sym.y - sym.h / 2" :width="sym.w" :height="sym.h"
+            :transform="sym.rotation ? `rotate(${sym.rotation}, ${sym.x}, ${sym.y})` : null"
+          />
           <path
             v-for="(p, i) in symPaths(sym)"
             :key="`${sym.instanceId}-${i}`"
@@ -508,7 +522,23 @@ const gradLine = computed(() => {
       @mouseleave="hoveredSymbolId = null"
       @wheel.stop.prevent="onSymbolWheel($event, sym.instanceId)"
     >
-      <g :transform="symbolTransform(sym)">
+      <rect
+        v-if="sym.kind === 'rect'"
+        :x="sym.x - sym.w / 2"
+        :y="sym.y - sym.h / 2"
+        :width="sym.w"
+        :height="sym.h"
+        :transform="sym.rotation ? `rotate(${sym.rotation}, ${sym.x}, ${sym.y})` : null"
+        :stroke-width="sym.strokeWidth || 0"
+        stroke-linejoin="round"
+        paint-order="stroke fill"
+        :style="{
+          fill: sym.color,
+          stroke: sym.strokeWidth > 0 ? sym.strokeColor : 'none',
+          transition: 'fill 0.35s ease, stroke 0.35s ease',
+        }"
+      />
+      <g v-else :transform="symbolTransform(sym)">
         <path
           v-for="(p, i) in symPaths(sym)"
           :key="i"
@@ -584,7 +614,23 @@ const gradLine = computed(() => {
       @mouseleave="hoveredSymbolId = null"
       @wheel.stop.prevent="onSymbolWheel($event, sym.instanceId)"
     >
-      <g :transform="symbolTransform(sym)">
+      <rect
+        v-if="sym.kind === 'rect'"
+        :x="sym.x - sym.w / 2"
+        :y="sym.y - sym.h / 2"
+        :width="sym.w"
+        :height="sym.h"
+        :transform="sym.rotation ? `rotate(${sym.rotation}, ${sym.x}, ${sym.y})` : null"
+        :stroke-width="sym.strokeWidth || 0"
+        stroke-linejoin="round"
+        paint-order="stroke fill"
+        :style="{
+          fill: sym.color,
+          stroke: sym.strokeWidth > 0 ? sym.strokeColor : 'none',
+          transition: 'fill 0.35s ease, stroke 0.35s ease',
+        }"
+      />
+      <g v-else :transform="symbolTransform(sym)">
         <path
           v-for="(p, i) in symPaths(sym)"
           :key="i"

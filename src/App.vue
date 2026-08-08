@@ -49,6 +49,7 @@ const {
   setBorderColor,
   setBorderWidth,
   addSymbol,
+  addRect,
   removeSymbol,
   updateSymbol,
   updateSymbolPosition,
@@ -209,7 +210,8 @@ function selectionBoxes() {
     if (s.type === 'symbol') {
       const sym = config.symbols.find(x => x.instanceId === s.id)
       if (!sym) continue
-      const hw = sym.size / 2, hh = sym.size / 2
+      const hw = (sym.kind === 'rect' ? sym.w : sym.size) / 2
+      const hh = (sym.kind === 'rect' ? sym.h : sym.size) / 2
       boxes.push({ type: 'symbol', id: s.id, ax: sym.x, ay: sym.y, cx: sym.x, cy: sym.y, hw, hh, left: sym.x - hw, right: sym.x + hw, top: sym.y - hh, bottom: sym.y + hh })
     } else {
       const t = config.texts.find(x => x.id === s.id)
@@ -296,10 +298,11 @@ const DIST_ICONS = {
 function distIcon(axis) { return `<svg viewBox="0 0 16 16" width="15" height="15">${DIST_ICONS[axis]}</svg>` }
 
 function onPickIcon(iconId) {
-  if (selectedSymbolId.value) {
-    updateSymbol(selectedSymbolId.value, { iconId })
+  const sel = selectedSymbolId.value && config.symbols.find(s => s.instanceId === selectedSymbolId.value)
+  if (sel && sel.kind !== 'rect') {
+    updateSymbol(selectedSymbolId.value, { iconId }) // swap the selected icon
   } else {
-    addSymbol(iconId)
+    addSymbol(iconId)                                // nothing (or a rect) selected → add new
   }
 }
 
@@ -312,6 +315,11 @@ function symPreviewVB(iconId) {
 function symPreviewStroke(sym) {
   const vb = iconsById[sym.iconId]?.viewBox ?? [100, 100]
   return sym.strokeWidth * Math.max(vb[0], vb[1]) / 100
+}
+// Scale a rectangle's w/h to fit the ~30px sidebar preview, keeping its ratio.
+function rectPreview(sym) {
+  const scale = 30 / (Math.max(sym.w, sym.h) || 1)
+  return { w: sym.w * scale, h: sym.h * scale }
 }
 
 // ── Crest stage: pointer tilt ──────────────────────────────────────────────
@@ -1147,6 +1155,7 @@ function stepBg(dir) {
         <div class="control-group">
           <h3 class="control-label">Add Symbol</h3>
           <IconPicker :placed-counts="placedIconCounts" @add-icon="onPickIcon" />
+          <button class="random-colors-btn" style="margin-top: 8px;" @click="addRect" title="Add a rectangle you can size">▭ Add Rectangle</button>
         </div>
 
         <!-- Placed Symbols -->
@@ -1162,7 +1171,19 @@ function stepBg(dir) {
               @click="onSelectSymbol(sym.instanceId, $event.shiftKey || $event.metaKey)"
             >
               <div class="sym-row">
-                <svg :viewBox="symPreviewVB(sym.iconId)" width="28" height="28" class="sym-preview">
+                <svg v-if="sym.kind === 'rect'" viewBox="0 0 40 40" width="28" height="28" class="sym-preview">
+                  <rect
+                    :x="20 - rectPreview(sym).w / 2"
+                    :y="20 - rectPreview(sym).h / 2"
+                    :width="rectPreview(sym).w"
+                    :height="rectPreview(sym).h"
+                    :fill="sym.color"
+                    :stroke="sym.strokeWidth > 0 ? sym.strokeColor : 'none'"
+                    stroke-width="2"
+                    paint-order="stroke fill"
+                  />
+                </svg>
+                <svg v-else :viewBox="symPreviewVB(sym.iconId)" width="28" height="28" class="sym-preview">
                   <path
                     v-for="(p, i) in iconsById[sym.iconId]?.paths"
                     :key="i"
@@ -1174,7 +1195,7 @@ function stepBg(dir) {
                   />
                 </svg>
 
-                <span class="sym-label">{{ iconsById[sym.iconId]?.label }}</span>
+                <span class="sym-label">{{ sym.kind === 'rect' ? 'Rectangle' : iconsById[sym.iconId]?.label }}</span>
 
                 <div class="sym-controls">
                   <ColorPicker
@@ -1193,7 +1214,27 @@ function stepBg(dir) {
               <!-- Expanded controls, visible when this row is selected -->
               <Transition name="panel-fade">
               <div v-if="selectedSymbolId === sym.instanceId" class="sym-expanded" @click.stop>
-                <label class="sym-field">
+                <template v-if="sym.kind === 'rect'">
+                  <label class="sym-field">
+                    Width
+                    <input
+                      type="range" min="6" max="200"
+                      :value="sym.w"
+                      @input="updateSymbol(sym.instanceId, { w: Number($event.target.value) })"
+                    />
+                    <span>{{ sym.w }}</span>
+                  </label>
+                  <label class="sym-field">
+                    Height
+                    <input
+                      type="range" min="6" max="240"
+                      :value="sym.h"
+                      @input="updateSymbol(sym.instanceId, { h: Number($event.target.value) })"
+                    />
+                    <span>{{ sym.h }}</span>
+                  </label>
+                </template>
+                <label v-else class="sym-field">
                   Size
                   <input
                     type="range" min="20" max="240"
@@ -1234,7 +1275,7 @@ function stepBg(dir) {
                     :title="sym.clipped === false ? 'Click to clip to badge shape' : 'Click to allow outside badge bounds'"
                   >{{ sym.clipped === false ? 'Free' : 'Clipped' }}</button>
                 </div>
-                <div class="sym-field sym-clip-row">
+                <div v-if="sym.kind !== 'rect'" class="sym-field sym-clip-row">
                   <span>Flip</span>
                   <button
                     class="sym-clip-toggle"

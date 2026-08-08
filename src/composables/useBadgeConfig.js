@@ -215,6 +215,16 @@ export function useBadgeConfig() {
     setSelection('symbol', instanceId)
   }
 
+  // A rectangle primitive — a symbol with kind 'rect' and independent w/h
+  // (no icon/size). Reuses all the symbol placement/selection/align machinery.
+  function addRect() {
+    const instanceId = `sym-${nextId++}`
+    const color = config.palette[Math.floor(Math.random() * config.palette.length)] || '#ffffff'
+    const strokeColor = _contrastColor(color, config.palette)
+    config.symbols.push({ instanceId, kind: 'rect', color, x: 100, y: 120, w: 90, h: 40, rotation: 0, strokeColor, strokeWidth: 0, clipped: true })
+    setSelection('symbol', instanceId)
+  }
+
   function removeSymbol(instanceId) {
     const idx = config.symbols.findIndex(s => s.instanceId === instanceId)
     if (idx !== -1) config.symbols.splice(idx, 1)
@@ -339,6 +349,7 @@ export function useBadgeConfig() {
     setBorderColor,
     setBorderWidth,
     addSymbol,
+    addRect,
     removeSymbol,
     updateSymbol,
     updateSymbolPosition,
