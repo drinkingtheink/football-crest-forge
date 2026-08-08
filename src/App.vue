@@ -1605,7 +1605,7 @@ function stepBg(dir) {
 
 .overlay-opacity {
   flex: 1;
-  accent-color: #e8c84a;
+  accent-color: var(--accent-cool);
 }
 
 .overlay-label {
@@ -1914,7 +1914,7 @@ function stepBg(dir) {
   font-size: 12px;
   color: #aaa;
 }
-.range-row input[type="range"] { flex: 1; accent-color: #e8c84a; }
+.range-row input[type="range"] { flex: 1; accent-color: var(--accent-cool); }
 .range-row span { font-size: 11px; color: #ddd; min-width: 24px; text-align: right; }
 
 /* Placed symbols list */
@@ -1980,11 +1980,11 @@ function stepBg(dir) {
   font-size: 11px;
   color: #aaa;
 }
-.sym-field input[type="range"] { flex: 1; accent-color: #e8c84a; }
+.sym-field input[type="range"] { flex: 1; accent-color: var(--accent-cool); }
 .sym-field > span:last-child { font-size: 11px; color: #ddd; min-width: 24px; text-align: right; }
 
 .sym-stroke-row { gap: 6px; }
-.sym-stroke-range { flex: 1; accent-color: #e8c84a; }
+.sym-stroke-range { flex: 1; accent-color: var(--accent-cool); }
 
 .sym-clip-row { gap: 8px; }
 .sym-clip-toggle {

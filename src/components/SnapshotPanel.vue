@@ -131,7 +131,7 @@ function formatDate(ts) {
   padding: 6px 8px;
   outline: none;
 }
-.snap-name-input:focus { border-color: #e8c84a; }
+.snap-name-input:focus { border-color: var(--accent-cool); }
 
 .snap-confirm-btn {
   background: #e8c84a;

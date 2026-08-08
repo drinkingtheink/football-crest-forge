@@ -306,7 +306,7 @@ function onFontPick(textId, family) {
 .field { display: flex; flex-direction: column; gap: 4px; }
 
 .stroke-row { display: flex; align-items: center; gap: 8px; }
-.stroke-range { flex: 1; accent-color: #e8c84a; }
+.stroke-range { flex: 1; accent-color: var(--accent-cool); }
 
 .rotation-row { display: flex; align-items: center; gap: 6px; }
 .rotation-row input { flex: 1; }
@@ -341,8 +341,8 @@ function onFontPick(textId, family) {
 .t-input,
 .t-number,
 .t-select {
-  background: rgba(232, 200, 74, 0.04);
-  border: 1px solid rgba(232, 200, 74, 0.28);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid #2a2a35;
   border-radius: 4px;
   color: #e8e8ec;
   font-size: 12px;
@@ -350,17 +350,16 @@ function onFontPick(textId, family) {
   outline: none;
   width: 100%;
   box-sizing: border-box;
-  box-shadow: 0 0 6px rgba(232, 200, 74, 0.07);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .t-input:focus,
 .t-number:focus,
 .t-select:focus {
-  border-color: rgba(232, 200, 74, 0.85);
-  box-shadow: 0 0 0 2px rgba(232, 200, 74, 0.15), 0 0 14px rgba(232, 200, 74, 0.4), 0 0 28px rgba(232, 200, 74, 0.12);
+  border-color: var(--accent-cool);
+  box-shadow: 0 0 0 2px rgba(95, 146, 196, 0.18), 0 0 14px var(--accent-cool-glow);
 }
 
-.field input[type="range"] { accent-color: #e8c84a; width: 100%; }
+.field input[type="range"] { accent-color: var(--accent-cool); width: 100%; }
 
 .arc-opts { display: flex; gap: 5px; }
 
