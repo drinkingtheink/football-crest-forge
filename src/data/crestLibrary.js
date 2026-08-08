@@ -34,14 +34,14 @@ export const crestLibrary = [
       "palette": ["#6CABDD", "#1C2C5B", "#FFC659", "#FFFFFF"],
       "background": { "type": "striped-diagonal", "stripeCount": 2, "sashWidth": 174, "sunburstRays": 12 },
       "symbols": [
-        { "instanceId": "sym-16", "iconId": "dragon", "color": "#FFC659", "x": 110.64618682861328, "y": 106.96627044677734, "size": 128, "rotation": 0, "flipH": false, "strokeColor": "#1C2C5B", "strokeWidth": 10.5, "clipped": true },
+        { "instanceId": "sym-16", "iconId": "dragon", "color": "#FFC659", "x": 110.64618682861328, "y": 106.96627044677734, "size": 128, "rotation": 0, "flipH": false, "strokeColor": "#1C2C5B", "strokeWidth": 5.5, "clipped": true },
         { "instanceId": "sym-17", "iconId": "star-8", "color": "#FFFFFF", "x": 44.21052551269531, "y": 57.63157653808594, "size": 49, "rotation": 0, "flipH": false, "strokeColor": "#1C2C5B", "strokeWidth": 12.5, "clipped": true }
       ],
       "texts": [
         { "fontFamily": "Righteous", "fontWeight": "bold", "fontSize": 19, "color": "#ffffff", "letterSpacing": 2, "rotation": 0, "arc": null, "arcRx": 78, "arcRy": 78, "arcX": 100, "arcY": 120, "archHeight": 40, "x": 102.13673400878906, "y": -0.3916800022125244, "id": "club-name", "content": "CREST FOUNDRY" },
         { "fontFamily": "Righteous", "fontWeight": "normal", "fontSize": 33, "color": "#ffffff", "letterSpacing": 1.5, "rotation": 0, "arc": null, "arcRx": 78, "arcRy": 78, "arcX": 100, "arcY": 120, "archHeight": 40, "x": 101.57894897460938, "y": 200.26315307617188, "id": "year", "content": "FC" }
       ],
-      "border": { "color": "#1C2C5B", "width": 8 }
+      "border": { "color": "#1C2C5B", "width": 2 }
     },
   },
   {
