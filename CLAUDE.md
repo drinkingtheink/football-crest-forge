@@ -20,13 +20,11 @@ Both formats start from `buildCleanCrestSvg(svgEl)`: clones the live badge `<svg
 - Verified in-browser: exported SVG has 0 `<text>`, 0 `@font-face`; straight + arc text render correctly as a bare `file://` with no app/network/fonts. Blackletter (UnifrakturMaguntia) and serif outlines match on-screen.
 - Filenames via `crestFilename(texts, ext)` → always `crest-foundry-<slug>.<ext>`. Toolbar "⬇ PNG" / "⬇ SVG" (`App.vue`), guarded by `isExporting`.
 
-### Text stroke (deferred — build after export pipeline)
-- SVG `<text>` supports `stroke`/`stroke-width` natively; use `paint-order="stroke fill"` so stroke renders behind fill (same pattern already used on symbols)
-- Config shape addition: `strokeColor` and `strokeWidth` on each text object (mirrors symbol stroke fields)
-- Browser rendering: works automatically
-- PNG export: works automatically via canvas rasterisation
-- SVG export with outlining: once text is converted to `<path>` elements by opentype.js, apply `stroke`/`stroke-width` to the output paths — carries through with no extra work
-- **Do not implement text stroke until the export pipeline is in place**, so stroke behaviour is consistent between canvas display and exported files
+### Text stroke (SHIPPED)
+- `strokeColor` + `strokeWidth` (0 = off) on each text object, mirroring symbol stroke. Config default in `DEFAULT_TEXT()`; UI is the "Outline" row in `TextEditor.vue`.
+- Rendered on straight *and* arc `<text>` in `BadgeComposer.vue` with `paint-order="stroke fill"` (stroke behind fill). Unlike symbols, text stroke-width is in badge viewBox units directly (text isn't scaled like icons), so no viewBox-scaling helper.
+- **Browser + PNG**: automatic (browser honours `paint-order` natively, canvas rasterisation picks it up).
+- **SVG export with outlining**: `outlineTexts` sets `stroke`/`stroke-width`/`paint-order` on the outlined glyph `<g>`. Critical ordering: `flattenPaintOrder` runs *after* `outlineTexts` (not before) — otherwise the live `<text>`'s `paint-order` gets split into two `<text>` copies before outlining, leaving a stray un-outlined text with an embedded font. Fallback (font load failed) text keeps `paint-order` and is flattened as `<text>`.
 
 ## Architecture
 
@@ -38,15 +36,29 @@ src/
     BadgeComposer.vue   # SVG renderer + drag handling ONLY
     IconPicker.vue      # Heraldic symbol gallery (emits add-icon)
     TextEditor.vue      # Text element list + editing controls
+    ClubPicker.vue      # Searchable dropdown of preset club palettes (emits apply)
+    ColorPicker.vue     # Reusable swatch + native color input (emits change)
+    FontPicker.vue      # In-font font picker w/ lazy load + live hover preview
+    SnapshotPanel.vue   # Save/load/delete grid for stored designs
+    ToastContainer.vue  # Teleported toast queue (success/tip/quota errors)
+    AboutModal.vue      # ⓘ modal — icon attribution (game-icons CC BY authors)
+    AppBackground.vue   # Animated page backdrop (bokeh + spark particles)
+    LogoMark.vue        # Animated Crest Foundry logo mark
   composables/
     useBadgeConfig.js   # All reactive badge state + mutations
+    useToast.js         # Global reactive toast queue (addToast/dismiss)
   data/
-    shapes.js           # 20 SVG shield shape path definitions (VIEWBOX: 200×240)
-    icons.js            # ~270 heraldic SVG icons (single fill; viewBox 0 0 100 100, or per-icon `viewBox: [w, h]`)
+    shapes.js           # SVG shield shape path definitions (VIEWBOX: 200×240)
+    icons.js            # heraldic SVG icons (single fill; viewBox 0 0 100 100, or per-icon `viewBox: [w, h]`)
+    clubs.js            # ~88 preset real-club palettes ({ id, name, colors: [{ name, hex }] })
   utils/
     arcPath.js          # Pure fn: generates SVG arc path string for textPath
     exportBadge.js      # PNG + SVG export (shared clean-SVG builder + font embedding)
     fonts.js            # Font registry + lazy Google Fonts loader (promise-based; EB Garamond pre-loaded in index.html)
+    snapshots.js        # localStorage persistence for saved designs (+ PNG thumbnail)
+    bokeh.js            # Pure canvas fn: palette-tinted bokeh backdrop
+    particles.js        # Pure fn: foundry spark field (emit/burst/float)
+    patterns.js         # Pure fns: CSS background styles (aurora/waves/crisscross)
   App.vue               # Layout shell + wires composable to components
   style.css             # Global reset only
 ```
@@ -66,25 +78,44 @@ src/
 ```js
 config = {
   shapeId: 'traditional-english',
+  noShield: false,              // "No Badge" mode — no shield, symbols unclipped, no drop-shadow
+  palette: ['#1a3a6b', ...],    // 1–6 hex colors; single source for swatches + colour remap
   background: {
-    type: 'halved-v',           // solid|halved-v|halved-h|quartered|diagonal|striped-v|striped-h
-    colors: ['#1a3a6b', '#c8102e'],
+    type: 'halved-v',           // solid|halved-v|halved-h|quartered|diagonal|chevron|sash|
+                                //   striped-v|striped-h|striped-diagonal|checkered|saltire|
+                                //   sunburst|gradient|radial
+    stripeCount,                // 2–16, for striped-*/checkered/saltire
+    sashWidth,                  // 68–280, sash band width
+    sunburstRays,               // 6–48 (even), sunburst wedge count
+    gradient: ['#..', '#..'],   // 2–5 editable stops (gradient + radial fills)
+    gradientAngle,              // 0–359 deg, linear gradient direction
   },
   symbols: [
-    // { instanceId, iconId, color, x, y, size }
+    // { instanceId, iconId, color, x, y, size,
+    //   rotation, flipH, strokeColor, strokeWidth, clipped,
+    //   ringThickness }        // only when the icon has supportsRing
   ],
   texts: [
     {
       id, content, fontFamily, fontWeight, fontSize, color,
+      strokeColor, strokeWidth, // text outline (0 = off); mirrors symbol stroke, paint-order stroke fill
       letterSpacing,            // px, number
-      arc,                      // null | 'top' | 'bottom'
-      arcRadius, arcX, arcY,    // arc circle params (used when arc !== null)
+      rotation,                 // deg (straight text only)
+      arc,                      // null | 'top' | 'bottom' | 'arch'
+      arcRx, arcRy, arcX, arcY, // arc ellipse params (used when arc !== null)
+      archHeight,               // arch-mode curvature (arc === 'arch')
       x, y,                     // used when arc === null (straight, draggable)
     }
   ],
   border: { color, width },
 }
 ```
+
+Symbols carry stroke (`strokeColor`/`strokeWidth`, rendered `paint-order="stroke fill"`), `rotation`, `flipH`, and `clipped` (default true; `false` = "free" symbol rendered unclipped, may extend past bounds). Icons may declare `supportsRing: true` + `defaultRingThickness`; such symbols get a `ringThickness` and render as a ring/annulus (or chevron band when `thicknessShape === 'chevron'`).
+
+**Clubs & boot state**: `data/clubs.js` holds preset real-club palettes; `ClubPicker` emits `apply` → `setPalette`, which remaps existing symbol/border/gradient colours to the nearest new palette entry. The app boots with a random club palette, random background type, and one random symbol.
+
+**Snapshots**: `snapshots.js` persists deep-cloned configs + a PNG thumbnail to `localStorage` (`crest-foundry:snap:<id>`, reads legacy `crest-forge:` keys too); throws a `QUOTA`-coded error when full. `SnapshotPanel` is the save/load/delete UI; `useToast`/`ToastContainer` surface success and quota errors.
 
 ### SVG coordinate system
 
