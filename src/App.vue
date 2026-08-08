@@ -539,19 +539,17 @@ function randomizeAll() {
   ;[...config.symbols].forEach(s => removeSymbol(s.instanceId))
   if (Math.random() < 2/3) {
     addSymbol(icons[Math.floor(Math.random() * icons.length)].id)
-    const sym = config.symbols.find(s => s.instanceId === selectedSymbolId.value)
-    // Random badges get a bolder symbol than a manual picker-add (default 72).
-    updateSymbol(selectedSymbolId.value, { size: 90 + Math.floor(Math.random() * 45) })
-    if (third && config.palette.length > 2 && Math.random() < 0.4) {
-      const strokeColor = config.palette.find(c => c.toLowerCase() !== third.toLowerCase()) ?? config.palette[0]
-      updateSymbol(selectedSymbolId.value, { color: third, strokeWidth: 3, strokeColor })
-    } else {
-      // Two-colour palettes (and the non-accent case) always get a stroke in
-      // the other palette colour so it never matches the fill.
-      const strokeColor = config.palette.find(c => c.toLowerCase() !== sym.color.toLowerCase())
-        ?? (sym.color.toLowerCase() === '#000000' ? '#ffffff' : '#000000')
-      updateSymbol(selectedSymbolId.value, { strokeWidth: 3, strokeColor })
-    }
+    // Random symbols always take the palette's 3rd colour as their fill, with a
+    // contrasting stroke so the shape never disappears against it.
+    const fill = config.palette[2] ?? config.palette[config.palette.length - 1] ?? '#ffffff'
+    const strokeColor = config.palette.find(c => c.toLowerCase() !== fill.toLowerCase())
+      ?? (fill.toLowerCase() === '#000000' ? '#ffffff' : '#000000')
+    updateSymbol(selectedSymbolId.value, {
+      color: fill,
+      size: 90 + Math.floor(Math.random() * 45), // bolder than a manual picker-add (default 72)
+      strokeWidth: 3,
+      strokeColor,
+    })
   }
 
   const nameFont = randomFonts[Math.floor(Math.random() * randomFonts.length)].family
