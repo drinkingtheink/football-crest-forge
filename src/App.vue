@@ -392,11 +392,13 @@ function onDragEmber(clientX, clientY) {
   if (reduceMotion || !sparkField) return
   const c = particleCanvas.value
   if (!c) return
-  const now = performance.now()
-  if (now - _emberT < 28) return
-  _emberT = now
   const cr = c.getBoundingClientRect()
-  sparkField.emit(clientX - cr.left, clientY - cr.top, 2 + Math.floor(Math.random() * 2), 1)
+  const x = clientX - cr.left, y = clientY - cr.top
+  sparkField.drag(x, y)                 // molten trail — every move, for a smooth line
+  const now = performance.now()
+  if (now - _emberT < 28) return        // throttle only the sparks thrown off it
+  _emberT = now
+  sparkField.emit(x, y, 2 + Math.floor(Math.random() * 2), 1)
 }
 
 // Intermittent embers drifting up from the forge glow at the base of the stage.

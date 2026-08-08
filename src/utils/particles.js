@@ -6,9 +6,34 @@
 const SPARK_COLORS = ['#ffffff', '#fff2cc', '#ffd36e', '#ffab2e', '#ff7a1a', '#e8c84a']
 const pick = () => SPARK_COLORS[Math.floor(Math.random() * SPARK_COLORS.length)]
 
+// Molten cooling ramp: t=1 white-hot → t=0 dark red. Linear between stops.
+const MOLTEN_STOPS = [
+  [0.0, [90, 22, 8]],
+  [0.15, [200, 48, 18]],
+  [0.4, [255, 130, 40]],
+  [0.7, [255, 208, 108]],
+  [1.0, [255, 255, 238]],
+]
+function moltenRGB(t) {
+  for (let i = 1; i < MOLTEN_STOPS.length; i++) {
+    const [t1, c1] = MOLTEN_STOPS[i]
+    if (t <= t1) {
+      const [t0, c0] = MOLTEN_STOPS[i - 1]
+      const k = (t - t0) / (t1 - t0)
+      return [
+        Math.round(c0[0] + (c1[0] - c0[0]) * k),
+        Math.round(c0[1] + (c1[1] - c0[1]) * k),
+        Math.round(c0[2] + (c1[2] - c0[2]) * k),
+      ]
+    }
+  }
+  return MOLTEN_STOPS[MOLTEN_STOPS.length - 1][1]
+}
+
 export function createSparkField(canvas) {
   const ctx = canvas.getContext('2d')
   let particles = []
+  let trail = []
   let flash = 0
   let raf = null
   let running = false
@@ -25,6 +50,27 @@ export function createSparkField(canvas) {
 
     ctx.globalCompositeOperation = 'lighter'
     ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+
+    // Molten drag trail — a cooling liquid-metal streak, hot at the cursor,
+    // fading to dark red down the tail. Two passes: soft glow + bright core.
+    for (let i = 1; i < trail.length; i++) {
+      const b = trail[i]
+      if (b.life <= 0) continue
+      const a = trail[i - 1]
+      const t = b.life
+      const [r, g, bl] = moltenRGB(t)
+      ctx.strokeStyle = `rgba(${r},${g},${bl},${t * 0.26})`
+      ctx.lineWidth = 11 * t + 1
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke()
+      ctx.strokeStyle = `rgba(${r},${g},${bl},${Math.min(1, t * 1.1)})`
+      ctx.lineWidth = 4.5 * t + 0.5
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke()
+    }
+    for (const p of trail) p.life -= 0.045
+    trail = trail.filter(p => p.life > 0)
+    const trailAlive = trail.length > 1
+
     let alive = false
     for (const p of particles) {
       if (p.life <= 0) continue
@@ -57,7 +103,7 @@ export function createSparkField(canvas) {
     ctx.globalCompositeOperation = 'source-over'
     particles = particles.filter(p => p.life > 0)
 
-    if (alive || flash > 0) {
+    if (alive || flash > 0 || trailAlive) {
       raf = requestAnimationFrame(step)
     } else {
       running = false
@@ -108,6 +154,22 @@ export function createSparkField(canvas) {
       }
       ensureRunning()
     },
+    // Molten drag trail: extend the cooling streak to (x,y). Subdivides long
+    // jumps so a fast drag stays a connected line rather than dashes.
+    drag(x, y) {
+      const last = trail[trail.length - 1]
+      if (last) {
+        const d = Math.hypot(x - last.x, y - last.y)
+        if (d < 2) return
+        const steps = Math.min(6, Math.floor(d / 10))
+        for (let i = 1; i < steps; i++) {
+          trail.push({ x: last.x + (x - last.x) * i / steps, y: last.y + (y - last.y) * i / steps, life: 1 })
+        }
+      }
+      trail.push({ x, y, life: 1 })
+      if (trail.length > 100) trail.splice(0, trail.length - 100)
+      ensureRunning()
+    },
     // A single ember that floats up from (x,y), wobbling and fading — from the coals.
     float(x, y) {
       const v = 0.4 + Math.random() * 0.5
@@ -129,6 +191,7 @@ export function createSparkField(canvas) {
       cancelAnimationFrame(raf)
       running = false
       particles = []
+      trail = []
       if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height)
     },
   }
