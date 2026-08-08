@@ -340,6 +340,19 @@ function onBadgeLeave() {
   overCrest.value = false
 }
 
+// After a sustained hover over the crest, ring its edge with orbiting sparks.
+const EDGE_SPARK_DELAY = 2000 // ms of continuous hover (2s for testing)
+const showEdgeSparks = ref(false)
+let edgeSparkTimer = null
+watch(overCrest, (over) => {
+  clearTimeout(edgeSparkTimer)
+  if (over && !reduceMotion) {
+    edgeSparkTimer = setTimeout(() => { showEdgeSparks.value = true }, EDGE_SPARK_DELAY)
+  } else {
+    showEdgeSparks.value = false
+  }
+})
+
 function onKeyDown(e) {
   if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return
 
@@ -725,6 +738,7 @@ function stepBg(dir) {
             :config="config"
             :selected-symbol-id="selectedSymbolId"
             :selection="selection"
+            :edge-sparks="showEdgeSparks"
             :size="380"
             uid="main"
             @update-text="updateText"

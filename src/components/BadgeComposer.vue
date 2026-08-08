@@ -12,9 +12,20 @@ const props = defineProps({
   config: { type: Object, required: true },
   selectedSymbolId: { type: String, default: null },
   selection: { type: Array, default: () => [] },
+  edgeSparks: { type: Boolean, default: false },
   size: { type: Number, default: 380 },
   uid: { type: String, default: 'b0' },
 })
+
+// Sparks orbiting the crest outline on long hover. Fixed varied radii/colours
+// so each fleck reads as its own hot ember.
+const edgePathId = computed(() => `edge-path-${props.uid}`)
+const EDGE_SPARKS = [
+  { r: 1.8, fill: '#ffe6a6' }, { r: 1.2, fill: '#ff9130' }, { r: 2.0, fill: '#ffd47a' },
+  { r: 1.4, fill: '#ffb347' }, { r: 1.7, fill: '#ffe6a6' }, { r: 1.2, fill: '#ff7a2e' },
+  { r: 1.9, fill: '#ffd47a' }, { r: 1.4, fill: '#ffb347' },
+]
+const EDGE_SPARK_DUR = 3.6
 
 const selectedSyms  = computed(() => new Set(props.selection.filter(s => s.type === 'symbol').map(s => s.id)))
 const selectedTexts = computed(() => new Set(props.selection.filter(s => s.type === 'text').map(s => s.id)))
@@ -413,6 +424,8 @@ const gradLine = computed(() => {
         :d="arcPathD(text)"
         fill="none"
       />
+      <!-- Motion path for the long-hover edge sparks -->
+      <path v-if="shape" :id="edgePathId" :d="shape.path" fill="none" />
       <!-- Palette background gradients (linear diagonal + radial) -->
       <linearGradient v-if="config.background.type === 'gradient'" :id="`bg-grad-${uid}`" gradientUnits="userSpaceOnUse" :x1="gradLine.x1" :y1="gradLine.y1" :x2="gradLine.x2" :y2="gradLine.y2">
         <stop v-for="(s, i) in gradientStops" :key="i" :offset="s.offset" :stop-color="s.color" />
@@ -642,6 +655,20 @@ const gradLine = computed(() => {
       >{{ text.content }}</textPath>
     </text>
 
+    <!-- Edge sparks — orbit the crest outline after a sustained hover -->
+    <g v-if="edgeSparks && shape && !config.noShield" class="edge-sparks" data-export-hide style="pointer-events:none">
+      <circle v-for="(sp, i) in EDGE_SPARKS" :key="i" :r="sp.r" :fill="sp.fill">
+        <animateMotion
+          :dur="`${EDGE_SPARK_DUR}s`"
+          repeatCount="indefinite"
+          rotate="auto"
+          :begin="`${-i * EDGE_SPARK_DUR / EDGE_SPARKS.length}s`"
+        >
+          <mpath :href="`#${edgePathId}`" />
+        </animateMotion>
+      </circle>
+    </g>
+
     <!-- Size hint bubble (shown while scroll-resizing) -->
     <g v-if="sizeHint" :transform="`translate(${sizeHint.x}, ${sizeHint.y})`" style="pointer-events:none" data-export-hide>
       <rect x="-14" y="-9" width="28" height="13" rx="3" fill="#000000" fill-opacity="0.65" />
@@ -665,6 +692,15 @@ const gradLine = computed(() => {
 </template>
 
 <style>
+.edge-sparks {
+  filter: drop-shadow(0 0 1.5px #ffb347) drop-shadow(0 0 3px rgba(255, 120, 30, 0.7));
+  animation: edge-sparks-in 0.45s ease both;
+}
+@keyframes edge-sparks-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 .align-guide {
   stroke: #00e5ff;
   stroke-width: 0.75;
