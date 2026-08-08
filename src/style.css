@@ -19,3 +19,9 @@ body {
   font-family: system-ui, sans-serif;
   min-height: 100vh;
 }
+
+/* Steel sliders carry a soft cool glow, so the blue accent shares the app's
+   luminous quality instead of reading flat next to the gold. */
+input[type="range"] {
+  filter: drop-shadow(0 0 2px rgba(95, 146, 196, 0.65));
+}
