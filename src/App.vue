@@ -62,7 +62,6 @@ const {
   pasteText,
   deselectAll,
   loadConfig,
-  resetConfig,
 } = useBadgeConfig()
 
 const clipboard = ref(null)
@@ -565,10 +564,9 @@ function randomizeColors() {
 }
 
 function startOver() {
-  // Fires instantly like the other crest-changing actions (Space / Forge /
-  // Recast) — no confirm dialog to interrupt or get suppressed by the browser.
-  resetConfig()
-  activeClub.value = null
+  // "Start Over" forges a completely fresh random crest, just like Space / the
+  // Forge button — not a reset to the static default.
+  randomizeAll()
 }
 
 function randomizeAll() {
