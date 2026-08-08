@@ -126,6 +126,13 @@ const activeClubModified = computed(() => {
   if (original.length !== config.palette.length) return true
   return original.some((c, i) => c !== config.palette[i]?.toLowerCase())
 })
+// Adding/removing 2+ swatches from a club's palette makes it no longer that
+// club — show "Custom". A single auto-appended neutral (withNeutral) stays under
+// the threshold, so a freshly applied club is never flagged custom.
+const isCustomPalette = computed(() => {
+  if (!activeClub.value) return false
+  return Math.abs(config.palette.length - activeClub.value.colors.length) >= 2
+})
 
 // Count of each iconId currently placed in the design, for the picker to flag
 const placedIconCounts = computed(() => {
@@ -1007,8 +1014,8 @@ function stepBg(dir) {
           <div v-if="activeClub" class="active-club">
             <span class="active-club-dot" />
             <span class="active-club-label">Showing</span>
-            <span class="active-club-name">{{ activeClub.name }}</span>
-            <span v-if="activeClubModified" class="modified-flag">modified</span>
+            <span class="active-club-name">{{ isCustomPalette ? 'Custom' : activeClub.name }}</span>
+            <span v-if="!isCustomPalette && activeClubModified" class="modified-flag">modified</span>
           </div>
           <div class="palette-editor" style="margin-top: 10px;">
             <div
