@@ -126,11 +126,22 @@ Symbols carry stroke (`strokeColor`/`strokeWidth`, rendered `paint-order="stroke
 
 ### Drag system
 
-`BadgeComposer` handles all drag via `createSVGPoint` + `getScreenCTM().inverse()` for coordinate conversion. Drag state is `{ type: 'text'|'symbol', id/instanceId, sx, sy, ox, oy }`. Straight text is draggable; arc text is not (positioned via sidebar sliders).
+`BadgeComposer` handles all drag via `createSVGPoint` + `getScreenCTM().inverse()` for coordinate conversion. `beginDrag(e, type, id)` is the shared mousedown handler for symbols and text. Drag state is `{ type, id, targets: [{type,id,ox,oy,isArc}], px, py, moved, collapse }`. Straight text is draggable; arc text is not (positioned via sidebar sliders). Group-drag: if the pressed element is part of a multi-selection, `targets` is the whole selection (moved together, selection preserved); a plain click on a grouped element (mousedown without movement) collapses to just that one on mouseup.
+
+### Selection & alignment (multi-select)
+
+Selection lives in `useBadgeConfig` as a single ordered array `selection = [{ type: 'symbol'|'text', id }]`. `selectedSymbolId`/`selectedTextId` are **read-only computed shims** that resolve only when exactly one element of that type is selected — so all single-select consumers (expanded editors, keyboard nudge/delete, symbol controls, auto-scroll) behave as before. Helpers: `isSelected(type, id)`, `toggleSelection(type, id)`, plus `setSelection`/`clearSelection`/`removeFromSelection` used internally by the mutators.
+
+- **Interaction**: shift/⌘-click an element (canvas or sidebar row) toggles membership; a plain click replaces. Selected elements get a cyan glow on canvas (`SELECT_GLOW` in `BadgeComposer`; stripped from exports by the element-filter pass in `buildCleanCrestSvg`). Arrow-nudge and Delete act on the whole selection.
+- **Align toolbar** (`App.vue`): a contextual bar over the stage, appears at ≥2 alignable elements; 6 ops (left/h-center/right/top/v-center/bottom) align to the selection bounding box. At ≥3, two **Distribute** buttons equalise the gaps between adjacent edges along an axis (endpoints held). `selectionBoxes()` measures each element — symbols by their size box, straight text by a live `getBBox()` — and `moveBox()` writes new positions via the centre anchors. **Arc text is excluded** (its anchor is a circle centre, not a linear edge) and doesn't count toward the toolbar threshold.
+
+### Welding-spark hover effect
+
+On a sustained *idle* hover over the crest (nothing selected, not dragging), a weld head laps the shield outline once, spitting a dense spark trail that hugs the edge on a canvas **behind** the crest, then pauses before the next pass. Driven from `App.vue` (rAF + lap/cooldown state machine) using `BadgeComposer.outlinePointAt(t)` (point + outward normal + travel tangent in screen space) and `particles.js`' `weld()` emitter. Canvas-only, so exports are untouched; skipped in No-Shield mode and under reduced motion. Tunable constants (`EDGE_SPARK_DELAY`, `WELD_LAP_MS`, `WELD_COOLDOWN`, `WELD_EMIT`) at the top of the welding block.
 
 ### Auto-scroll pattern
 
-When `selectedSymbolId` or `selectedTextId` changes, `App.vue` scrolls the corresponding sidebar row into view:
+When `selectedSymbolId` or `selectedTextId` changes (the single-select shims above), `App.vue` scrolls the corresponding sidebar row into view:
 ```js
 watch(selectedId, async (id) => {
   await nextTick()
