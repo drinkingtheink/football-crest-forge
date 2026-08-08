@@ -2,7 +2,7 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useBadgeConfig } from '../composables/useBadgeConfig.js'
 import { startBokeh } from '../utils/bokeh.js'
-import { wavesBg, crisscrossBg, pinstripeBg, diamondsBg } from '../utils/patterns.js'
+import { wavesBg, crisscrossBg, pinstripeBg, diamondsBg, dotsBg, gridBg, zigzagBg } from '../utils/patterns.js'
 
 const props = defineProps({
   type: { type: String, default: 'none' },
@@ -55,6 +55,9 @@ function styleFor(type) {
   if (type === 'crisscross') return crisscrossBg(config.palette, props.tone)
   if (type === 'pinstripe')  return pinstripeBg(config.palette, props.tone)
   if (type === 'diamonds')   return diamondsBg(config.palette, props.tone)
+  if (type === 'dots')       return dotsBg(config.palette, props.tone)
+  if (type === 'grid')       return gridBg(config.palette, props.tone)
+  if (type === 'zigzag')     return zigzagBg(config.palette, props.tone)
   if (imageMap[type])        return { backgroundImage: `url(${imageMap[type]})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: imagePos[type] || 'center' }
   return {}
 }

@@ -15,7 +15,7 @@ import { saveSnapshot } from './utils/snapshots.js'
 import { clubs } from './data/clubs.js'
 import { shapes, shapesById } from './data/shapes.js'
 import { icons, iconsById } from './data/icons.js'
-import { auroraBg, wavesBg, crisscrossBg, pinstripeBg, diamondsBg } from './utils/patterns.js'
+import { auroraBg, wavesBg, crisscrossBg, pinstripeBg, diamondsBg, dotsBg, gridBg, zigzagBg } from './utils/patterns.js'
 import { randomFonts, loadFont } from './utils/fonts.js'
 import { exportCrestPng, exportCrestSvg, crestFilename } from './utils/exportBadge.js'
 import { createSparkField } from './utils/particles.js'
@@ -70,7 +70,7 @@ const bgTypes = ['solid', 'gradient', 'radial', 'halved-v', 'halved-h', 'quarter
 const stripeTypes = new Set(['striped-v', 'striped-h', 'striped-diagonal', 'checkered'])
 const imageBgTypes = new Set(['grass', 'stadium', 'fabric', 'brick', 'pitch'])
 // Patterns that respond to the Dark/Medium/Light tone selector.
-const patternTonedTypes = new Set(['waves', 'crisscross', 'pinstripe', 'diamonds'])
+const patternTonedTypes = new Set(['waves', 'crisscross', 'pinstripe', 'diamonds', 'dots', 'grid', 'zigzag'])
 const patternTones = ['dark', 'medium', 'light']
 
 // Auto-scroll sidebar to selected symbol row
@@ -98,6 +98,9 @@ const bgOptions = [
   { id: 'crisscross',  label: 'Criss-Cross' },
   { id: 'pinstripe',   label: 'Pinstripe' },
   { id: 'diamonds',    label: 'Diamonds' },
+  { id: 'dots',        label: 'Dots' },
+  { id: 'grid',        label: 'Grid' },
+  { id: 'zigzag',      label: 'Zigzag' },
 ]
 
 const appBg = ref(bgOptions[Math.floor(Math.random() * bgOptions.length)].id)
@@ -153,6 +156,9 @@ const wavesThumb     = computed(() => wavesBg(config.palette, patternTone.value)
 const crisscrossThumb = computed(() => crisscrossBg(config.palette, patternTone.value))
 const pinstripeThumb = computed(() => pinstripeBg(config.palette, patternTone.value))
 const diamondsThumb  = computed(() => diamondsBg(config.palette, patternTone.value))
+const dotsThumb      = computed(() => dotsBg(config.palette, patternTone.value))
+const gridThumb      = computed(() => gridBg(config.palette, patternTone.value))
+const zigzagThumb    = computed(() => zigzagBg(config.palette, patternTone.value))
 
 const _ARROW_DELTA = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }
 
@@ -858,7 +864,7 @@ function stepBg(dir) {
                 class="bg-opt"
                 :class="{ active: appBg === opt.id }"
                 :title="opt.label"
-                :style="opt.id === 'aurora' ? auroraThumb : opt.id === 'waves' ? wavesThumb : opt.id === 'crisscross' ? crisscrossThumb : opt.id === 'pinstripe' ? pinstripeThumb : opt.id === 'diamonds' ? diamondsThumb : {}"
+                :style="opt.id === 'aurora' ? auroraThumb : opt.id === 'waves' ? wavesThumb : opt.id === 'crisscross' ? crisscrossThumb : opt.id === 'pinstripe' ? pinstripeThumb : opt.id === 'diamonds' ? diamondsThumb : opt.id === 'dots' ? dotsThumb : opt.id === 'grid' ? gridThumb : opt.id === 'zigzag' ? zigzagThumb : {}"
                 @click="appBg = opt.id"
               >
                 <img v-if="opt.thumb" :src="opt.thumb" class="bg-opt-thumb" />

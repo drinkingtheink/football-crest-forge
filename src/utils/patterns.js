@@ -150,3 +150,49 @@ export function diamondsBg(palette, tone = 'dark') {
     backgroundColor: base,
   }
 }
+
+// ── Dots ──────────────────────────────────────────────────────────────────────
+// A fine stipple in the secondary colour over a c0-tinted base — minimal, classy.
+export function dotsBg(palette, tone = 'dark') {
+  const { base, ink1, strong } = toneSet(palette, tone)
+  const dot = rgba(ink1, strong)
+  return {
+    backgroundImage: `radial-gradient(circle, ${dot} 1.6px, transparent 1.9px)`,
+    backgroundSize: '18px 18px',
+    backgroundColor: base,
+  }
+}
+
+// ── Grid ──────────────────────────────────────────────────────────────────────
+// Graph paper: bold c0 major lines every 90px with fine c1 minor lines between.
+export function gridBg(palette, tone = 'dark') {
+  const { base, ink0, ink1, strong, soft } = toneSet(palette, tone)
+  const major = rgba(ink0, strong)
+  const minor = rgba(ink1, soft + 0.1)
+  return {
+    background: [
+      `repeating-linear-gradient(0deg,  ${major} 0 1.3px, transparent 1.3px 90px)`,
+      `repeating-linear-gradient(90deg, ${major} 0 1.3px, transparent 1.3px 90px)`,
+      `repeating-linear-gradient(0deg,  ${minor} 0 1px, transparent 1px 22.5px)`,
+      `repeating-linear-gradient(90deg, ${minor} 0 1px, transparent 1px 22.5px)`,
+    ].join(', '),
+    backgroundColor: base,
+  }
+}
+
+// ── Zigzag ──────────────────────────────────────────────────────────────────
+// Two-tone chevrons — the secondary colour zigzagging over a c0 base.
+export function zigzagBg(palette, tone = 'dark') {
+  const { base, ink1, strong } = toneSet(palette, tone)
+  const c = rgba(ink1, strong)
+  const s = 26, h = s / 2
+  return {
+    background: [
+      `linear-gradient(135deg, ${c} 25%, transparent 25%) -${h}px 0 / ${s}px ${s}px`,
+      `linear-gradient(225deg, ${c} 25%, transparent 25%) -${h}px 0 / ${s}px ${s}px`,
+      `linear-gradient(315deg, ${c} 25%, transparent 25%) 0 0 / ${s}px ${s}px`,
+      `linear-gradient(45deg,  ${c} 25%, transparent 25%) 0 0 / ${s}px ${s}px`,
+    ].join(', '),
+    backgroundColor: base,
+  }
+}
