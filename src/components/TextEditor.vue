@@ -133,7 +133,7 @@ function onFontPick(textId, family) {
                 @change="$emit('update-text', text.id, { strokeColor: $event })"
               />
               <input
-                type="range" min="0" max="6" step="0.25"
+                type="range" min="0" max="16" step="0.25"
                 :value="text.strokeWidth || 0"
                 class="stroke-range"
                 @input="$emit('update-text', text.id, { strokeWidth: Number($event.target.value) })"
