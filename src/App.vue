@@ -1632,6 +1632,9 @@ function stepBg(dir) {
   display: flex;
   align-items: center;
   gap: 8px;
+  /* Reserve a constant row height so .scene-controls doesn't jump as the
+     background sub-menu (image overlay / pattern tone / none) changes. */
+  min-height: 34px;
 }
 
 .overlay-color {
