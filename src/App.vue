@@ -565,7 +565,8 @@ function randomizeColors() {
 }
 
 function startOver() {
-  if (!window.confirm('Start over? This clears the current design.')) return
+  // Fires instantly like the other crest-changing actions (Space / Forge /
+  // Recast) — no confirm dialog to interrupt or get suppressed by the browser.
   resetConfig()
   activeClub.value = null
 }
