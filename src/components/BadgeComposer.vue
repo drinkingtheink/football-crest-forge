@@ -18,7 +18,7 @@ const props = defineProps({
 
 const selectedSyms  = computed(() => new Set(props.selection.filter(s => s.type === 'symbol').map(s => s.id)))
 const selectedTexts = computed(() => new Set(props.selection.filter(s => s.type === 'text').map(s => s.id)))
-const SELECT_GLOW = 'drop-shadow(0 0 2.5px #00e5ff) drop-shadow(0 0 7px rgba(0,229,255,0.7))'
+const SELECT_GLOW = 'drop-shadow(0 0 2.5px #ff7a2e) drop-shadow(0 0 7px rgba(255,122,46,0.75))'
 
 const emit = defineEmits(['update-text-position', 'update-symbol-position', 'update-text', 'update-symbol', 'select-symbol', 'select-text', 'deselect', 'symbol-outside-bounds', 'ember', 'drag-start', 'drag-end'])
 

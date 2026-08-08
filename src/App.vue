@@ -1537,7 +1537,7 @@ function stepBg(dir) {
   flex-shrink: 0;
 }
 .bg-opt:hover   { transform: scale(1.1); border-color: rgba(255,255,255,0.3); }
-.bg-opt.active  { border-color: #e8c84a; }
+.bg-opt.active  { border-color: var(--accent-warm); box-shadow: 0 0 8px var(--accent-warm-glow); }
 
 .bg-opt-thumb {
   width: 100%;
@@ -1605,7 +1605,7 @@ function stepBg(dir) {
 
 .overlay-opacity {
   flex: 1;
-  accent-color: var(--accent-cool);
+  accent-color: var(--accent-warm);
 }
 
 .overlay-label {
@@ -1785,7 +1785,7 @@ function stepBg(dir) {
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
 }
-.palette-add:hover { border-color: #e8c84a; color: #e8c84a; }
+.palette-add:hover { border-color: var(--accent-warm); color: var(--accent-warm); box-shadow: 0 0 8px var(--accent-warm-glow); }
 
 .random-colors-btn {
   display: flex;
@@ -1914,7 +1914,7 @@ function stepBg(dir) {
   font-size: 12px;
   color: #aaa;
 }
-.range-row input[type="range"] { flex: 1; accent-color: var(--accent-cool); }
+.range-row input[type="range"] { flex: 1; accent-color: var(--accent-warm); }
 .range-row span { font-size: 11px; color: #ddd; min-width: 24px; text-align: right; }
 
 /* Placed symbols list */
@@ -1980,11 +1980,11 @@ function stepBg(dir) {
   font-size: 11px;
   color: #aaa;
 }
-.sym-field input[type="range"] { flex: 1; accent-color: var(--accent-cool); }
+.sym-field input[type="range"] { flex: 1; accent-color: var(--accent-warm); }
 .sym-field > span:last-child { font-size: 11px; color: #ddd; min-width: 24px; text-align: right; }
 
 .sym-stroke-row { gap: 6px; }
-.sym-stroke-range { flex: 1; accent-color: var(--accent-cool); }
+.sym-stroke-range { flex: 1; accent-color: var(--accent-warm); }
 
 .sym-clip-row { gap: 8px; }
 .sym-clip-toggle {

@@ -62,7 +62,7 @@ const { toasts, dismiss } = useToast()
 }
 
 .toast--info,
-.toast--tip     { border-left-color: var(--accent-cool); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 14px rgba(95, 146, 196, 0.22); }
+.toast--tip     { border-left-color: var(--accent-admin); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 14px rgba(0, 229, 255, 0.2); }
 .toast--success { border-left-color: #4caf50; }
 .toast--error   { border-left-color: #e05555; }
 

@@ -110,9 +110,9 @@ function formatDate(ts) {
   font-size: 12px;
   padding: 8px;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
 }
-.snap-save-btn:hover { border-color: #e8c84a; color: #e8c84a; }
+.snap-save-btn:hover { border-color: var(--accent-warm); color: var(--accent-warm); box-shadow: 0 0 10px var(--accent-warm-glow); }
 
 .snap-name-form {
   display: flex;
@@ -131,7 +131,7 @@ function formatDate(ts) {
   padding: 6px 8px;
   outline: none;
 }
-.snap-name-input:focus { border-color: var(--accent-cool); }
+.snap-name-input:focus { border-color: var(--accent-warm); }
 
 .snap-confirm-btn {
   background: #e8c84a;

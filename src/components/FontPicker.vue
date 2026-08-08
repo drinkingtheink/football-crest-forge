@@ -184,7 +184,7 @@ onBeforeUnmount(() => {
   font-size: 12px;
   outline: none;
 }
-.fp-search:focus { border-color: var(--accent-cool); }
+.fp-search:focus { border-color: var(--accent-warm); }
 
 .fp-list { overflow-y: auto; padding: 0 6px 8px; }
 .fp-group {

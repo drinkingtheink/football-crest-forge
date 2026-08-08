@@ -1,10 +1,11 @@
 :root {
-  /* Gold stays the hero accent (brand / active / forge heat). Steel is the cool
-     supporting accent — quench blue — used for secondary controls, input focus,
-     and informational UI, to balance the black + gold. */
-  --accent-cool: #5f92c4;
-  --accent-cool-soft: rgba(95, 146, 196, 0.28);
-  --accent-cool-glow: rgba(95, 146, 196, 0.4);
+  /* Gold stays the hero accent (brand / labels / forge heat). Ember orange is
+     the secondary interactive accent — glowing, warm, balances gold. Cyan is
+     the "administrative" accent, reserved for guides + toasts. */
+  --accent-warm: #ff7a2e;
+  --accent-warm-soft: rgba(255, 122, 46, 0.45);
+  --accent-warm-glow: rgba(255, 122, 46, 0.55);
+  --accent-admin: #00e5ff;
 }
 
 *, *::before, *::after {
@@ -20,8 +21,8 @@ body {
   min-height: 100vh;
 }
 
-/* Steel sliders carry a soft cool glow, so the blue accent shares the app's
+/* Sliders carry a soft ember glow, so the warm accent shares the app's
    luminous quality instead of reading flat next to the gold. */
 input[type="range"] {
-  filter: drop-shadow(0 0 2px rgba(95, 146, 196, 0.65));
+  filter: drop-shadow(0 0 2px rgba(255, 122, 46, 0.6));
 }
