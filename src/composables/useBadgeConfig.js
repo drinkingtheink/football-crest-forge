@@ -4,6 +4,7 @@ import { icons } from '../data/icons.js'
 
 const _randomClub = clubs[Math.floor(Math.random() * clubs.length)]
 const _randomIcon = icons[Math.floor(Math.random() * icons.length)]
+const _iconIdSet = new Set(icons.map(i => i.id))
 function _contrastColor(fill, palette) {
   const alt = palette.find(c => c.toLowerCase() !== fill.toLowerCase())
   return alt ?? (fill.toLowerCase() === '#000000' ? '#ffffff' : '#000000')
@@ -311,7 +312,13 @@ export function useBadgeConfig() {
       config.background.gradient = config.palette.slice(0, 2)
     }
     if (config.background.gradientAngle == null) config.background.gradientAngle = 45
-    config.symbols.splice(0, config.symbols.length, ...saved.symbols)
+    // A saved crest may reference an icon that no longer exists (removed/renamed)
+    // — swap it for a random one so the symbol still shows. Rects have no icon.
+    const validSymbols = saved.symbols.map(s => {
+      if (s.kind === 'rect' || _iconIdSet.has(s.iconId)) return s
+      return { ...s, iconId: icons[Math.floor(Math.random() * icons.length)].id }
+    })
+    config.symbols.splice(0, config.symbols.length, ...validSymbols)
     config.texts.splice(0, config.texts.length, ...saved.texts)
     Object.assign(config.border, saved.border)
     clearSelection()

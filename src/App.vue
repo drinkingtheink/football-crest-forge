@@ -15,6 +15,7 @@ import { saveSnapshot } from './utils/snapshots.js'
 import { clubs } from './data/clubs.js'
 import { shapes, shapesById } from './data/shapes.js'
 import { icons, iconsById } from './data/icons.js'
+import { crestLibrary } from './data/crestLibrary.js'
 import { auroraBg, wavesBg, crisscrossBg, pinstripeBg, diamondsBg, dotsBg, gridBg, zigzagBg } from './utils/patterns.js'
 import { randomFonts, loadFont } from './utils/fonts.js'
 import { exportCrestPng, exportCrestSvg, crestFilename } from './utils/exportBadge.js'
@@ -109,6 +110,9 @@ const patternTone = ref('dark')
 const overlay = reactive({ color: config.palette[0] ?? '#000000', opacity: 0.7 })
 
 const activeClub = ref(initialClub)
+// When a curated crest from the library is forged, its name for the badge (else null).
+const LIBRARY_CHANCE = 0.2
+const curatedName = ref(null)
 const activeClubModified = computed(() => {
   if (!activeClub.value) return false
   const original = activeClub.value.colors.map(c => c.hex.toLowerCase())
@@ -667,6 +671,11 @@ function randomizeColors() {
   activeClub.value = club
 }
 
+function onLoadSnapshot(cfg) {
+  loadConfig(cfg)
+  curatedName.value = null // a loaded snapshot isn't the library's curated crest
+}
+
 function startOver() {
   // "Start Over" forges a completely fresh random crest, just like Space / the
   // Forge button — not a reset to the static default.
@@ -674,6 +683,17 @@ function startOver() {
 }
 
 function randomizeAll() {
+  // Small chance to surface a curated crest from the library instead of a
+  // procedurally-generated one (loaded verbatim).
+  if (crestLibrary.length && Math.random() < LIBRARY_CHANCE) {
+    const pick = crestLibrary[Math.floor(Math.random() * crestLibrary.length)]
+    loadConfig(pick.config)   // clears selection; missing icons swapped in loadConfig
+    curatedName.value = pick.name
+    activeClub.value = null
+    return
+  }
+  curatedName.value = null
+
   const club     = clubs[Math.floor(Math.random() * clubs.length)]
   const shape    = shapes[Math.floor(Math.random() * shapes.length)]
   const bgType   = bgTypes[Math.floor(Math.random() * bgTypes.length)]
@@ -781,6 +801,13 @@ function stepBg(dir) {
         <!-- Warm forge glow at the base of the stage (behind the badge, above the background) -->
         <div class="forge-glow" />
 
+        <!-- Curated crest badge — shown when a library crest was forged -->
+        <Transition name="curated-fade">
+          <div v-if="curatedName" class="curated-badge" title="A curated crest from the library">
+            <span class="curated-star">✦</span> {{ curatedName }}
+          </div>
+        </Transition>
+
         <!-- Align toolbar — appears when 2+ alignable elements are selected -->
         <Transition name="align-fade">
           <div v-if="alignableCount >= 2" class="align-bar">
@@ -851,7 +878,7 @@ function stepBg(dir) {
         <div class="scene-wrap">
           <div class="scene-actions">
             <button class="start-over-btn" @click="startOver" title="Clear the current design and start fresh">
-              ↺ Start Over
+              ↺ Reforge
             </button>
             <button class="swap-colors-btn" @click="randomizeColors" title="Recast the palette">
               ⇄ Recast
@@ -1315,7 +1342,7 @@ function stepBg(dir) {
           <SnapshotPanel
             ref="snapshotPanelRef"
             :save-fn="doSaveSnapshot"
-            @load="loadConfig"
+            @load="onLoadSnapshot"
           />
         </div>
 
@@ -1545,6 +1572,30 @@ function stepBg(dir) {
 }
 
 /* Align toolbar */
+.curated-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(12, 12, 20, 0.7);
+  border: 1px solid var(--accent-warm-soft);
+  color: #e8d9c8;
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+.curated-star { color: var(--accent-warm); text-shadow: 0 0 6px var(--accent-warm-glow); }
+.curated-fade-enter-active, .curated-fade-leave-active { transition: opacity 0.3s ease; }
+.curated-fade-enter-from, .curated-fade-leave-to { opacity: 0; }
+
 .align-bar {
   position: absolute;
   top: 14px;
