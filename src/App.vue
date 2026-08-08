@@ -110,9 +110,16 @@ const patternTone = ref('dark')
 const overlay = reactive({ color: config.palette[0] ?? '#000000', opacity: 0.7 })
 
 const activeClub = ref(initialClub)
-// When a curated crest from the library is forged, its name for the badge (else null).
+// True while showing an unedited curated crest from the library (drives the badge).
 const LIBRARY_CHANCE = 0.2
-const curatedName = ref(null)
+const isCurated = ref(false)
+let curatedLoadPending = false // ignore the library-load's own config mutation
+// Any edit to the crest drops the "curated" badge. The load itself batches into
+// one watcher trigger, which we skip via the guard.
+watch(config, () => {
+  if (curatedLoadPending) { curatedLoadPending = false; return }
+  if (isCurated.value) isCurated.value = false
+}, { deep: true })
 const activeClubModified = computed(() => {
   if (!activeClub.value) return false
   const original = activeClub.value.colors.map(c => c.hex.toLowerCase())
@@ -673,7 +680,7 @@ function randomizeColors() {
 
 function onLoadSnapshot(cfg) {
   loadConfig(cfg)
-  curatedName.value = null // a loaded snapshot isn't the library's curated crest
+  isCurated.value = false // a loaded snapshot isn't the library's curated crest
 }
 
 function startOver() {
@@ -687,12 +694,13 @@ function randomizeAll() {
   // procedurally-generated one (loaded verbatim).
   if (crestLibrary.length && Math.random() < LIBRARY_CHANCE) {
     const pick = crestLibrary[Math.floor(Math.random() * crestLibrary.length)]
+    curatedLoadPending = true
     loadConfig(pick.config)   // clears selection; missing icons swapped in loadConfig
-    curatedName.value = pick.name
+    isCurated.value = true
     activeClub.value = null
     return
   }
-  curatedName.value = null
+  isCurated.value = false
 
   const club     = clubs[Math.floor(Math.random() * clubs.length)]
   const shape    = shapes[Math.floor(Math.random() * shapes.length)]
@@ -803,8 +811,8 @@ function stepBg(dir) {
 
         <!-- Curated crest badge — shown when a library crest was forged -->
         <Transition name="curated-fade">
-          <div v-if="curatedName" class="curated-badge" title="A curated crest from the library">
-            <span class="curated-star">✦</span> {{ curatedName }}
+          <div v-if="isCurated" class="curated-badge" title="A curated crest from the library">
+            <span class="curated-star">✦</span> Curated Entry
           </div>
         </Transition>
 
