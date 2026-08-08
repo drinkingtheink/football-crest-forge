@@ -18,6 +18,13 @@ const imageMap = {
   pitch:   '/backgrounds/pitch.png',
 }
 
+// Per-image focal anchor for `cover` cropping. The stadium photo is 4:3 with the
+// pitch low in frame, so a plain center crop drops the pitch below screen-centre;
+// anchor lower to bring the field into the middle. Others stay neutrally centred.
+const imagePos = {
+  stadium: 'center 62%',
+}
+
 function hexRgba(hex, alpha) {
   const h = hex.replace('#', '')
   const r = parseInt(h.slice(0, 2), 16)
@@ -45,7 +52,7 @@ function auroraRibbonsFor(palette) {
 function styleFor(type) {
   if (type === 'waves')      return wavesBg(config.palette)
   if (type === 'crisscross') return crisscrossBg(config.palette)
-  if (imageMap[type])        return { backgroundImage: `url(${imageMap[type]})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }
+  if (imageMap[type])        return { backgroundImage: `url(${imageMap[type]})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: imagePos[type] || 'center' }
   return {}
 }
 
