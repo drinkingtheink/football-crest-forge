@@ -1,18 +1,16 @@
 <script setup>
 import { ref, watch, nextTick, onMounted } from 'vue'
 import { listSnapshots, deleteSnapshot } from '../utils/snapshots.js'
-import { useBadgeConfig } from '../composables/useBadgeConfig.js'
 import { useToast } from '../composables/useToast.js'
 
 const props = defineProps({ saveFn: { type: Function, required: true } })
 const emit = defineEmits(['load'])
 
-const { config } = useBadgeConfig()
 const { addToast } = useToast()
 
-async function copyConfig() {
+async function copyConfig(snap) {
   try {
-    await navigator.clipboard.writeText(JSON.stringify(config, null, 2))
+    await navigator.clipboard.writeText(JSON.stringify(snap.config, null, 2))
     addToast('Crest config copied', { type: 'success', duration: 2500 })
   } catch {
     addToast('Couldn’t copy config', { type: 'error' })
@@ -74,10 +72,7 @@ function formatDate(ts) {
 <template>
   <div class="snapshot-panel">
     <div class="snap-header">
-      <template v-if="!showNameInput">
-        <button class="snap-save-btn" @click="startSave">+ Save Snapshot</button>
-        <button class="snap-copy-btn" @click="copyConfig" title="Copy crest config (JSON)">{ }</button>
-      </template>
+      <button v-if="!showNameInput" class="snap-save-btn" @click="startSave">+ Save Snapshot</button>
       <div v-else class="snap-name-form">
         <input
           ref="nameFieldRef"
@@ -108,6 +103,7 @@ function formatDate(ts) {
         </div>
         <div class="snap-actions">
           <button class="snap-load-btn" @click="handleLoad(snap)">Load</button>
+          <button class="snap-copy-btn" @click="copyConfig(snap)" title="Copy crest config (JSON)">{ }</button>
           <button class="snap-del-btn" @click="handleDelete(snap)" title="Delete">✕</button>
         </div>
       </div>
@@ -116,10 +112,10 @@ function formatDate(ts) {
 </template>
 
 <style scoped>
-.snap-header { display: flex; gap: 6px; align-items: stretch; margin-bottom: 10px; }
+.snap-header { margin-bottom: 10px; }
 
 .snap-save-btn {
-  flex: 1;
+  width: 100%;
   background: #1e1e28;
   border: 1px dashed #3a3a4a;
   border-radius: 6px;
@@ -131,23 +127,7 @@ function formatDate(ts) {
 }
 .snap-save-btn:hover { border-color: var(--accent-warm); color: var(--accent-warm); box-shadow: 0 0 10px var(--accent-warm-glow); }
 
-.snap-copy-btn {
-  flex-shrink: 0;
-  background: #1e1e28;
-  border: 1px dashed #3a3a4a;
-  border-radius: 6px;
-  color: #aaa;
-  font-family: ui-monospace, "SF Mono", Menlo, monospace;
-  font-size: 14px;
-  font-weight: 700;
-  padding: 0 11px;
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
-}
-.snap-copy-btn:hover { border-color: var(--accent-warm); color: var(--accent-warm); box-shadow: 0 0 10px var(--accent-warm-glow); }
-
 .snap-name-form {
-  flex: 1;
   display: flex;
   gap: 5px;
   align-items: center;
@@ -280,6 +260,21 @@ function formatDate(ts) {
   transition: background 0.12s, color 0.12s, border-color 0.12s;
 }
 .snap-load-btn:hover { background: #e8c84a; color: #111; border-color: #e8c84a; }
+
+.snap-copy-btn {
+  background: none;
+  border: 1px solid #3a3a4a;
+  border-radius: 4px;
+  color: #888;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 6px;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.12s, border-color 0.12s, box-shadow 0.12s;
+}
+.snap-copy-btn:hover { color: var(--accent-warm); border-color: var(--accent-warm); box-shadow: 0 0 8px var(--accent-warm-glow); }
 
 .snap-del-btn {
   background: none;
