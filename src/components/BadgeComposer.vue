@@ -78,38 +78,31 @@ const drag = ref(null)
 const svgRootEl = ref(null)
 const shapePathEl = ref(null)
 
-// Sample `n` random points along the shield outline, returned in screen (client)
-// coordinates with an outward unit normal — used to spray welding sparks from the
-// seam. Empty in No-Shield mode (no edge). The normal direction is preserved to
-// screen space since the badge CTM is uniform scale + translate.
-function outlineScreenPoints(n) {
+// The point at fraction `t` (0–1) around the shield outline, in screen (client)
+// coordinates, with an outward unit normal and the travel tangent. Used to sweep
+// welding heads around the seam. Null in No-Shield mode. Directions are preserved
+// to screen space since the badge CTM is uniform scale + translate.
+function outlinePointAt(t) {
   const pathEl = shapePathEl.value
   const svg = svgRootEl.value
-  if (!pathEl || !svg || props.config.noShield) return []
+  if (!pathEl || !svg || props.config.noShield) return null
   const ctm = svg.getScreenCTM()
-  if (!ctm) return []
+  if (!ctm) return null
   const total = pathEl.getTotalLength()
-  const toScreen = (x, y) => {
-    const p = svg.createSVGPoint(); p.x = x; p.y = y
-    return p.matrixTransform(ctm)
-  }
-  const out = []
-  for (let i = 0; i < n; i++) {
-    const L = Math.random() * total
-    const a = pathEl.getPointAtLength(L)
-    const b = pathEl.getPointAtLength((L + 1.5) % total)
-    let tx = b.x - a.x, ty = b.y - a.y
-    const tl = Math.hypot(tx, ty) || 1
-    tx /= tl; ty /= tl
-    let nx = -ty, ny = tx                       // perpendicular
-    if ((a.x - 100) * nx + (a.y - 120) * ny < 0) { nx = -nx; ny = -ny } // point outward
-    const s = toScreen(a.x, a.y)
-    out.push({ x: s.x, y: s.y, nx, ny })
-  }
-  return out
+  const L = ((t % 1) + 1) % 1 * total
+  const a = pathEl.getPointAtLength(L)
+  const b = pathEl.getPointAtLength((L + 1.5) % total)
+  let tx = b.x - a.x, ty = b.y - a.y
+  const tl = Math.hypot(tx, ty) || 1
+  tx /= tl; ty /= tl
+  let nx = -ty, ny = tx                       // perpendicular
+  if ((a.x - 100) * nx + (a.y - 120) * ny < 0) { nx = -nx; ny = -ny } // outward
+  const p = svg.createSVGPoint(); p.x = a.x; p.y = a.y
+  const s = p.matrixTransform(ctm)
+  return { x: s.x, y: s.y, nx, ny, tx, ty }
 }
 
-defineExpose({ svgRootEl, outlineScreenPoints })
+defineExpose({ svgRootEl, outlinePointAt })
 const outsidePromptedId = ref(null)
 
 // ── Alignment guides (show-only, badge centre) ─────────────────────────────

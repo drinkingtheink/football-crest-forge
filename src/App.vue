@@ -344,31 +344,65 @@ function onBadgeLeave() {
 // After a sustained IDLE hover over the crest, spray a dense sputter of sparks
 // from behind the shield seam, following its outline — like welding, not
 // fireworks. Idle = nothing selected/being edited and not mid-drag.
-const EDGE_SPARK_DELAY = 2000 // ms of continuous idle hover (2s for testing)
+const EDGE_SPARK_DELAY = 2000  // ms of idle hover before the first weld pass (2s for testing)
+const WELD_LAP_MS = 1600       // duration of one full rotation around the outline
+const WELD_COOLDOWN = 10000    // pause between passes
+const WELD_EMIT = 20           // sparks emitted per frame at the weld head
 const weldCanvas = ref(null)
 let weldField = null
-const welding = ref(false)
+const welding = ref(false)     // armed (idle-hovering) — laps repeat with a cooldown between
 let weldDelayTimer = null
+let weldCooldownTimer = null
 let weldRaf = null
+let weldPhase = 0
+let weldLastT = 0
+let weldSweeping = false
 
 function crestIdle() { return selection.value.length === 0 && !isDraggingEl.value }
 
-function weldTick() {
+// One pass: a weld head sweeps 0→1 around the outline, spitting sparks, then
+// hands off to a cooldown before the next pass.
+function weldTick(now) {
+  if (!welding.value || !weldSweeping) { weldRaf = null; return }
   const comp = badgeComposerRef.value
   const canvas = weldCanvas.value
-  if (!welding.value || !comp?.outlineScreenPoints || !canvas || !weldField) { weldRaf = null; return }
+  if (!comp?.outlinePointAt || !canvas || !weldField) { weldRaf = null; return }
+
+  const dt = Math.min(64, now - weldLastT); weldLastT = now
+  weldPhase += dt / WELD_LAP_MS
   const r = canvas.getBoundingClientRect()
-  for (const p of comp.outlineScreenPoints(6)) {
-    weldField.weld(p.x - r.left, p.y - r.top, p.nx, p.ny, 2)
+  const p = comp.outlinePointAt(weldPhase)
+  if (p) weldField.weld(p.x - r.left, p.y - r.top, p.nx, p.ny, p.tx, p.ty, WELD_EMIT)
+
+  if (weldPhase >= 1) {                       // lap complete → cool down, then lap again
+    weldSweeping = false
+    weldRaf = null
+    clearTimeout(weldCooldownTimer)
+    weldCooldownTimer = setTimeout(() => {
+      if (welding.value && overCrest.value && crestIdle()) startLap()
+    }, WELD_COOLDOWN)
+    return
   }
   weldRaf = requestAnimationFrame(weldTick)
+}
+
+function startLap() {
+  weldPhase = 0
+  weldSweeping = true
+  weldLastT = performance.now()
+  if (!weldRaf) weldRaf = requestAnimationFrame(weldTick)
 }
 function startWelding() {
   if (welding.value) return
   welding.value = true
-  if (!weldRaf) weldRaf = requestAnimationFrame(weldTick)
+  startLap()
 }
-function stopWelding() { welding.value = false } // weldTick self-cancels next frame
+function stopWelding() {
+  welding.value = false
+  weldSweeping = false
+  clearTimeout(weldCooldownTimer)
+  if (weldRaf) { cancelAnimationFrame(weldRaf); weldRaf = null }
+}
 
 function evalWeld() {
   if (overCrest.value && crestIdle() && !reduceMotion) {
@@ -593,6 +627,7 @@ onUnmounted(() => {
   document.removeEventListener('click', onDocumentClick)
   clearTimeout(emberTimer)
   clearTimeout(weldDelayTimer)
+  clearTimeout(weldCooldownTimer)
   cancelAnimationFrame(weldRaf)
   sparkField?.stop()
   weldField?.stop()

@@ -170,22 +170,25 @@ export function createSparkField(canvas) {
       if (trail.length > 100) trail.splice(0, trail.length - 100)
       ensureRunning()
     },
-    // Welding spray: a burst of hot streaks jetting out from a seam point (x,y)
-    // along the outward normal (nx,ny), with a wide fan, quick decay and gravity.
-    weld(x, y, nx = 0, ny = 1, n = 2) {
+    // Welding spray from a seam point (x,y): a burst of hot streaks fanning out
+    // along the outward normal (nx,ny) plus a skid along the travel tangent
+    // (tx,ty), so a torch sweeping the outline leaves a trail hugging the edge.
+    weld(x, y, nx = 0, ny = 1, tx = 1, ty = 0, n = 2) {
       const base = Math.atan2(ny, nx)
       for (let i = 0; i < n; i++) {
-        const angle = base + (Math.random() - 0.5) * 1.7 // ~±49° fan around the normal
-        const v = 2.5 + Math.random() * 5.5
+        const angle = base + (Math.random() - 0.5) * 1.5 // fan around the normal
+        const v = 1 + Math.random() * 4.5
+        const skid = 0.5 + Math.random() * 2.2
         particles.push({
-          x, y,
-          vx: Math.cos(angle) * v,
-          vy: Math.sin(angle) * v,
+          x: x + (Math.random() - 0.5) * 3,
+          y: y + (Math.random() - 0.5) * 3,
+          vx: Math.cos(angle) * v + tx * skid,
+          vy: Math.sin(angle) * v + ty * skid,
           size: 0.5 + Math.random() * 0.9,
           color: pick(),
           life: 1,
-          decay: 0.06 + Math.random() * 0.06, // short-lived — sputtering, not lingering
-          grav: 0.16 + Math.random() * 0.12,
+          decay: 0.05 + Math.random() * 0.05,
+          grav: 0.05 + Math.random() * 0.07, // low — sparks hug the edge, don't rain
         })
       }
       ensureRunning()
