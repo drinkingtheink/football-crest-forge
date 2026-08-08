@@ -1800,9 +1800,9 @@ function stepBg(dir) {
   color: #aaa;
   font-size: 12px;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
 }
-.random-colors-btn:hover { border-color: #e8c84a; color: #e8c84a; }
+.random-colors-btn:hover { border-color: var(--accent-warm); color: var(--accent-warm); box-shadow: 0 0 10px var(--accent-warm-glow); }
 
 .active-club {
   display: flex;
