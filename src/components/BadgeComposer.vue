@@ -552,11 +552,15 @@ const gradLine = computed(() => {
       :letter-spacing="text.letterSpacing ?? 0"
       text-anchor="middle"
       dominant-baseline="middle"
+      :stroke-width="text.strokeWidth || 0"
+      stroke-linejoin="round"
+      paint-order="stroke fill"
       :style="{
         fill: text.color,
+        stroke: text.strokeWidth > 0 ? text.strokeColor : 'none',
         cursor: drag?.id === text.id ? 'grabbing' : 'grab',
         filter: hoveredTextId === text.id ? 'drop-shadow(0 0 5px rgba(255,255,255,0.35))' : 'none',
-        transition: 'fill 0.35s ease, filter 0.15s ease',
+        transition: 'fill 0.35s ease, stroke 0.35s ease, filter 0.15s ease',
       }"
       @mousedown="startTextDrag($event, text.id)"
       @click.stop="$emit('select-text', text.id)"
@@ -575,11 +579,15 @@ const gradLine = computed(() => {
       :font-weight="text.fontWeight"
       :letter-spacing="text.letterSpacing ?? 0"
       text-anchor="middle"
+      :stroke-width="text.strokeWidth || 0"
+      stroke-linejoin="round"
+      paint-order="stroke fill"
       :style="{
         fill: text.color,
+        stroke: text.strokeWidth > 0 ? text.strokeColor : 'none',
         cursor: drag?.id === text.id ? 'grabbing' : 'grab',
         filter: hoveredTextId === text.id ? 'drop-shadow(0 0 5px rgba(255,255,255,0.35))' : 'none',
-        transition: 'fill 0.35s ease, filter 0.15s ease',
+        transition: 'fill 0.35s ease, stroke 0.35s ease, filter 0.15s ease',
       }"
       @mousedown="startTextDrag($event, text.id)"
       @click.stop="$emit('select-text', text.id)"

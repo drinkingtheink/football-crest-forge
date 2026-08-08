@@ -124,6 +124,23 @@ function onFontPick(textId, family) {
             />
           </label>
 
+          <div class="field">
+            <span>Outline <em>{{ text.strokeWidth || 0 }}</em></span>
+            <div class="stroke-row">
+              <ColorPicker
+                :value="text.strokeColor || '#000000'"
+                @click.stop
+                @change="$emit('update-text', text.id, { strokeColor: $event })"
+              />
+              <input
+                type="range" min="0" max="6" step="0.25"
+                :value="text.strokeWidth || 0"
+                class="stroke-range"
+                @input="$emit('update-text', text.id, { strokeWidth: Number($event.target.value) })"
+              />
+            </div>
+          </div>
+
           <label class="field">
             <span>Layout</span>
             <div class="arc-opts">
@@ -286,6 +303,9 @@ function onFontPick(textId, family) {
 }
 
 .field { display: flex; flex-direction: column; gap: 4px; }
+
+.stroke-row { display: flex; align-items: center; gap: 8px; }
+.stroke-range { flex: 1; accent-color: #e8c84a; }
 
 .rotation-row { display: flex; align-items: center; gap: 6px; }
 .rotation-row input { flex: 1; }

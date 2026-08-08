@@ -22,6 +22,8 @@ const DEFAULT_TEXT = () => ({
   fontWeight: 'normal',
   fontSize: 14,
   color: '#ffffff',
+  strokeColor: '#000000',
+  strokeWidth: 0,
   letterSpacing: 0,
   rotation: 0,
   arc: null,

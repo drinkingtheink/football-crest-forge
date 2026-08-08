@@ -205,7 +205,7 @@ async function outlineTexts(liveSvg, clone, texts) {
     const key = `${t.fontFamily}__${weight}`
     if (!byKey.has(key)) byKey.set(key, { family: t.fontFamily, weight, chars: new Set() })
     for (const ch of t.content) byKey.get(key).chars.add(ch)
-    metaById.set(t.id, { key, color: t.color })
+    metaById.set(t.id, { key, color: t.color, strokeColor: t.strokeColor, strokeWidth: t.strokeWidth })
   }
 
   const fonts = new Map()
@@ -233,6 +233,14 @@ async function outlineTexts(liveSvg, clone, texts) {
 
     const g = document.createElementNS(SVGNS, 'g')
     g.setAttribute('fill', meta.color || '#000000')
+    // Text stroke — carry through to the outlined glyphs. paint-order is
+    // flattened into stroke-behind/fill-front copies after outlining (below).
+    if (meta.strokeWidth > 0) {
+      g.setAttribute('stroke', meta.strokeColor || '#000000')
+      g.setAttribute('stroke-width', meta.strokeWidth)
+      g.setAttribute('stroke-linejoin', 'round')
+      g.setAttribute('paint-order', 'stroke fill')
+    }
     const tr = cloneT.getAttribute('transform')
     if (tr) g.setAttribute('transform', tr)
 
@@ -297,7 +305,6 @@ export async function exportCrestPng(svgEl, { texts = [], pxWidth = 1600, filena
 export async function exportCrestSvg(svgEl, { texts = [], pxWidth = 800, filename = 'crest.svg' } = {}) {
   const frame = exportFrame(svgEl)
   const clone = buildCleanCrestSvg(svgEl)
-  flattenPaintOrder(clone)
 
   let failed = []
   try {
@@ -307,6 +314,11 @@ export async function exportCrestSvg(svgEl, { texts = [], pxWidth = 800, filenam
     failed = texts
   }
   if (failed.length) await embedFontsInto(clone, failed)
+
+  // Flatten AFTER outlining: outlineTexts sets paint-order on the outlined <g>,
+  // and any text left as <text> (font load failed) still carries paint-order —
+  // both are converted to explicit stroke-behind/fill-front draw order here.
+  flattenPaintOrder(clone)
 
   const density = pxWidth / VIEWBOX_W
   clone.setAttribute('viewBox', `${fmt(frame.x)} ${fmt(frame.y)} ${fmt(frame.w)} ${fmt(frame.h)}`)
