@@ -1,9 +1,23 @@
 <script setup>
 import { ref, watch, nextTick, onMounted } from 'vue'
 import { listSnapshots, deleteSnapshot } from '../utils/snapshots.js'
+import { useBadgeConfig } from '../composables/useBadgeConfig.js'
+import { useToast } from '../composables/useToast.js'
 
 const props = defineProps({ saveFn: { type: Function, required: true } })
 const emit = defineEmits(['load'])
+
+const { config } = useBadgeConfig()
+const { addToast } = useToast()
+
+async function copyConfig() {
+  try {
+    await navigator.clipboard.writeText(JSON.stringify(config, null, 2))
+    addToast('Crest config copied', { type: 'success', duration: 2500 })
+  } catch {
+    addToast('Couldn’t copy config', { type: 'error' })
+  }
+}
 
 const snapshots = ref([])
 const saving = ref(false)
@@ -60,7 +74,10 @@ function formatDate(ts) {
 <template>
   <div class="snapshot-panel">
     <div class="snap-header">
-      <button v-if="!showNameInput" class="snap-save-btn" @click="startSave">+ Save Snapshot</button>
+      <template v-if="!showNameInput">
+        <button class="snap-save-btn" @click="startSave">+ Save Snapshot</button>
+        <button class="snap-copy-btn" @click="copyConfig" title="Copy crest config (JSON)">{ }</button>
+      </template>
       <div v-else class="snap-name-form">
         <input
           ref="nameFieldRef"
@@ -99,10 +116,10 @@ function formatDate(ts) {
 </template>
 
 <style scoped>
-.snap-header { margin-bottom: 10px; }
+.snap-header { display: flex; gap: 6px; align-items: stretch; margin-bottom: 10px; }
 
 .snap-save-btn {
-  width: 100%;
+  flex: 1;
   background: #1e1e28;
   border: 1px dashed #3a3a4a;
   border-radius: 6px;
@@ -114,7 +131,23 @@ function formatDate(ts) {
 }
 .snap-save-btn:hover { border-color: var(--accent-warm); color: var(--accent-warm); box-shadow: 0 0 10px var(--accent-warm-glow); }
 
+.snap-copy-btn {
+  flex-shrink: 0;
+  background: #1e1e28;
+  border: 1px dashed #3a3a4a;
+  border-radius: 6px;
+  color: #aaa;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 0 11px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.snap-copy-btn:hover { border-color: var(--accent-warm); color: var(--accent-warm); box-shadow: 0 0 10px var(--accent-warm-glow); }
+
 .snap-name-form {
+  flex: 1;
   display: flex;
   gap: 5px;
   align-items: center;
